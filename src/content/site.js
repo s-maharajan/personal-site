@@ -1,6 +1,6 @@
 // Everything personal about the site lives here. Links left empty are hidden.
 export const site = {
-  name: "Sommah",
+  name: "Som",
   role: "Principal engineer, AI & platform",
   location: "Remote",
   tagline:
