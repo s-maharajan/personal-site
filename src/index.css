@@ -1,3 +1,75 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Light palette is the default; dark applies from the OS setting or the toggle. */
+:root {
+  --bg: #fbfbfc;
+  --surface: #f1f3f6;
+  --text: #13161c;
+  --muted: #555b67;
+  --faint: #6c727e;
+  --line: #e2e5ea;
+  --accent: #2b54d4;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d0f13;
+    --surface: #161920;
+    --text: #e9ebef;
+    --muted: #a3a9b4;
+    --faint: #8b919c;
+    --line: #242833;
+    --accent: #8ba6ff;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0d0f13;
+  --surface: #161920;
+  --text: #e9ebef;
+  --muted: #a3a9b4;
+  --faint: #8b919c;
+  --line: #242833;
+  --accent: #8ba6ff;
+  color-scheme: dark;
+}
+
+@layer base {
+  body {
+    @apply bg-bg font-sans text-text antialiased;
+    font-feature-settings: "ss01";
+  }
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  .label {
+    @apply font-mono text-xs uppercase tracking-[0.12em] text-faint;
+  }
+  .link {
+    @apply underline decoration-line underline-offset-4 transition-colors hover:text-accent hover:decoration-accent;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fade-in {
+    animation: fade-in 0.5s ease-out both;
+  }
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+  }
+}

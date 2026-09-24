@@ -1,16 +1,39 @@
-# React + Vite
+# personal-site
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+My personal site: a short intro, case studies, and background. Built with React, Vite, Tailwind CSS, and React Router, and deployed on Vercel.
 
-Currently, two official plugins are available:
+## Run it locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```sh
+npm install
+npm run dev      # http://localhost:5173
+npm run lint
+npm run build    # outputs to dist/
+```
 
-## React Compiler
+Requires Node 22.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Editing content
 
-## Expanding the ESLint configuration
+All the text lives in `src/content/`, so most changes don't touch any components:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| File | What it holds |
+| --- | --- |
+| `site.js` | Name, role, intro, "Now" list, email, and social links. Empty links are hidden. |
+| `work.js` | Case studies. Each one gets its own page at `/work/<slug>`. The first three appear on the home page. |
+| `about.js` | Experience timeline, principles, toolbox, and planned writing. Add an `href` to a post to make it a link. |
+
+## Structure
+
+```
+src/
+  content/     text and data
+  components/  Layout, Header, Footer, ThemeToggle, WorkList, Section, SocialLinks
+  pages/       Home, Work, CaseStudy, About, NotFound
+```
+
+Colours are CSS variables in `src/index.css`, with light and dark palettes. The site follows the system theme until a visitor picks one with the toggle.
+
+## Deploying
+
+`vercel.json` builds with `npm run build` and rewrites every path to `index.html` so client-side routes work on refresh.

@@ -2,9 +2,25 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>my-site</title>
+    <title>Sommah · Principal engineer, AI & platform</title>
+    <meta name="description" content="Sommah builds distributed systems and AI infrastructure. Case studies on LLM latency, retrieval, streaming, and cost." />
+    <meta property="og:title" content="Sommah · Principal engineer, AI & platform" />
+    <meta property="og:description" content="Case studies on LLM latency, retrieval, streaming, and cost." />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#fbfbfc" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d0f13" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" />
+    <script>
+      // Apply the saved theme before first paint to avoid a flash.
+      try {
+        var t = localStorage.getItem("theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
