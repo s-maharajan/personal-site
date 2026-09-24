@@ -6,23 +6,24 @@ import { experience, writing } from "../content/about";
 import Section from "../components/Section";
 import WorkGrid from "../components/WorkGrid";
 import Contact from "../components/Contact";
+import LatencyCard from "../components/LatencyCard";
 
 export default function Home() {
   return (
     <>
       <title>{`${site.name} · ${site.role}`}</title>
 
-      <section className="grid items-end gap-10 lg:grid-cols-[1fr_20rem]">
+      <section className="grid items-center gap-10 lg:grid-cols-[1fr_22rem] lg:gap-16">
         <div>
           <p className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-muted">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
             {site.role}
           </p>
-          <h1 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-tight text-text sm:text-6xl">
+          <h1 className="mt-6 text-3xl font-semibold tracking-tight text-text sm:text-4xl">
             Hi, I'm {site.name}.
-            <span className="block text-muted">{site.tagline}</span>
           </h1>
-          <p className="mt-6 max-w-prose text-lg leading-relaxed text-muted">{site.intro}</p>
+          <p className="mt-3 max-w-prose text-xl leading-snug text-muted sm:text-2xl">{site.tagline}</p>
+          <p className="mt-5 max-w-prose leading-relaxed text-muted">{site.intro}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/work" className="btn-primary">
               See my work
@@ -31,18 +32,19 @@ export default function Home() {
             <a href="#contact" className="btn-ghost">Get in touch</a>
           </div>
         </div>
+        <LatencyCard />
+      </section>
 
-        <aside className="card p-6">
-          <p className="label">Now</p>
-          <ul className="mt-4 flex flex-col gap-3 text-sm leading-relaxed text-muted">
-            {site.now.map((item) => (
-              <li key={item} className="flex gap-3">
-                <span className="mt-[0.55em] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </aside>
+      <section className="mt-16" aria-labelledby="now">
+        <p id="now" className="label">Now</p>
+        <ul className="mt-3 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-3">
+          {site.now.map((item) => (
+            <li key={item} className="flex gap-3 bg-bg p-5 text-sm leading-relaxed text-muted">
+              <span className="mt-[0.55em] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+              {item}
+            </li>
+          ))}
+        </ul>
       </section>
 
       <Section

@@ -24,7 +24,7 @@ export default function CaseStudy() {
         <p className="label">
           {w.year} · {w.tags.join(" · ")}
         </p>
-        <h1 className="mt-4 text-4xl font-semibold leading-tight tracking-tight text-text sm:text-5xl">
+        <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-tight text-text sm:text-4xl">
           {w.title}
         </h1>
       </header>

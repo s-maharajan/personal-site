@@ -17,7 +17,7 @@ export default function Contact() {
         aria-hidden="true"
       />
       <p className="label">Contact</p>
-      <h2 className="mt-3 max-w-xl text-2xl font-semibold tracking-tight text-text sm:text-4xl">
+      <h2 className="mt-2 max-w-xl text-xl font-semibold tracking-tight text-text sm:text-2xl">
         Got a hard problem? Let's talk.
       </h2>
       <p className="mt-4 max-w-prose leading-relaxed text-muted">

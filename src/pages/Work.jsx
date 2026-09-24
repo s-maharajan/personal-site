@@ -8,7 +8,7 @@ export default function Work() {
     <>
       <title>{`Work · ${site.name}`}</title>
       <p className="label">Work</p>
-      <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight text-text sm:text-5xl">
+      <h1 className="mt-4 max-w-3xl text-3xl font-semibold tracking-tight text-text sm:text-4xl">
         Case studies
       </h1>
       <p className="mt-5 max-w-prose text-lg leading-relaxed text-muted">

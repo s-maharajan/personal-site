@@ -8,7 +8,7 @@ export default function About() {
     <>
       <title>{`About · ${site.name}`}</title>
       <p className="label">About</p>
-      <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-text sm:text-5xl">
+      <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-text sm:text-4xl">
         I work on the parts of systems that resist obvious answers.
       </h1>
 

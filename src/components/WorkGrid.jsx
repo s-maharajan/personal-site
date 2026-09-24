@@ -16,7 +16,7 @@ export default function WorkGrid({ items, featureFirst = false }) {
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <div className="font-mono text-4xl font-medium tracking-tight text-accent sm:text-5xl">
+                  <div className="font-mono text-3xl font-medium tracking-tight text-accent sm:text-4xl">
                     {w.metric.value}
                   </div>
                   <div className="mt-1 text-sm text-faint">{w.metric.label}</div>
@@ -27,7 +27,7 @@ export default function WorkGrid({ items, featureFirst = false }) {
                   aria-hidden="true"
                 />
               </div>
-              <h3 className={`mt-8 font-semibold tracking-tight text-text ${featured ? "text-xl sm:text-2xl" : "text-lg"}`}>
+              <h3 className={`mt-8 font-semibold tracking-tight text-text ${featured ? "text-lg sm:text-xl" : "text-base sm:text-lg"}`}>
                 {w.title}
               </h3>
               <p className={`mt-2 leading-relaxed text-muted ${featured ? "max-w-prose" : "text-sm"}`}>
