@@ -2,6 +2,7 @@
 export const work = [
   {
     slug: "llm-tail-latency",
+    metric: { value: "6×", label: "faster p99" },
     year: "2025",
     title: "Cutting LLM tail latency 6×",
     summary: "p99 went from 4.2s to 680ms on a production LLM endpoint.",
@@ -23,6 +24,7 @@ export const work = [
   },
   {
     slug: "hybrid-retrieval",
+    metric: { value: "+34%", label: "nDCG@10" },
     year: "2025",
     title: "Hybrid retrieval that beat pure vector search by 34%",
     summary: "BM25, dense retrieval, and a reranker, measured against 12k labelled pairs.",
@@ -44,6 +46,7 @@ export const work = [
   },
   {
     slug: "exactly-once-pipeline",
+    metric: { value: "0", label: "duplicates in 18 months" },
     year: "2024",
     title: "Exactly-once delivery across three datastores",
     summary: "No duplicate-event incidents in 18 months on a Kafka → Postgres → Redis pipeline.",
@@ -64,6 +67,7 @@ export const work = [
   },
   {
     slug: "monolith-decomposition",
+    metric: { value: "11", label: "services extracted" },
     year: "2023–24",
     title: "Splitting up a 400k-line monolith with no downtime",
     summary: "11 services extracted in 9 months. Deploys went up 4×.",
@@ -85,6 +89,7 @@ export const work = [
   },
   {
     slug: "cloud-cost",
+    metric: { value: "−42%", label: "cloud spend" },
     year: "2023",
     title: "Cutting cloud spend 42% without slowing teams down",
     summary: "Cost attribution found three workloads using 60% of compute.",

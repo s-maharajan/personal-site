@@ -19,8 +19,8 @@ All the text lives in `src/content/`, so most changes don't touch any components
 
 | File | What it holds |
 | --- | --- |
-| `site.js` | Name, role, intro, "Now" list, email, and social links. Empty links are hidden. |
-| `work.js` | Case studies. Each one gets its own page at `/work/<slug>`. The first three appear on the home page. |
+| `site.js` | Name, role, tagline, intro, "Now" list, email, and social links. Empty links are hidden. |
+| `work.js` | Case studies. Each one gets its own page at `/work/<slug>`. The first four appear on the home page, and `metric` is the big number on each card. |
 | `about.js` | Experience timeline, principles, toolbox, and planned writing. Add an `href` to a post to make it a link. |
 
 ## Structure
@@ -28,11 +28,11 @@ All the text lives in `src/content/`, so most changes don't touch any components
 ```
 src/
   content/     text and data
-  components/  Layout, Header, Footer, ThemeToggle, WorkList, Section, SocialLinks
+  components/  Layout, Header, Footer, Section, WorkGrid, Contact
   pages/       Home, Work, CaseStudy, About, NotFound
 ```
 
-Colours are CSS variables in `src/index.css`, with light and dark palettes. The site follows the system theme until a visitor picks one with the toggle.
+The site is dark only. Colours are CSS variables at the top of `src/index.css`, and each case study's headline number (`metric` in `work.js`) leads its card.
 
 ## Deploying
 

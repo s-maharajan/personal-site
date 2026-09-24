@@ -2,67 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Light palette is the default; dark applies from the OS setting or the toggle. */
+/* The site is dark only. Blue-black ground, cool greys, one warm accent. */
 :root {
-  --bg: #fbfbfc;
-  --surface: #f1f3f6;
-  --text: #13161c;
-  --muted: #555b67;
-  --faint: #6c727e;
-  --line: #e2e5ea;
-  --accent: #2b54d4;
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0d0f13;
-    --surface: #161920;
-    --text: #e9ebef;
-    --muted: #a3a9b4;
-    --faint: #8b919c;
-    --line: #242833;
-    --accent: #8ba6ff;
-    color-scheme: dark;
-  }
-}
-
-:root[data-theme="dark"] {
-  --bg: #0d0f13;
-  --surface: #161920;
-  --text: #e9ebef;
-  --muted: #a3a9b4;
-  --faint: #8b919c;
-  --line: #242833;
-  --accent: #8ba6ff;
+  --bg: #0a0c11;
+  --surface: #11141b;
+  --raised: #171b24;
+  --text: #eceef3;
+  --muted: #a3aab8;
+  --faint: #7d8494;
+  --line: #222734;
+  --accent: #f0b46c;
   color-scheme: dark;
 }
 
 @layer base {
   body {
     @apply bg-bg font-sans text-text antialiased;
-    font-feature-settings: "ss01";
   }
   h1, h2, h3 {
     text-wrap: balance;
   }
   ::selection {
-    background: color-mix(in srgb, var(--accent) 25%, transparent);
+    background: color-mix(in srgb, var(--accent) 35%, transparent);
+    color: var(--text);
   }
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
-    border-radius: 4px;
+    border-radius: 6px;
   }
 }
 
 @layer components {
   .label {
-    @apply font-mono text-xs uppercase tracking-[0.12em] text-faint;
+    @apply font-mono text-xs uppercase tracking-[0.14em] text-faint;
   }
   .link {
-    @apply underline decoration-line underline-offset-4 transition-colors hover:text-accent hover:decoration-accent;
+    @apply underline decoration-line decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent;
   }
+  .btn {
+    @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors;
+  }
+  .btn-primary {
+    @apply btn bg-text text-bg hover:bg-accent;
+  }
+  .btn-ghost {
+    @apply btn border border-line text-text hover:border-faint;
+  }
+  .card {
+    @apply rounded-2xl border border-line bg-surface transition-colors;
+  }
+}
+
+/* A soft glow and fine grid behind the top of every page. */
+.backdrop {
+  background:
+    radial-gradient(60rem 28rem at 15% -10%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%),
+    radial-gradient(50rem 30rem at 95% 0%, rgba(96, 124, 214, 0.1), transparent 70%);
+}
+.backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, black, transparent 80%);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -70,6 +76,6 @@
     animation: fade-in 0.5s ease-out both;
   }
   @keyframes fade-in {
-    from { opacity: 0; transform: translateY(6px); }
+    from { opacity: 0; transform: translateY(8px); }
   }
 }

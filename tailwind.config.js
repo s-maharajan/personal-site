@@ -6,6 +6,7 @@ export default {
       colors: {
         bg: "var(--bg)",
         surface: "var(--surface)",
+        raised: "var(--raised)",
         text: "var(--text)",
         muted: "var(--muted)",
         faint: "var(--faint)",
@@ -17,7 +18,8 @@ export default {
         mono: ["Geist Mono", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       maxWidth: {
-        page: "42rem",
+        page: "68rem",
+        prose: "40rem",
       },
     },
   },

@@ -11,12 +11,15 @@ export default function Layout() {
   }, [pathname]);
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-page flex-col px-5 sm:px-6">
-      <Header />
-      <main key={pathname} className="fade-in flex-1 pb-20 pt-10 sm:pt-16">
-        <Outlet />
-      </main>
-      <Footer />
+    <div className="relative min-h-screen overflow-x-hidden">
+      <div className="backdrop pointer-events-none absolute inset-x-0 top-0 h-[36rem]" aria-hidden="true" />
+      <div className="relative mx-auto flex min-h-screen max-w-page flex-col px-5 sm:px-8">
+        <Header />
+        <main key={pathname} className="fade-in flex-1 pb-24 pt-12 sm:pt-20">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }
