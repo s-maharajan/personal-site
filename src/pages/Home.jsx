@@ -26,17 +26,8 @@ export default function Home() {
           Architecting distributed platforms & AI infrastructure that hold up at p99.
         </h1>
 
-        <div className="flex flex-col gap-3 text-base sm:text-lg leading-relaxed text-muted font-sans max-w-prose">
-          <p>
-            I'm <strong className="text-text font-medium">Som Maharajan</strong>. For over a decade, I've designed and scaled high-throughput systems: low-latency LLM serving runtimes, prefix-aware KV-cache routers, hybrid retrieval engines, and deterministic transactional CDC pipelines.
-          </p>
-          <p className="text-sm sm:text-base text-muted/90">
-            Currently focused on sub-second tail latency in generative AI serving, continuous evaluation harnesses, and distributed consensus.
-          </p>
-        </div>
-
         {/* Links row */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-2 text-sm font-sans">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1 text-sm font-sans">
           <a
             href={`mailto:${site.email}`}
             className="inline-flex items-center gap-1.5 text-accent hover:text-accent-hover font-medium underline underline-offset-4 decoration-accent/40 transition-colors"
