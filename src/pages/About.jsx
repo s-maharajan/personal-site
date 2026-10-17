@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import { ArrowRight, FileText } from "lucide-react";
 import { site } from "../content/site";
 import { principles, toolbox } from "../content/about";
 import Section from "../components/Section";
@@ -18,11 +20,22 @@ export default function About() {
           That's where I've spent most of my career.
         </p>
         <p>
-          I've spent years on large-scale backends, debugging issues buried a thousand stack frames
+          I've spent years on large-scale backends, debugging anomalies buried a thousand stack frames
           deep and rewriting the parts everyone said were fine. More recently I've focused on AI in
-          production: serving models, evaluating them, and knowing when to trust them.
+          production: serving models at scale, evaluating them rigorously, and knowing when to trust them.
         </p>
         <p>I work {site.location.toLowerCase()}.</p>
+
+        <div className="pt-2 flex flex-wrap gap-3">
+          <Link to="/resume" className="btn-primary">
+            <FileText className="h-4 w-4" strokeWidth={1.75} />
+            View Printable Resume
+          </Link>
+          <Link to="/writing" className="btn-ghost">
+            Read Architecture Notes
+            <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
+          </Link>
+        </div>
       </div>
 
       <Section label="Principles" title="How I work">

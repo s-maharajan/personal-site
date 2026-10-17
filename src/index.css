@@ -41,16 +41,16 @@
     @apply underline decoration-line decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent;
   }
   .btn {
-    @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors;
+    @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors cursor-pointer;
   }
   .btn-primary {
     @apply btn bg-text text-bg hover:bg-accent;
   }
   .btn-ghost {
-    @apply btn border border-line text-text hover:border-faint;
+    @apply btn border border-line text-text hover:border-faint hover:bg-surface;
   }
   .card {
-    @apply rounded-2xl border border-line bg-surface transition-colors;
+    @apply rounded-2xl border border-line bg-surface transition-all duration-200;
   }
 }
 
@@ -73,10 +73,11 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .fade-in {
-    animation: fade-in 0.5s ease-out both;
+    animation: fade-in 0.4s ease-out both;
   }
   @keyframes fade-in {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
 
@@ -87,5 +88,18 @@
   }
   @keyframes grow {
     from { transform: scaleX(0); }
+  }
+}
+
+/* Print Styles for Resume and Documentation */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+  }
+  .card {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
   }
 }
