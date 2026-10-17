@@ -20,23 +20,22 @@ export default function Contact() {
   ].filter(Boolean);
 
   return (
-    <section id="contact" className="rounded-2xl border border-line bg-surface p-6 sm:p-8 print-hidden font-sans">
+    <section id="contact" className="rounded-xl border border-line/80 bg-raised/40 p-6 sm:p-8 print-hidden font-sans">
       <div className="flex flex-col gap-2">
-        <span className="label-mono">Connect & Advisory</span>
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-text">
-          Have an architecture challenge? Let's talk.
+        <h2 className="font-serif text-xl sm:text-2xl font-normal text-text">
+          Have an architecture challenge? Let's connect.
         </h2>
-        <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">
+        <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted">
           I'm most useful on distributed systems, AI inference platforms, p99 tail latency investigations, and
           architecture reviews where obvious solutions have already been exhausted.
         </p>
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-2.5">
+      <div className="mt-5 flex flex-wrap items-center gap-2.5">
         {email && (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <a href={`mailto:${email}`} className="btn-primary">
-              <Mail className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+              <Mail className="h-3.5 w-3.5" aria-hidden="true" />
               <span>{email}</span>
             </a>
             <button
@@ -45,15 +44,15 @@ export default function Contact() {
               className="btn-ghost"
               title="Copy email address"
             >
-              {copied ? <Check className="h-3.5 w-3.5 text-accent" /> : <Copy className="h-3.5 w-3.5 text-faint" />}
+              {copied ? <Check className="h-3.5 w-3.5 text-accent" /> : <Copy className="h-3.5 w-3.5" />}
               <span>{copied ? "Copied" : "Copy"}</span>
             </button>
           </div>
         )}
 
         <Link to="/resume" className="btn-ghost">
-          <FileText className="h-3.5 w-3.5 text-faint" strokeWidth={1.75} aria-hidden="true" />
-          <span>Dossier</span>
+          <FileText className="h-3.5 w-3.5" aria-hidden="true" />
+          <span>Resume</span>
         </Link>
 
         {external.map((l) => (
@@ -65,7 +64,7 @@ export default function Contact() {
             className="btn-ghost"
           >
             <span>{l.label}</span>
-            <ArrowUpRight className="h-3.5 w-3.5 text-faint" strokeWidth={2} aria-hidden="true" />
+            <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
           </a>
         ))}
       </div>

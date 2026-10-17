@@ -13,17 +13,20 @@ export default {
         faint: "var(--faint)",
         line: "var(--line)",
         accent: "var(--accent)",
+        "accent-hover": "var(--accent-hover)",
         "accent-secondary": "var(--accent-secondary)",
+        "accent-tertiary": "var(--accent-tertiary)",
       },
       fontFamily: {
-        sans: ["Geist", "Inter", "system-ui", "-apple-system", "sans-serif"],
+        serif: ["Newsreader", "Charter", "Georgia", "serif"],
+        sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
         mono: ["Geist Mono", "JetBrains Mono", "SFMono-Regular", "monospace"],
       },
       maxWidth: {
-        page: "56rem",
-        prose: "46rem",
+        page: "46rem",
+        prose: "42rem",
       },
     },
   },
   plugins: [],
-}
+};

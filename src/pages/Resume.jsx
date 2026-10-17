@@ -18,17 +18,17 @@ export default function Resume() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl font-sans">
-      <title>{`Engineering Dossier · ${resumeData.name}`}</title>
+    <div className="mx-auto max-w-prose font-sans">
+      <title>{`Resume · ${resumeData.name}`}</title>
 
       {/* Screen-only top action bar */}
-      <div className="print-hidden mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-line pb-4">
+      <div className="print-hidden mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-line/70 pb-4">
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 font-mono text-xs text-muted transition-colors hover:text-accent"
+          className="inline-flex items-center gap-1.5 font-sans text-xs text-muted transition-colors hover:text-accent"
         >
           <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
-          <span>Back to Overview</span>
+          <span>Back to home</span>
         </Link>
 
         <div className="flex items-center gap-2">
@@ -37,8 +37,8 @@ export default function Resume() {
             onClick={handleCopyEmail}
             className="btn-ghost"
           >
-            {copied ? <Check className="h-3 w-3 text-accent" /> : <Copy className="h-3 w-3 text-faint" />}
-            <span>{copied ? "Copied Email" : "Copy Email"}</span>
+            {copied ? <Check className="h-3 w-3 text-accent" /> : <Copy className="h-3 w-3" />}
+            <span>{copied ? "Copied" : "Copy Email"}</span>
           </button>
           <button
             type="button"
@@ -46,21 +46,21 @@ export default function Resume() {
             className="btn-primary"
           >
             <Printer className="h-3 w-3" />
-            <span>Print Dossier (PDF)</span>
+            <span>Print / PDF</span>
           </button>
         </div>
       </div>
 
-      {/* Resume Document Wrapper */}
-      <div className="rounded-2xl border border-line bg-surface print:border-none print:bg-white print:text-black print:p-0 p-8 sm:p-12">
+      {/* Resume Document */}
+      <div className="flex flex-col gap-8 print:p-0">
         {/* Header */}
-        <header className="border-b border-line print:border-neutral-300 pb-8">
+        <header className="border-b border-line/70 pb-8">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-text print:text-black sm:text-4xl">
+              <h1 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-text print:text-black">
                 {resumeData.name}
               </h1>
-              <p className="mt-1 font-mono text-xs uppercase tracking-wider text-accent print:text-neutral-800 font-semibold">
+              <p className="mt-1 font-mono text-xs uppercase tracking-wider text-accent print:text-neutral-800 font-medium">
                 {resumeData.title}
               </p>
               <p className="mt-0.5 text-xs text-muted print:text-neutral-600">
@@ -97,20 +97,20 @@ export default function Resume() {
             </div>
           </div>
 
-          <p className="mt-6 text-sm leading-relaxed text-muted print:text-neutral-700">
+          <p className="mt-5 text-sm leading-relaxed text-muted print:text-neutral-700">
             {resumeData.summary}
           </p>
         </header>
 
         {/* Core Competencies */}
-        <section className="mt-8 border-b border-line print:border-neutral-300 pb-8 font-mono">
+        <section className="border-b border-line/70 pb-8 font-mono">
           <h2 className="text-xs font-semibold uppercase tracking-widest text-accent print:text-black">
             Core Competencies & Technical Stack
           </h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {resumeData.skills.map((s) => (
               <div key={s.category}>
-                <div className="text-xs font-semibold text-text print:text-black">
+                <div className="text-xs font-medium text-text print:text-black">
                   {s.category}
                 </div>
                 <div className="mt-1 flex flex-wrap gap-1.5">
@@ -129,7 +129,7 @@ export default function Resume() {
         </section>
 
         {/* Experience */}
-        <section className="mt-8 border-b border-line print:border-neutral-300 pb-8">
+        <section className="border-b border-line/70 pb-8">
           <h2 className="font-mono text-xs font-semibold uppercase tracking-widest text-accent print:text-black">
             Professional Experience
           </h2>
@@ -138,14 +138,14 @@ export default function Resume() {
             {resumeData.experience.map((exp, idx) => (
               <div key={idx}>
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <h3 className="text-base font-bold text-text print:text-black">
+                  <h3 className="font-serif text-lg font-normal text-text print:text-black">
                     {exp.role}
                   </h3>
                   <span className="font-mono text-xs text-faint print:text-neutral-600">
                     {exp.period}
                   </span>
                 </div>
-                <p className="font-mono text-xs text-accent print:text-neutral-700 font-semibold">
+                <p className="font-mono text-xs text-accent print:text-neutral-700 font-medium">
                   {exp.company}
                 </p>
                 <ul className="mt-3 flex flex-col gap-2">
@@ -162,12 +162,12 @@ export default function Resume() {
         </section>
 
         {/* Education */}
-        <section className="mt-8">
+        <section>
           <h2 className="font-mono text-xs font-semibold uppercase tracking-widest text-accent print:text-black">
             Education
           </h2>
           <div className="mt-3">
-            <h3 className="text-sm font-semibold text-text print:text-black">
+            <h3 className="text-sm font-medium text-text print:text-black">
               {resumeData.education.degree}
             </h3>
             <p className="mt-0.5 text-xs text-muted print:text-neutral-600">
