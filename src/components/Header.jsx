@@ -4,10 +4,10 @@ import { Search, Sun, Moon } from "lucide-react";
 import { site } from "../content/site";
 
 const links = [
-  { to: "/", label: "Home" },
-  { to: "/work", label: "Work" },
-  { to: "/writing", label: "Writing" },
-  { to: "/about", label: "About" },
+  { to: "/", label: "Overview" },
+  { to: "/work", label: "Case Studies" },
+  { to: "/writing", label: "Field Notes" },
+  { to: "/about", label: "Philosophy" },
   { to: "/resume", label: "Resume" },
 ];
 
@@ -31,67 +31,69 @@ export default function Header({ onOpenPalette }) {
   }, [isDark]);
 
   return (
-    <header className="pt-6 sm:pt-10 print-hidden">
-      {/* Masthead */}
-      <div className="flex flex-col items-center text-center">
-        <Link to="/" className="group inline-block">
-          <h1 className="font-serif text-3xl font-medium tracking-tight text-text transition-colors group-hover:text-accent sm:text-4xl">
-            {site.fullName || site.name}
-          </h1>
+    <header className="pt-6 sm:pt-8 print-hidden">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-line pb-4">
+        {/* Brand identity */}
+        <Link to="/" className="group flex items-center gap-3">
+          <div className="grid h-8 w-8 place-items-center rounded-lg border border-line bg-surface font-mono text-xs font-bold text-accent shadow-sm transition group-hover:border-accent">
+            SM
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-sans font-semibold text-text group-hover:text-accent transition-colors">
+                {site.fullName || site.name}
+              </span>
+              <span className="inline-flex items-center gap-1 font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Active
+              </span>
+            </div>
+            <p className="font-mono text-[11px] text-faint">
+              {site.role}
+            </p>
+          </div>
         </Link>
-        <p className="mt-1 font-mono text-xs uppercase tracking-wider text-faint">
-          {site.role}
-        </p>
-      </div>
 
-      {/* Editorial Navigation Strip */}
-      <div className="mt-5 flex items-center justify-between border-y border-line py-2.5">
-        <nav className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm sm:gap-x-6">
-          {links.map((l, i) => (
-            <div key={l.to} className="flex items-center gap-4 sm:gap-6">
+        {/* Navigation & Utilities */}
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <nav className="flex items-center rounded-lg border border-line bg-surface p-1 text-xs font-mono">
+            {links.map((l) => (
               <NavLink
+                key={l.to}
                 to={l.to}
                 end={l.to === "/"}
                 className={({ isActive }) =>
-                  `transition-colors ${
+                  `rounded px-2.5 py-1 transition-all ${
                     isActive
-                      ? "font-semibold text-accent underline decoration-accent decoration-1 underline-offset-4"
-                      : "text-muted hover:text-text"
+                      ? "bg-text font-semibold text-bg shadow-sm"
+                      : "text-muted hover:text-text hover:bg-raised"
                   }`
                 }
               >
                 {l.label}
               </NavLink>
-              {i < links.length - 1 && (
-                <span className="select-none text-line" aria-hidden="true">
-                  |
-                </span>
-              )}
-            </div>
-          ))}
-        </nav>
+            ))}
+          </nav>
 
-        {/* Right side utility icons: Theme switch & search */}
-        <div className="flex items-center gap-1.5 pl-3">
           <button
             type="button"
             onClick={() => setIsDark((prev) => !prev)}
-            className="grid h-8 w-8 place-items-center rounded text-muted transition hover:bg-raised hover:text-text"
-            title={isDark ? "Switch to light theme" : "Switch to dark theme"}
+            className="grid h-8 w-8 place-items-center rounded-lg border border-line bg-surface text-muted transition hover:border-text hover:text-text"
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
             aria-label="Toggle theme"
           >
-            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {isDark ? <Sun className="h-3.5 w-3.5 text-accent" /> : <Moon className="h-3.5 w-3.5" />}
           </button>
 
           {onOpenPalette && (
             <button
               type="button"
               onClick={onOpenPalette}
-              className="inline-flex h-8 items-center gap-1.5 rounded px-2 text-xs font-mono text-faint transition hover:bg-raised hover:text-text"
-              title="Quick Search (⌘K)"
+              className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-line bg-surface px-2.5 text-xs font-mono text-faint transition hover:border-text hover:text-text"
+              title="Command Palette (⌘K)"
             >
-              <Search className="h-3.5 w-3.5" />
-              <kbd className="hidden sm:inline-block">⌘K</kbd>
+              <Search className="h-3 w-3" />
+              <kbd className="text-[10px]">⌘K</kbd>
             </button>
           )}
         </div>

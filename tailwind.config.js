@@ -16,13 +16,12 @@ export default {
         "accent-secondary": "var(--accent-secondary)",
       },
       fontFamily: {
-        serif: ["Newsreader", "Georgia", "Cambria", "Times New Roman", "serif"],
-        sans: ["IBM Plex Sans", "Geist", "ui-sans-serif", "system-ui", "sans-serif"],
-        mono: ["Geist Mono", "ui-monospace", "SFMono-Regular", "monospace"],
+        sans: ["Geist", "Inter", "system-ui", "-apple-system", "sans-serif"],
+        mono: ["Geist Mono", "JetBrains Mono", "SFMono-Regular", "monospace"],
       },
       maxWidth: {
-        page: "52rem",
-        prose: "44rem",
+        page: "56rem",
+        prose: "46rem",
       },
     },
   },

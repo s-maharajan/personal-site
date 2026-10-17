@@ -14,16 +14,16 @@ export default function Work() {
     : work.filter((w) => w.category === selectedCategory);
 
   return (
-    <>
+    <div className="flex flex-col gap-10">
       <title>{`Case Studies & Work · ${site.fullName || site.name}`}</title>
-      <div className="pb-8 border-b border-line">
-        <p className="label">Architecture & Production</p>
-        <h1 className="mt-2 font-serif text-3xl font-medium tracking-tight text-text sm:text-4xl">
-          Systems Case Studies
+      <div className="border-b border-line pb-6">
+        <span className="label-mono">Systems Architecture</span>
+        <h1 className="mt-1 text-3xl font-bold tracking-tight text-text sm:text-4xl">
+          Production Case Studies
         </h1>
-        <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted font-sans">
-          Engineering investigations and system architectures that resolved deep tail-latency spikes,
-          distributed data anomalies, and scaling bottlenecks in production.
+        <p className="mt-2 max-w-2xl text-base leading-relaxed text-muted font-sans">
+          In-depth architectural breakdowns of production challenges: p99 tail latency collapses,
+          deterministic streaming pipelines, monolith migrations, and infrastructure efficiency.
         </p>
 
         {/* Category Filter Tabs */}
@@ -36,24 +36,22 @@ export default function Work() {
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`rounded px-3 py-1 font-mono text-xs transition ${
+                className={`rounded-lg px-3 py-1.5 font-mono text-xs transition ${
                   isSelected
-                    ? "bg-text font-semibold text-bg"
+                    ? "bg-text font-semibold text-bg shadow-sm"
                     : "border border-line bg-surface text-muted hover:border-text hover:text-text"
                 }`}
               >
-                {cat} <span className="opacity-60">({count})</span>
+                {cat} <span className="opacity-60 font-normal">({count})</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      <div className="mt-8">
-        <WorkGrid items={filteredWork} />
-      </div>
+      <WorkGrid items={filteredWork} />
 
       <Contact />
-    </>
+    </div>
   );
 }

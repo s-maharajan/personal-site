@@ -2,30 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Modern Editorial Theme (Inspired by Steven Gonsalvez & Charly Webster) */
+/* Engineered Studio Theme - Bespoke design for Som Maharajan */
 :root {
-  --bg: #faf8f3;
+  --bg: #f8fafc;
   --surface: #ffffff;
-  --raised: #f3efe6;
-  --text: #1a1a1a;
-  --muted: #4a4a4a;
-  --faint: #767676;
-  --line: #c9c5bc;
-  --accent: #8b2635;
-  --accent-secondary: #2c4a6e;
+  --raised: #f1f5f9;
+  --text: #0f172a;
+  --muted: #475569;
+  --faint: #94a3b8;
+  --line: #e2e8f0;
+  --accent: #0284c7;
+  --accent-secondary: #6366f1;
   color-scheme: light;
 }
 
 .dark {
-  --bg: #0d0e12;
-  --surface: #14151c;
-  --raised: #1c1e27;
-  --text: #f0f1f5;
-  --muted: #a3a8b6;
-  --faint: #6d7383;
-  --line: #262936;
-  --accent: #e27d86;
-  --accent-secondary: #6ba4e8;
+  --bg: #090b10;
+  --surface: #11141d;
+  --raised: #181c28;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --faint: #64748b;
+  --line: #1e2433;
+  --accent: #38bdf8;
+  --accent-secondary: #818cf8;
   color-scheme: dark;
 }
 
@@ -47,32 +47,36 @@
 }
 
 @layer components {
-  .headline {
-    @apply font-serif tracking-tight text-text;
+  .label-mono {
+    @apply font-mono text-[11px] uppercase tracking-wider text-faint;
   }
-  .label {
-    @apply font-mono text-[11px] uppercase tracking-[0.14em] text-faint;
-  }
-  .link {
-    @apply underline decoration-line decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent;
+  .tag-pill {
+    @apply inline-flex items-center rounded-md border border-line bg-surface px-2 py-0.5 font-mono text-[11px] text-muted transition-colors;
   }
   .btn {
-    @apply inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors cursor-pointer;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-xs font-mono font-medium transition-all cursor-pointer;
   }
   .btn-primary {
-    @apply btn bg-text text-bg hover:bg-accent hover:text-white;
+    @apply btn bg-text text-bg hover:bg-accent hover:text-white dark:hover:text-black;
   }
   .btn-ghost {
-    @apply btn border border-line text-text hover:border-text hover:bg-raised;
+    @apply btn border border-line bg-surface text-text hover:border-accent hover:bg-raised;
   }
-  .editorial-card {
-    @apply border-b border-line py-6 transition-colors;
-  }
+}
+
+/* Subtle grid line accents */
+.systems-grid {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, var(--line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+  mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, #000 70%, transparent 100%);
+  opacity: 0.35;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .fade-in {
-    animation: fade-in 0.35s ease-out both;
+    animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
   @keyframes fade-in {
     from { opacity: 0; transform: translateY(4px); }
@@ -80,7 +84,7 @@
   }
 }
 
-/* Print Styles for Resume */
+/* Print styles */
 @media print {
   body {
     background: #ffffff !important;

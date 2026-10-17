@@ -1,16 +1,16 @@
 import { Link } from "react-router-dom";
-import { FileText, Mail, Copy, Check } from "lucide-react";
+import { ArrowRight, FileText, Mail, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { site } from "../content/site";
 import { work } from "../content/work";
 import { articles } from "../content/writing";
 import { principles } from "../content/about";
+import SystemVitals from "../components/SystemVitals";
 import LLMSimulator from "../components/LLMSimulator";
 import { GithubIcon, LinkedinIcon } from "../components/Icons";
 
 export default function Home() {
   const [copied, setCopied] = useState(false);
-  const featuredArticle = articles[0];
 
   const handleCopyEmail = async () => {
     await navigator.clipboard.writeText(site.email);
@@ -19,246 +19,231 @@ export default function Home() {
   };
 
   return (
-    <>
+    <div className="flex flex-col gap-12 sm:gap-16">
       <title>{`${site.fullName || site.name} · ${site.role}`}</title>
 
-      {/* Intro Header (Inspired by Charly Webster & Steven Gonsalvez) */}
-      <section className="pb-8 border-b border-line">
-        <p className="font-mono text-xs uppercase tracking-wider text-accent font-semibold">
-          {site.role}
-        </p>
-        <h1 className="mt-3 font-serif text-3xl font-medium tracking-tight text-text sm:text-4xl leading-tight">
-          Systems that hold up at p99.
-        </h1>
-        <p className="mt-4 text-base sm:text-lg leading-relaxed text-muted max-w-2xl font-sans">
-          I build distributed platforms and production AI infrastructure. Over the past decade, that has
-          meant designing high-throughput model serving runtimes, prefix-cache reuse, hybrid retrieval engines,
-          and deterministic event pipelines—and making sure they stay dependable when traffic spikes.
-        </p>
+      {/* Hero Section */}
+      <section className="pt-2">
+        <div className="flex flex-col gap-4">
+          <div className="inline-flex items-center gap-2 self-start rounded-full border border-line bg-surface px-3 py-1 font-mono text-xs text-muted">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+            <span>{site.role}</span>
+          </div>
 
-        {/* Quick Social & Contact Bar */}
-        <div className="mt-6 flex flex-wrap items-center gap-3 text-xs">
-          <button
-            type="button"
-            onClick={handleCopyEmail}
-            className="inline-flex items-center gap-1.5 rounded border border-line bg-surface px-3 py-1.5 font-mono text-text hover:border-text transition-colors"
-          >
-            {copied ? <Check className="h-3.5 w-3.5 text-accent" /> : <Copy className="h-3.5 w-3.5 text-faint" />}
-            <span>{copied ? "Email Copied!" : site.email}</span>
-          </button>
+          <h1 className="font-sans text-3xl font-bold tracking-tight text-text sm:text-4xl md:text-5xl leading-[1.15]">
+            Architecting distributed platforms & AI infrastructure that hold up at p99.
+          </h1>
 
-          <a
-            href={`mailto:${site.email}`}
-            className="inline-flex items-center gap-1.5 rounded border border-line bg-surface px-3 py-1.5 text-muted hover:text-text hover:border-text transition-colors"
-          >
-            <Mail className="h-3.5 w-3.5 text-faint" />
-            <span>Send Email</span>
-          </a>
+          <p className="mt-1 text-base sm:text-lg leading-relaxed text-muted max-w-2xl font-sans">
+            I'm Som Maharajan. Over the past decade, I've designed and scaled high-throughput platform
+            infrastructure: low-latency LLM serving runtimes, Radix-tree prefix cache reuse, hybrid retrieval engines,
+            and deterministic event pipelines across millions of daily transactions.
+          </p>
 
-          <Link
-            to="/resume"
-            className="inline-flex items-center gap-1.5 rounded border border-line bg-surface px-3 py-1.5 text-muted hover:text-text hover:border-text transition-colors"
-          >
-            <FileText className="h-3.5 w-3.5 text-faint" />
-            <span>Resume</span>
-          </Link>
-
-          {site.links.linkedin && (
-            <a
-              href={site.links.linkedin}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded border border-line bg-surface px-3 py-1.5 text-muted hover:text-text hover:border-text transition-colors"
+          {/* Quick Action Cluster */}
+          <div className="mt-3 flex flex-wrap items-center gap-2.5">
+            <button
+              type="button"
+              onClick={handleCopyEmail}
+              className="btn-primary"
             >
-              <LinkedinIcon className="h-3.5 w-3.5 text-faint" />
-              <span>LinkedIn</span>
-            </a>
-          )}
+              {copied ? <Check className="h-3.5 w-3.5 text-accent" /> : <Copy className="h-3.5 w-3.5" />}
+              <span>{copied ? "Copied Email" : "Copy Email"}</span>
+            </button>
 
-          {site.links.github && (
             <a
-              href={site.links.github}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded border border-line bg-surface px-3 py-1.5 text-muted hover:text-text hover:border-text transition-colors"
+              href={`mailto:${site.email}`}
+              className="btn-ghost"
             >
-              <GithubIcon className="h-3.5 w-3.5 text-faint" />
-              <span>GitHub</span>
+              <Mail className="h-3.5 w-3.5 text-faint" />
+              <span>{site.email}</span>
             </a>
-          )}
+
+            <Link
+              to="/resume"
+              className="btn-ghost"
+            >
+              <FileText className="h-3.5 w-3.5 text-faint" />
+              <span>View Dossier</span>
+            </Link>
+
+            {site.links.linkedin && (
+              <a
+                href={site.links.linkedin}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-ghost"
+              >
+                <LinkedinIcon className="h-3.5 w-3.5 text-faint" />
+                <span>LinkedIn</span>
+              </a>
+            )}
+
+            {site.links.github && (
+              <a
+                href={site.links.github}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-ghost"
+              >
+                <GithubIcon className="h-3.5 w-3.5 text-faint" />
+                <span>GitHub</span>
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Bespoke System Vitals Panel */}
+        <div className="mt-8">
+          <SystemVitals />
         </div>
       </section>
 
-      {/* Featured Deep Dive / Long Read (Steven Gonsalvez Featured Story Style) */}
-      {featuredArticle && (
-        <section className="py-8 border-b-2 border-text">
-          <Link to={`/writing/${featuredArticle.slug}`} className="group block cursor-pointer">
-            <div className="flex items-center gap-3 mb-3 flex-wrap">
-              <span className="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 bg-text text-bg font-semibold rounded-sm">
-                Long read
-              </span>
-              <span className="font-mono text-xs text-faint">{featuredArticle.date}</span>
-              <span className="text-line">|</span>
-              <span className="font-mono text-xs text-faint">{featuredArticle.readTime}</span>
-              <span className="text-line">|</span>
-              <span className="font-mono text-xs text-accent">#{featuredArticle.topic.toLowerCase()}</span>
-            </div>
-
-            <h2 className="font-serif text-2xl sm:text-3xl font-medium text-text group-hover:text-accent transition-colors leading-snug">
-              {featuredArticle.title}
-            </h2>
-
-            <p className="mt-3 text-base text-muted leading-relaxed max-w-2xl">
-              {featuredArticle.summary}
-            </p>
-
-            <div className="mt-4 flex items-center gap-1 text-sm font-medium text-accent group-hover:underline">
-              <span>Read complete architecture write-up</span>
-              <span aria-hidden="true">→</span>
-            </div>
-          </Link>
-        </section>
-      )}
-
-      {/* Selected Systems Work (Clean Editorial Row List) */}
-      <section className="py-10 border-b border-line">
-        <div className="flex items-baseline justify-between mb-6">
+      {/* Featured Architecture Dossiers */}
+      <section className="flex flex-col gap-6">
+        <div className="flex items-baseline justify-between border-b border-line pb-3">
           <div>
-            <p className="label">Selected Architecture</p>
-            <h2 className="mt-1 font-serif text-2xl font-medium text-text">
-              Production Case Studies
+            <span className="label-mono">Selected Case Studies</span>
+            <h2 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-text">
+              Architecture & Production Dossiers
             </h2>
           </div>
-          <Link to="/work" className="text-xs font-mono text-muted hover:text-accent underline underline-offset-2">
-            All {work.length} studies →
+          <Link
+            to="/work"
+            className="font-mono text-xs text-accent hover:underline inline-flex items-center gap-1"
+          >
+            <span>All {work.length} dossiers</span>
+            <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
 
-        <div className="divide-y divide-line">
-          {work.slice(0, 4).map((w) => (
+        <div className="flex flex-col gap-4">
+          {work.slice(0, 4).map((w, idx) => (
             <Link
               key={w.slug}
               to={`/work/${w.slug}`}
-              className="group block py-5 transition-colors hover:bg-raised/50 -mx-3 px-3 rounded"
+              className="group flex flex-col rounded-xl border border-line bg-surface p-5 transition-all hover:border-accent hover:shadow-sm"
             >
               <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
                 <div className="flex items-baseline gap-2.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-accent shrink-0 mt-1 sm:mt-0" />
-                  <h3 className="font-serif text-lg font-medium text-text group-hover:text-accent transition-colors">
+                  <span className="font-mono text-xs font-semibold text-faint">
+                    0{idx + 1}
+                  </span>
+                  <h3 className="text-base sm:text-lg font-semibold text-text group-hover:text-accent transition-colors">
                     {w.title}
                   </h3>
                 </div>
                 <div className="font-mono text-xs font-semibold text-accent shrink-0 sm:text-right">
-                  {w.metric.label}: {w.metric.value}
+                  {w.metric.label}: <span className="font-bold">{w.metric.value}</span>
                 </div>
               </div>
 
-              <p className="mt-1.5 text-sm text-muted leading-relaxed pl-4 max-w-2xl">
+              <p className="mt-2 text-sm text-muted leading-relaxed max-w-2xl">
                 {w.summary}
               </p>
 
-              <div className="mt-2 pl-4 flex flex-wrap items-center gap-2 font-mono text-[11px] text-faint">
-                <span>{w.year}</span>
-                <span>·</span>
-                <span>{w.category}</span>
-                <span>·</span>
-                <span className="text-muted">{w.stack.slice(0, 4).join(", ")}</span>
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-line/50 pt-3">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="tag-pill text-accent">{w.category}</span>
+                  {w.stack.slice(0, 4).map((tech) => (
+                    <span key={tech} className="tag-pill">{tech}</span>
+                  ))}
+                </div>
+
+                <span className="font-mono text-xs text-accent inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                  <span>Inspect Architecture</span>
+                  <ArrowRight className="h-3 w-3" />
+                </span>
               </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Interactive Systems Lab (Linear Precision Instrument) */}
-      <section className="py-10 border-b border-line">
-        <div className="mb-6">
-          <p className="label">Interactive Systems Lab</p>
-          <h2 className="mt-1 font-serif text-2xl font-medium text-text">
-            Simulate P99 Tail Latency & Memory Contention
+      {/* Interactive Systems Lab */}
+      <section className="flex flex-col gap-4">
+        <div className="border-b border-line pb-3">
+          <span className="label-mono">Simulation Sandbox</span>
+          <h2 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-text">
+            P99 Latency & Concurrency Workbench
           </h2>
-          <p className="mt-2 text-sm text-muted">
-            Test how prompt sizes, concurrency, and prefix KV-cache reuse impact tail latency and GPU cost.
+          <p className="mt-1 text-sm text-muted">
+            Experiment with prompt batching, concurrency load, and prefix KV-cache reuse.
           </p>
         </div>
         <LLMSimulator />
       </section>
 
-      {/* Latest Technical Writing (Charly Webster Post List Style) */}
-      <section className="py-10 border-b border-line">
-        <div className="flex items-baseline justify-between mb-6">
+      {/* Field Notes & Technical Writing */}
+      <section className="flex flex-col gap-6">
+        <div className="flex items-baseline justify-between border-b border-line pb-3">
           <div>
-            <p className="label">Writing</p>
-            <h2 className="mt-1 font-serif text-2xl font-medium text-text">
-              Architecture Notes & Essays
+            <span className="label-mono">Technical Writing</span>
+            <h2 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-text">
+              Engineering Field Notes
             </h2>
           </div>
-          <Link to="/writing" className="text-xs font-mono text-muted hover:text-accent underline underline-offset-2">
-            All essays →
+          <Link
+            to="/writing"
+            className="font-mono text-xs text-accent hover:underline inline-flex items-center gap-1"
+          >
+            <span>All write-ups</span>
+            <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
 
-        <ol className="divide-y divide-line">
+        <div className="grid gap-4 sm:grid-cols-2">
           {articles.map((article) => (
-            <li key={article.slug} className="py-5">
-              <article>
-                <div className="flex items-center gap-2 font-mono text-xs text-faint mb-1.5">
-                  <time>{article.date}</time>
-                  <span>·</span>
+            <Link
+              key={article.slug}
+              to={`/writing/${article.slug}`}
+              className="group flex flex-col justify-between rounded-xl border border-line bg-surface p-5 transition-all hover:border-accent hover:shadow-sm"
+            >
+              <div>
+                <div className="flex items-center justify-between font-mono text-[11px] text-faint mb-2">
+                  <span className="text-accent font-medium">#{article.topic.toLowerCase()}</span>
                   <span>{article.readTime}</span>
                 </div>
-                <h3 className="font-serif text-lg font-medium text-text">
-                  <Link
-                    to={`/writing/${article.slug}`}
-                    className="hover:text-accent transition-colors hover:underline underline-offset-2"
-                  >
-                    {article.title}
-                  </Link>
+                <h3 className="text-base font-semibold text-text group-hover:text-accent transition-colors leading-snug">
+                  {article.title}
                 </h3>
-                <p className="mt-1.5 text-sm text-muted leading-relaxed">
+                <p className="mt-2 text-xs text-muted leading-relaxed line-clamp-3">
                   {article.summary}
                 </p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <span className="font-mono text-[11px] text-accent">
-                    #{article.topic.toLowerCase()}
-                  </span>
-                  <span className="font-mono text-[11px] text-faint">
-                    #systems
-                  </span>
-                  <span className="font-mono text-[11px] text-faint">
-                    #production
-                  </span>
-                </div>
-              </article>
-            </li>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between font-mono text-[11px] text-faint">
+                <span>{article.date}</span>
+                <span className="text-accent group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1">
+                  Read Note <ArrowRight className="h-3 w-3" />
+                </span>
+              </div>
+            </Link>
           ))}
-        </ol>
+        </div>
       </section>
 
-      {/* A Bit About Me & Engineering Philosophy (Charly Webster Style) */}
-      <section className="py-10">
-        <p className="label">Philosophy</p>
-        <h2 className="mt-1 font-serif text-2xl font-medium text-text">
-          A Bit About How I Work
-        </h2>
-        <div className="mt-4 space-y-4 text-base leading-relaxed text-muted max-w-2xl font-sans">
-          <p>
-            I care about building dependable software and healthy platform foundations: clear architectural direction,
-            profiling before arguing, keeping the hot path boring, and designing systems that survive the requirement nobody has written yet.
-          </p>
-          <p>
-            This site is where I share field notes from production: what worked, what failed under load, and the trade-offs worth remembering.
-          </p>
+      {/* Engineering Philosophy */}
+      <section className="flex flex-col gap-6">
+        <div className="border-b border-line pb-3">
+          <span className="label-mono">Principles</span>
+          <h2 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-text">
+            Architectural Ethos
+          </h2>
         </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          {principles.map(([title, detail]) => (
-            <div key={title} className="border-l-2 border-line pl-4 py-1">
-              <h3 className="font-serif text-base font-medium text-text">{title}</h3>
-              <p className="mt-1 text-xs leading-relaxed text-muted">{detail}</p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {principles.map(([title, detail], idx) => (
+            <div key={title} className="rounded-xl border border-line bg-surface p-4">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs font-bold text-accent">0{idx + 1}.</span>
+                <h3 className="text-sm font-semibold text-text">{title}</h3>
+              </div>
+              <p className="mt-2 text-xs leading-relaxed text-muted">{detail}</p>
             </div>
           ))}
         </div>
       </section>
-    </>
+    </div>
   );
 }

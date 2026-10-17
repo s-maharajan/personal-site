@@ -1,53 +1,59 @@
 import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 import { site } from "../content/site";
 import { articles } from "../content/writing";
 import Contact from "../components/Contact";
 
 export default function Writing() {
   return (
-    <>
-      <title>{`Writing & Architecture Notes · ${site.fullName || site.name}`}</title>
-      <div className="pb-8 border-b border-line">
-        <p className="label">Essays & Field Notes</p>
-        <h1 className="mt-2 font-serif text-3xl font-medium tracking-tight text-text sm:text-4xl">
-          Architecture Notes
+    <div className="flex flex-col gap-10">
+      <title>{`Field Notes & Technical Writing · ${site.fullName || site.name}`}</title>
+
+      <div className="border-b border-line pb-6">
+        <span className="label-mono">Technical Writing</span>
+        <h1 className="mt-1 text-3xl font-bold tracking-tight text-text sm:text-4xl">
+          Engineering Field Notes
         </h1>
-        <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted font-sans">
-          Deep dives into production systems, failure modes, retrieval optimization,
-          and model serving at scale. No marketing fluff—just architecture decisions, trade-offs, and benchmarks.
+        <p className="mt-2 max-w-2xl text-base leading-relaxed text-muted font-sans">
+          Deep dives into real production systems, failure modes, retrieval optimization,
+          and model serving at scale.
         </p>
       </div>
 
-      <div className="mt-8 divide-y divide-line border-y border-line">
+      <div className="grid gap-4 sm:grid-cols-2">
         {articles.map((article) => (
-          <article key={article.slug} className="py-6 transition-colors hover:bg-raised/40 -mx-3 px-3 rounded">
-            <Link to={`/writing/${article.slug}`} className="group block">
-              <div className="flex items-center gap-2 font-mono text-xs text-faint mb-2">
-                <time>{article.date}</time>
-                <span>·</span>
-                <span>{article.readTime}</span>
-                <span>·</span>
+          <Link
+            key={article.slug}
+            to={`/writing/${article.slug}`}
+            className="group flex flex-col justify-between rounded-xl border border-line bg-surface p-6 transition-all hover:border-accent hover:shadow-sm"
+          >
+            <div>
+              <div className="flex items-center justify-between font-mono text-[11px] text-faint mb-3">
                 <span className="text-accent font-semibold">#{article.topic.toLowerCase()}</span>
+                <span>{article.readTime}</span>
               </div>
 
-              <h2 className="font-serif text-2xl font-medium text-text group-hover:text-accent transition-colors leading-snug">
+              <h2 className="text-lg font-bold text-text group-hover:text-accent transition-colors leading-snug">
                 {article.title}
               </h2>
 
-              <p className="mt-2 text-sm text-muted leading-relaxed font-sans max-w-2xl">
+              <p className="mt-2 text-xs leading-relaxed text-muted font-sans line-clamp-3">
                 {article.summary}
               </p>
+            </div>
 
-              <div className="mt-3 flex items-center gap-1.5 text-xs font-mono font-medium text-accent">
-                <span>Read essay</span>
-                <span aria-hidden="true">→</span>
-              </div>
-            </Link>
-          </article>
+            <div className="mt-6 pt-3 border-t border-line/60 flex items-center justify-between font-mono text-xs text-faint">
+              <span>{article.date}</span>
+              <span className="text-accent group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1">
+                <span>Read Note</span>
+                <ArrowRight className="h-3 w-3" />
+              </span>
+            </div>
+          </Link>
         ))}
       </div>
 
       <Contact />
-    </>
+    </div>
   );
 }

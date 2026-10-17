@@ -3,52 +3,43 @@ import { site } from "../content/site";
 
 export default function Footer() {
   return (
-    <footer className="mt-16 border-t-2 border-text pt-8 pb-12 print-hidden">
+    <footer className="mt-16 border-t border-line pt-8 pb-12 print-hidden font-mono text-xs">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="font-serif text-lg font-medium text-text">
-            {site.fullName || site.name}
-          </p>
-          <p className="mt-0.5 text-xs text-muted">
-            Principal Engineer, AI & Platform ·{" "}
-            <a href={`mailto:${site.email}`} className="hover:text-accent underline underline-offset-2">
+        <div className="flex items-center gap-3">
+          <div className="grid h-6 w-6 place-items-center rounded bg-surface border border-line text-[10px] font-bold text-accent">
+            SM
+          </div>
+          <div>
+            <span className="font-semibold text-text">{site.fullName || site.name}</span>
+            <span className="text-faint mx-2">·</span>
+            <a href={`mailto:${site.email}`} className="text-muted hover:text-accent underline underline-offset-2">
               {site.email}
             </a>
-          </p>
+          </div>
         </div>
 
-        <nav className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
-          <Link to="/" className="hover:text-accent transition-colors">Home</Link>
-          <span>·</span>
-          <Link to="/work" className="hover:text-accent transition-colors">Work</Link>
-          <span>·</span>
-          <Link to="/writing" className="hover:text-accent transition-colors">Writing</Link>
-          <span>·</span>
-          <Link to="/about" className="hover:text-accent transition-colors">About</Link>
-          <span>·</span>
-          <Link to="/resume" className="hover:text-accent transition-colors">Resume</Link>
+        <nav className="flex flex-wrap items-center gap-x-4 gap-y-1 text-muted">
+          <Link to="/" className="hover:text-text transition-colors">Overview</Link>
+          <Link to="/work" className="hover:text-text transition-colors">Case Studies</Link>
+          <Link to="/writing" className="hover:text-text transition-colors">Field Notes</Link>
+          <Link to="/about" className="hover:text-text transition-colors">Philosophy</Link>
+          <Link to="/resume" className="hover:text-text transition-colors">Resume</Link>
           {site.links.github && (
-            <>
-              <span>·</span>
-              <a href={site.links.github} target="_blank" rel="noreferrer" className="hover:text-accent transition-colors">
-                GitHub
-              </a>
-            </>
+            <a href={site.links.github} target="_blank" rel="noreferrer" className="hover:text-text transition-colors">
+              GitHub
+            </a>
           )}
           {site.links.linkedin && (
-            <>
-              <span>·</span>
-              <a href={site.links.linkedin} target="_blank" rel="noreferrer" className="hover:text-accent transition-colors">
-                LinkedIn
-              </a>
-            </>
+            <a href={site.links.linkedin} target="_blank" rel="noreferrer" className="hover:text-text transition-colors">
+              LinkedIn
+            </a>
           )}
         </nav>
       </div>
 
-      <div className="mt-6 flex flex-col gap-1 border-t border-line pt-4 text-[11px] text-faint sm:flex-row sm:items-center sm:justify-between">
-        <span>© {new Date().getFullYear()} {site.fullName || site.name}. All rights reserved.</span>
-        <span>Distributed Systems & AI Infrastructure</span>
+      <div className="mt-6 flex flex-col gap-1 border-t border-line/60 pt-4 text-[11px] text-faint sm:flex-row sm:items-center sm:justify-between">
+        <span>© {new Date().getFullYear()} {site.fullName || site.name}. All systems operational.</span>
+        <span>Built with React 19 & Tailwind · Deployed on Vercel</span>
       </div>
     </footer>
   );
