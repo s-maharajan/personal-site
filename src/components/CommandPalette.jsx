@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ArrowRight, FileText, Briefcase, BookOpen, Mail, Check } from "lucide-react";
+import { Search, ArrowRight, FileText, Briefcase, BookOpen, Mail, Check, Terminal, MessageSquare } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "./Icons";
 import { work } from "../content/work";
 import { articles } from "../content/writing";
+import { tools } from "../content/tools";
+import { banterPosts } from "../content/banter";
 import { site } from "../content/site";
 
 export default function CommandPalette({ isOpen, onClose }) {
@@ -28,12 +30,14 @@ export default function CommandPalette({ isOpen, onClose }) {
 
   // Aggregate searchable items
   const items = [
-    // Pages
-    { id: "page-home", title: "Home", category: "Navigation", icon: ArrowRight, action: () => navigate("/") },
-    { id: "page-work", title: "Case Studies (All 5)", category: "Navigation", icon: Briefcase, action: () => navigate("/work") },
-    { id: "page-writing", title: "Technical Writing & Essays", category: "Navigation", icon: BookOpen, action: () => navigate("/writing") },
-    { id: "page-about", title: "About & Engineering Principles", category: "Navigation", icon: ArrowRight, action: () => navigate("/about") },
-    { id: "page-resume", title: "Printable Engineering Resume", category: "Navigation", icon: FileText, action: () => navigate("/resume") },
+    // Navigation Pages
+    { id: "page-home", title: "Overview / Home", category: "Navigation", icon: ArrowRight, action: () => navigate("/") },
+    { id: "page-work", title: `Case Studies (${work.length} dossiers)`, category: "Navigation", icon: Briefcase, action: () => navigate("/work") },
+    { id: "page-writing", title: `Field Notes (${articles.length} essays)`, category: "Navigation", icon: BookOpen, action: () => navigate("/writing") },
+    { id: "page-tools", title: `Tools & Open Source (${tools.length} blueprints)`, category: "Navigation", icon: Terminal, action: () => navigate("/tools") },
+    { id: "page-banter", title: `Byte-Sized Banter (${banterPosts.length} takes)`, category: "Navigation", icon: MessageSquare, action: () => navigate("/banter") },
+    { id: "page-about", title: "Engineering Philosophy & Background", category: "Navigation", icon: ArrowRight, action: () => navigate("/about") },
+    { id: "page-resume", title: "Printable Executive Resume", category: "Navigation", icon: FileText, action: () => navigate("/resume") },
 
     // Case studies
     ...work.map((w) => ({
@@ -45,14 +49,34 @@ export default function CommandPalette({ isOpen, onClose }) {
       action: () => navigate(`/work/${w.slug}`),
     })),
 
+    // Tools
+    ...tools.map((t) => ({
+      id: `tool-${t.slug}`,
+      title: t.title,
+      subtitle: `${t.category} · ${t.metrics.label}: ${t.metrics.value}`,
+      category: "Tools & Blueprints",
+      icon: Terminal,
+      action: () => navigate("/tools"),
+    })),
+
     // Writing
     ...articles.map((a) => ({
       id: `article-${a.slug}`,
       title: a.title,
       subtitle: `${a.topic} · ${a.readTime}`,
-      category: "Writing",
+      category: "Field Notes",
       icon: BookOpen,
       action: () => navigate(`/writing/${a.slug}`),
+    })),
+
+    // Banter
+    ...banterPosts.map((b) => ({
+      id: `banter-${b.slug}`,
+      title: b.title,
+      subtitle: `#${b.tag.toLowerCase()} · ${b.readTime}`,
+      category: "Byte-Sized Banter",
+      icon: MessageSquare,
+      action: () => navigate("/banter"),
     })),
 
     // Actions
@@ -139,7 +163,7 @@ export default function CommandPalette({ isOpen, onClose }) {
               setSelectedIndex(0);
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Type a command or search case studies, articles, tech stack..."
+            placeholder="Search dossiers, tools, field notes, banter, tech stack..."
             className="w-full bg-transparent font-sans text-sm text-text placeholder-faint focus:outline-none"
           />
           <kbd className="rounded border border-line bg-raised px-1.5 py-0.5 font-mono text-[11px] text-faint">

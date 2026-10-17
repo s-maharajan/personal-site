@@ -1,4 +1,4 @@
-// Published technical essays and deep-dives.
+// Published technical essays, architecture reviews, and production deep-dives.
 export const articles = [
   {
     slug: "why-rag-hallucinates-chunking",
@@ -73,10 +73,126 @@ However, during high-batch decoding, modern Hopper GPUs (H100/H200) feature dedi
     ],
   },
   {
+    slug: "head-of-line-blocking-llm-batching",
+    title: "The Head-of-Line Blocking Trap in Continuous Batching",
+    topic: "Inference",
+    date: "July 2025",
+    readTime: "8 min read",
+    summary:
+      "Why mixing 4k-token document summarization with 50-token chatbot turns destroys tail latency, and how iteration-level chunked prefill fixes it.",
+    excerpt:
+      "When continuous batching arrived, we thought scheduling was solved. In reality, a massive prefill iteration can stall dozens of ongoing decode streams for 800 milliseconds, turning a snappy 50ms time-to-first-token into an on-call nightmare.",
+    content: [
+      {
+        heading: "The Asymmetry of Prefill and Decode",
+        body: `LLM inference consists of two fundamentally distinct phases:
+1. **Prefill (Prompt Processing)**: Highly parallelizable, compute-bound matrix multiplications that saturate every tensor core.
+2. **Decode (Token Generation)**: Sequential, memory-bandwidth-bound operations where the entire model weights must be streamed through the memory bus for every single generated token.
+
+When a 4,000-token prompt enters a standard continuous batching scheduler, the engine attempts to process all 4,000 tokens in a single forward pass. This prefill kernel monopolizes the GPU for hundreds of milliseconds, blocking all ongoing decode streams in the same batch from emitting their next token.`,
+      },
+      {
+        heading: "Measuring the Blast Radius",
+        body: `In our production telemetry, we observed that while median token generation latency was 28ms, the p99 spiked to 1,200ms whenever a heavy document analysis request landed on the pod. The conversational users experienced visible UI stuttering and websocket timeouts.
+
+The root cause: the scheduler had no prefill budget limit. A single giant prompt was starving 40 small conversational streams.`,
+      },
+      {
+        heading: "Chunked Prefill: Splitting Prompts Across Iterations",
+        body: `The modern architectural pattern to prevent this is **Chunked Prefill**:
+- Instead of computing a 4,000-token prompt in one massive pass, chunk it into slices of 512 tokens.
+- On iteration 1: execute 512 tokens of the prefill alongside 32 decode tokens.
+- On iteration 2: execute the next 512 tokens of the prefill alongside the next 32 decode tokens.
+
+By capping \`max_num_batched_tokens\` (e.g. at 2,048 or 4,096 tokens per step), the GPU execution time per iteration remains bounded under 40ms. Tail latency collapses from 4.2s down to 680ms with negligible throughput degradation.`,
+      },
+    ],
+  },
+  {
+    slug: "deterministic-outbox-kafka-cdc",
+    title: "Deterministic Replication: The PostgreSQL Outbox to Kafka Pipeline",
+    topic: "Distributed Systems",
+    date: "June 2025",
+    readTime: "9 min read",
+    summary:
+      "Dual-writes to databases and message queues are guaranteed to produce silent data corruption. How we built zero-loss CDC outbox replication.",
+    excerpt:
+      "Every junior architect tries to write to PostgreSQL and publish to Kafka inside the same HTTP handler. Network partitions, crashes between step A and B, and rollback inconsistencies will corrupt your downstream state.",
+    content: [
+      {
+        heading: "The Dual-Write Anti-Pattern",
+        body: `Consider the naive pattern:
+\`\`\`go
+func HandleOrder(order Order) error {
+    tx := db.Begin()
+    if err := tx.Save(&order); err != nil { return err }
+    if err := kafka.Publish("orders", order); err != nil {
+        tx.Rollback() // What if Rollback fails? What if the network times out?
+        return err
+    }
+    return tx.Commit() // What if Commit fails after Kafka published?
+}
+\`\`\`
+There is no two-phase commit between PostgreSQL and Apache Kafka without intolerable latency and distributed deadlock hazards. If the database commits but the network to Kafka drops, the downstream systems miss the event forever. If Kafka accepts the message but the database commit aborts on a serialization conflict, the downstream systems process a ghost transaction.`,
+      },
+      {
+        heading: "The Transactional Outbox Pattern",
+        body: `The architectural fix is atomicity within the local database engine:
+1. Write the domain entity (e.g., \`orders\`) and an event record into an \`outbox_events\` table within the exact same ACID database transaction.
+2. If the transaction commits, both records are guaranteed to exist on disk in the Write-Ahead Log (WAL). If it aborts, neither exists.
+3. A separate CDC worker reads the PostgreSQL WAL stream using logical decoding (\`pgoutput\`) and streams the outbox records to Kafka with exact partition keys.`,
+      },
+      {
+        heading: "Handling Schema Evolution and High Throughput",
+        body: `In our production deployment processing 3.2M daily transactions:
+- We avoided polling queries (\`SELECT * FROM outbox WHERE sent = false\`) which create massive index bloat and table lock contention.
+- We used dedicated logical replication slots that stream WAL changes at under 15ms latency.
+- Consumers use deterministic deduplication idempotency keys (\`event_id\`) stored in Redis with an atomic TTL to guarantee exact-once downstream processing even during failovers.`,
+      },
+    ],
+  },
+  {
+    slug: "reciprocal-rank-fusion-real-world",
+    title: "Reciprocal Rank Fusion: Why Vector-Only Search Fails at Scale",
+    topic: "Retrieval",
+    date: "May 2025",
+    readTime: "7 min read",
+    summary:
+      "Comparing BM25, dense embeddings, and cross-encoders across 14M enterprise records: why hybrid RRF delivers +34% relevance gains.",
+    excerpt:
+      "Semantic vector search is brilliant for fuzzy conversational questions, but disastrous for alphanumeric part numbers, error codes, and legal terms. How to combine lexical and semantic retrieval with reciprocal rank fusion.",
+    content: [
+      {
+        heading: "The Semantic Drift of Vector Embeddings",
+        body: `Dense vector embeddings project documents into high-dimensional geometric space where conceptual similarity equals cosine distance. This is extraordinary when someone searches for 'ways to cancel a contract' and finds documents talking about 'termination clauses'.
+
+However, when an engineer searches for error code \`ERR_CONN_RESET_4032\`, vector models fail. Because the specific token is rare in the training corpus, the embedding model places it near generic network errors, returning documents about DNS timeouts and TLS handshakes. Meanwhile, classic BM25 lexical search finds the exact match in 4 milliseconds.`,
+      },
+      {
+        heading: "Reciprocal Rank Fusion (RRF) Architecture",
+        body: `Rather than normalizing raw scores (which are calibrated completely differently between BM25 and cosine distance), RRF uses rank position:
+\`\`\`
+RRF_Score(d) = Σ [ 1 / (k + rank_i(d)) ]
+\`\`\`
+where \`k\` is a smoothing constant (typically 60) and \`rank_i(d)\` is the position of document \`d\` in search system \`i\`.
+This guarantees that a document appearing in the top 3 of both lexical and vector results rises to the top, while protecting against score distortion from outlier vector distances.`,
+      },
+      {
+        heading: "The Two-Stage Pipeline in Production",
+        body: `In our production pipeline across 14 million documents:
+1. **Stage 1 (Parallel Fanout)**: Query BM25 (Elasticsearch) and Dense Vector Index (FAISS HNSW) in parallel, retrieving top 100 candidates from each.
+2. **Stage 2 (RRF Merge)**: Merge candidate lists via RRF to produce top 40 candidates.
+3. **Stage 3 (Cross-Encoder Reranking)**: Pass the top 40 candidates through a lightweight BGE-Reranker model that scores full cross-attention between query and passage.
+
+This three-stage pipeline elevated nDCG@10 by 34% while keeping p95 latency under 45ms.`,
+      },
+    ],
+  },
+  {
     slug: "evals-before-models",
     title: "Evals before models: building a continuous LLM regression harness",
     topic: "Evaluation",
-    date: "May 2025",
+    date: "April 2025",
     readTime: "5 min read",
     summary:
       "Why synthetic test suites fail and how deterministic assertion cascades caught 92% of regressions before canary deployment.",
@@ -109,7 +225,7 @@ We built our CI evaluation pipeline as an tiered assertion cascade:
     slug: "agents-services-bad-memory",
     title: "Agents are services with bad memory",
     topic: "Agents",
-    date: "January 2025",
+    date: "February 2025",
     readTime: "6 min read",
     summary:
       "Treating agent execution loops as distributed state machines with idempotency keys, durable checkpoints, and state graphs.",
@@ -140,6 +256,37 @@ In production, this pattern is catastrophic. If the process crashes on step 4, t
 1. **Working Memory (Scratchpad)**: Transient token buffer for the immediate step.
 2. **Episodic Memory**: Checkpointed state machine log tracking past tool outputs and branch decisions.
 3. **Semantic Long-Term Memory**: Vector and key-value store queryable on-demand through explicit retrieval tools.`,
+      },
+    ],
+  },
+  {
+    slug: "p99-tail-latency-tax",
+    title: "The Tail Latency Tax: Debugging p99 Spikes Across gRPC & Kernel Swapping",
+    topic: "Observability",
+    date: "January 2025",
+    readTime: "8 min read",
+    summary:
+      "How we tracked a 3-second periodic latency spike down through Envoy connection pools, Linux CFS CPU throttling, and Go GC stop-the-world pauses.",
+    excerpt:
+      "A service with a 15ms median response time can still breach SLA if 1 in 100 requests hangs for 3 seconds. Here is how we instrumented eBPF and distributed traces to eliminate invisible tail latency.",
+    content: [
+      {
+        heading: "The Deceptive Allure of Median Latency",
+        body: `Engineers often look at p50 or average latency dashboards and conclude their systems are fast. But in microservice architectures where a single user request fans out across 20 downstream RPCs, the probability of hitting at least one p99 response is:
+\`\`\`
+P(encountering p99) = 1 - (0.99)^20 ≈ 18.2%
+\`\`\`
+Nearly 1 in 5 user transactions will hit a tail latency penalty. Tail latency is not an anomaly; it is the dominant user experience at scale.`,
+      },
+      {
+        heading: "The Ghost in the Metrics: CFS CPU Throttling",
+        body: `During an incident audit on our payment gateway, we observed periodic 2,800ms latency spikes occurring exactly every 100ms under moderate load. Application code metrics showed no slow database queries or lock contention.
+
+By attaching eBPF probes to the Linux kernel CFS (Completely Fair Scheduler), we discovered Kubernetes CPU limits were actively throttling the container. When multiple requests arrived concurrently, the Go runtime spawned OS threads that burned through the pod's 100ms CFS quota in 15ms. The kernel froze all threads for the remaining 85ms of the epoch. Removing aggressive CPU limits and sizing by memory requests alone instantly eliminated the recurring spikes.`,
+      },
+      {
+        heading: "Envoy Connection Pooling and TCP Keep-Alives",
+        body: `The remaining tail latency was caused by TCP handshake overhead and TLS renegotiation during sudden traffic surges. By configuring Envoy with warm connection pools, HTTP/2 connection multiplexing, and TCP keep-alive probes, we cut connection setup latency from 65ms to 0ms on the critical path.`,
       },
     ],
   },

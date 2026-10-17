@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, FileText } from "lucide-react";
+import { ArrowRight, FileText, Terminal, MessageSquare, Mail } from "lucide-react";
 import { site } from "../content/site";
 import { principles, toolbox, experience } from "../content/about";
 import Contact from "../components/Contact";
@@ -36,9 +36,43 @@ export default function About() {
               <span>Read Field Notes</span>
               <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.75} />
             </Link>
+            <Link to="/tools" className="btn-ghost">
+              <Terminal className="h-3.5 w-3.5" />
+              <span>Open Source Tools</span>
+            </Link>
+            <Link to="/banter" className="btn-ghost">
+              <MessageSquare className="h-3.5 w-3.5" />
+              <span>Byte-Sized Banter</span>
+            </Link>
           </div>
         </div>
       </div>
+
+      {/* Advisory & Consulting Section */}
+      <section className="rounded-2xl border border-accent/40 bg-gradient-to-br from-surface to-raised p-6 sm:p-7 font-sans">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <div className="max-w-xl">
+            <span className="label-mono text-accent">High-Concurrency Audits</span>
+            <h2 className="mt-1 text-xl font-bold text-text">
+              {site.advisory.title}
+            </h2>
+            <p className="mt-2 text-sm text-muted leading-relaxed">
+              {site.advisory.description}
+            </p>
+            <p className="mt-2.5 font-mono text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+              ● {site.advisory.availability}
+            </p>
+          </div>
+
+          <a
+            href={`mailto:${site.email}?subject=Architecture Review / Advisory Inquiry`}
+            className="btn-primary shrink-0 self-start sm:self-auto"
+          >
+            <Mail className="h-3.5 w-3.5" />
+            <span>Inquire Directly</span>
+          </a>
+        </div>
+      </section>
 
       {/* Principles */}
       <section className="flex flex-col gap-4">
@@ -51,7 +85,7 @@ export default function About() {
 
         <div className="grid gap-3 sm:grid-cols-2">
           {principles.map(([title, detail], idx) => (
-            <div key={title} className="rounded-xl border border-line bg-surface p-5">
+            <div key={title} className="rounded-2xl border border-line bg-surface p-5">
               <div className="flex items-center gap-2">
                 <span className="font-mono text-xs font-bold text-accent">0{idx + 1}.</span>
                 <h3 className="text-sm font-semibold text-text">{title}</h3>
@@ -73,7 +107,7 @@ export default function About() {
 
         <div className="flex flex-col gap-3">
           {experience.map((e) => (
-            <div key={e.period} className="rounded-xl border border-line bg-surface p-4 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
+            <div key={e.period} className="rounded-2xl border border-line bg-surface p-4 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
               <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4">
                 <span className="font-mono text-xs font-bold text-accent w-24 shrink-0">{e.period}</span>
                 <div>
@@ -95,7 +129,7 @@ export default function About() {
           </h2>
         </div>
 
-        <div className="rounded-xl border border-line bg-surface divide-y divide-line font-mono text-xs">
+        <div className="rounded-2xl border border-line bg-surface divide-y divide-line font-mono text-xs">
           {toolbox.map(([group, items]) => (
             <div key={group} className="grid gap-1.5 p-4 sm:grid-cols-[12rem_1fr] sm:gap-4 items-baseline">
               <span className="font-semibold text-text">{group}</span>

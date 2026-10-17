@@ -22,6 +22,8 @@ export default function Footer() {
           <Link to="/" className="hover:text-text transition-colors">Overview</Link>
           <Link to="/work" className="hover:text-text transition-colors">Case Studies</Link>
           <Link to="/writing" className="hover:text-text transition-colors">Field Notes</Link>
+          <Link to="/tools" className="hover:text-text transition-colors">Tools</Link>
+          <Link to="/banter" className="hover:text-text transition-colors">Banter</Link>
           <Link to="/about" className="hover:text-text transition-colors">Philosophy</Link>
           <Link to="/resume" className="hover:text-text transition-colors">Resume</Link>
           {site.links.github && (
@@ -38,8 +40,8 @@ export default function Footer() {
       </div>
 
       <div className="mt-6 flex flex-col gap-1 border-t border-line/60 pt-4 text-[11px] text-faint sm:flex-row sm:items-center sm:justify-between">
-        <span>© {new Date().getFullYear()} {site.fullName || site.name}. All systems operational.</span>
-        <span>Built with React 19 & Tailwind · Deployed on Vercel</span>
+        <span>© {new Date().getFullYear()} {site.fullName || site.name}. Distributed Systems & AI Platform.</span>
+        <span>Engineered Studio · Deployed on Vercel</span>
       </div>
     </footer>
   );
