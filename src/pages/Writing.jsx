@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Clock, Calendar } from "lucide-react";
 import { site } from "../content/site";
 import { articles } from "../content/writing";
 import Contact from "../components/Contact";
@@ -7,53 +6,40 @@ import Contact from "../components/Contact";
 export default function Writing() {
   return (
     <>
-      <title>{`Writing & Notes · ${site.name}`}</title>
-      <div className="max-w-3xl">
-        <p className="label">Engineering Notes</p>
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-text sm:text-4xl">
-          Writing & Architecture Notes
+      <title>{`Writing & Architecture Notes · ${site.fullName || site.name}`}</title>
+      <div className="pb-8 border-b border-line">
+        <p className="label">Essays & Field Notes</p>
+        <h1 className="mt-2 font-serif text-3xl font-medium tracking-tight text-text sm:text-4xl">
+          Architecture Notes
         </h1>
-        <p className="mt-5 text-lg leading-relaxed text-muted">
-          Deep dives into real production systems, failure modes, retrieval optimization,
+        <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted font-sans">
+          Deep dives into production systems, failure modes, retrieval optimization,
           and model serving at scale. No marketing fluff—just architecture decisions, trade-offs, and benchmarks.
         </p>
       </div>
 
-      <div className="mt-12 flex flex-col gap-6">
+      <div className="mt-8 divide-y divide-line border-y border-line">
         {articles.map((article) => (
-          <article key={article.slug} className="card group p-6 transition-all hover:border-faint sm:p-8">
-            <Link to={`/writing/${article.slug}`} className="block">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <span className="rounded-full border border-line bg-surface px-2.5 py-0.5 font-mono text-xs text-accent">
-                    {article.topic}
-                  </span>
-                  <div className="flex items-center gap-1.5 font-mono text-xs text-faint">
-                    <Calendar className="h-3.5 w-3.5" />
-                    <span>{article.date}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 font-mono text-xs text-faint">
-                    <Clock className="h-3.5 w-3.5" />
-                    <span>{article.readTime}</span>
-                  </div>
-                </div>
-                <ArrowUpRight
-                  className="h-5 w-5 text-faint transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
-                  strokeWidth={1.75}
-                  aria-hidden="true"
-                />
+          <article key={article.slug} className="py-6 transition-colors hover:bg-raised/40 -mx-3 px-3 rounded">
+            <Link to={`/writing/${article.slug}`} className="group block">
+              <div className="flex items-center gap-2 font-mono text-xs text-faint mb-2">
+                <time>{article.date}</time>
+                <span>·</span>
+                <span>{article.readTime}</span>
+                <span>·</span>
+                <span className="text-accent font-semibold">#{article.topic.toLowerCase()}</span>
               </div>
 
-              <h2 className="mt-4 text-xl font-semibold tracking-tight text-text group-hover:text-accent transition-colors sm:text-2xl">
+              <h2 className="font-serif text-2xl font-medium text-text group-hover:text-accent transition-colors leading-snug">
                 {article.title}
               </h2>
 
-              <p className="mt-3 max-w-prose text-base leading-relaxed text-muted">
+              <p className="mt-2 text-sm text-muted leading-relaxed font-sans max-w-2xl">
                 {article.summary}
               </p>
 
-              <div className="mt-6 flex items-center gap-2 text-sm font-medium text-accent">
-                <span>Read technical write-up</span>
+              <div className="mt-3 flex items-center gap-1.5 text-xs font-mono font-medium text-accent">
+                <span>Read essay</span>
                 <span aria-hidden="true">→</span>
               </div>
             </Link>

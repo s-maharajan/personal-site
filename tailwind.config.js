@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
@@ -12,14 +13,16 @@ export default {
         faint: "var(--faint)",
         line: "var(--line)",
         accent: "var(--accent)",
+        "accent-secondary": "var(--accent-secondary)",
       },
       fontFamily: {
-        sans: ["Geist", "ui-sans-serif", "system-ui", "sans-serif"],
+        serif: ["Newsreader", "Georgia", "Cambria", "Times New Roman", "serif"],
+        sans: ["IBM Plex Sans", "Geist", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["Geist Mono", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       maxWidth: {
-        page: "68rem",
-        prose: "40rem",
+        page: "52rem",
+        prose: "44rem",
       },
     },
   },

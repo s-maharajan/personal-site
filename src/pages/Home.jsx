@@ -1,150 +1,264 @@
-import { Link, useOutletContext } from "react-router-dom";
-import { ArrowRight, FileText } from "lucide-react";
+import { Link } from "react-router-dom";
+import { FileText, Mail, Copy, Check } from "lucide-react";
+import { useState } from "react";
 import { site } from "../content/site";
 import { work } from "../content/work";
-import { experience, writing } from "../content/about";
-import Section from "../components/Section";
-import WorkGrid from "../components/WorkGrid";
-import Contact from "../components/Contact";
-import LatencyCard from "../components/LatencyCard";
+import { articles } from "../content/writing";
+import { principles } from "../content/about";
 import LLMSimulator from "../components/LLMSimulator";
+import { GithubIcon, LinkedinIcon } from "../components/Icons";
 
 export default function Home() {
-  const { onOpenPalette } = useOutletContext() || {};
+  const [copied, setCopied] = useState(false);
+  const featuredArticle = articles[0];
+
+  const handleCopyEmail = async () => {
+    await navigator.clipboard.writeText(site.email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <>
-      <title>{`${site.name} · ${site.role}`}</title>
+      <title>{`${site.fullName || site.name} · ${site.role}`}</title>
 
-      {/* Hero Section */}
-      <section className="grid items-center gap-10 lg:grid-cols-[1fr_22rem] lg:gap-16">
-        <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-muted">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
-              {site.role}
-            </p>
-            {onOpenPalette && (
-              <button
-                type="button"
-                onClick={onOpenPalette}
-                className="hidden items-center gap-1.5 rounded-full border border-line/80 bg-raised/70 px-2.5 py-1 text-xs text-faint transition hover:border-faint hover:text-muted sm:inline-flex"
-                title="Search everything"
-              >
-                <kbd className="font-mono text-[10px]">⌘K</kbd> Quick Search
-              </button>
-            )}
-          </div>
+      {/* Intro Header (Inspired by Charly Webster & Steven Gonsalvez) */}
+      <section className="pb-8 border-b border-line">
+        <p className="font-mono text-xs uppercase tracking-wider text-accent font-semibold">
+          {site.role}
+        </p>
+        <h1 className="mt-3 font-serif text-3xl font-medium tracking-tight text-text sm:text-4xl leading-tight">
+          Systems that hold up at p99.
+        </h1>
+        <p className="mt-4 text-base sm:text-lg leading-relaxed text-muted max-w-2xl font-sans">
+          I build distributed platforms and production AI infrastructure. Over the past decade, that has
+          meant designing high-throughput model serving runtimes, prefix-cache reuse, hybrid retrieval engines,
+          and deterministic event pipelines—and making sure they stay dependable when traffic spikes.
+        </p>
 
-          <h1 className="mt-6 text-3xl font-semibold tracking-tight text-text sm:text-4xl">
-            Hi, I'm {site.name}.
-          </h1>
-          <p className="mt-3 max-w-prose text-xl leading-snug text-muted sm:text-2xl">{site.tagline}</p>
-          <p className="mt-5 max-w-prose leading-relaxed text-muted">{site.intro}</p>
+        {/* Quick Social & Contact Bar */}
+        <div className="mt-6 flex flex-wrap items-center gap-3 text-xs">
+          <button
+            type="button"
+            onClick={handleCopyEmail}
+            className="inline-flex items-center gap-1.5 rounded border border-line bg-surface px-3 py-1.5 font-mono text-text hover:border-text transition-colors"
+          >
+            {copied ? <Check className="h-3.5 w-3.5 text-accent" /> : <Copy className="h-3.5 w-3.5 text-faint" />}
+            <span>{copied ? "Email Copied!" : site.email}</span>
+          </button>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/work" className="btn-primary">
-              See case studies
-              <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-            </Link>
-            <Link to="/resume" className="btn-ghost">
-              <FileText className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
-              Resume
-            </Link>
-            <a href="#contact" className="btn-ghost">Get in touch</a>
-          </div>
-        </div>
-        <LatencyCard />
-      </section>
+          <a
+            href={`mailto:${site.email}`}
+            className="inline-flex items-center gap-1.5 rounded border border-line bg-surface px-3 py-1.5 text-muted hover:text-text hover:border-text transition-colors"
+          >
+            <Mail className="h-3.5 w-3.5 text-faint" />
+            <span>Send Email</span>
+          </a>
 
-      {/* Now Section */}
-      <section className="mt-16" aria-labelledby="now">
-        <p id="now" className="label">Focus Areas (Now)</p>
-        <ul className="mt-3 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
-          {site.now.map((item) => (
-            <li key={item} className="flex gap-3 bg-bg p-5 text-sm leading-relaxed text-muted">
-              <span className="mt-[0.55em] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
-              {item}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Selected Case Studies */}
-      <Section
-        label="Selected work"
-        title="Problems that didn't give way to the obvious fix"
-        action={
-          <Link to="/work" className="link text-sm text-muted">
-            All {work.length} case studies →
+          <Link
+            to="/resume"
+            className="inline-flex items-center gap-1.5 rounded border border-line bg-surface px-3 py-1.5 text-muted hover:text-text hover:border-text transition-colors"
+          >
+            <FileText className="h-3.5 w-3.5 text-faint" />
+            <span>Resume</span>
           </Link>
-        }
-      >
-        <WorkGrid items={work.slice(0, 4)} />
-      </Section>
 
-      {/* Interactive Systems Lab */}
-      <section className="mt-20 sm:mt-28">
-        <div className="mb-8">
-          <p className="label">Interactive Simulation</p>
-          <h2 className="mt-2 text-xl font-semibold tracking-tight text-text sm:text-2xl">
-            Explore P99 Tail Latency Dynamics
+          {site.links.linkedin && (
+            <a
+              href={site.links.linkedin}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded border border-line bg-surface px-3 py-1.5 text-muted hover:text-text hover:border-text transition-colors"
+            >
+              <LinkedinIcon className="h-3.5 w-3.5 text-faint" />
+              <span>LinkedIn</span>
+            </a>
+          )}
+
+          {site.links.github && (
+            <a
+              href={site.links.github}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded border border-line bg-surface px-3 py-1.5 text-muted hover:text-text hover:border-text transition-colors"
+            >
+              <GithubIcon className="h-3.5 w-3.5 text-faint" />
+              <span>GitHub</span>
+            </a>
+          )}
+        </div>
+      </section>
+
+      {/* Featured Deep Dive / Long Read (Steven Gonsalvez Featured Story Style) */}
+      {featuredArticle && (
+        <section className="py-8 border-b-2 border-text">
+          <Link to={`/writing/${featuredArticle.slug}`} className="group block cursor-pointer">
+            <div className="flex items-center gap-3 mb-3 flex-wrap">
+              <span className="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 bg-text text-bg font-semibold rounded-sm">
+                Long read
+              </span>
+              <span className="font-mono text-xs text-faint">{featuredArticle.date}</span>
+              <span className="text-line">|</span>
+              <span className="font-mono text-xs text-faint">{featuredArticle.readTime}</span>
+              <span className="text-line">|</span>
+              <span className="font-mono text-xs text-accent">#{featuredArticle.topic.toLowerCase()}</span>
+            </div>
+
+            <h2 className="font-serif text-2xl sm:text-3xl font-medium text-text group-hover:text-accent transition-colors leading-snug">
+              {featuredArticle.title}
+            </h2>
+
+            <p className="mt-3 text-base text-muted leading-relaxed max-w-2xl">
+              {featuredArticle.summary}
+            </p>
+
+            <div className="mt-4 flex items-center gap-1 text-sm font-medium text-accent group-hover:underline">
+              <span>Read complete architecture write-up</span>
+              <span aria-hidden="true">→</span>
+            </div>
+          </Link>
+        </section>
+      )}
+
+      {/* Selected Systems Work (Clean Editorial Row List) */}
+      <section className="py-10 border-b border-line">
+        <div className="flex items-baseline justify-between mb-6">
+          <div>
+            <p className="label">Selected Architecture</p>
+            <h2 className="mt-1 font-serif text-2xl font-medium text-text">
+              Production Case Studies
+            </h2>
+          </div>
+          <Link to="/work" className="text-xs font-mono text-muted hover:text-accent underline underline-offset-2">
+            All {work.length} studies →
+          </Link>
+        </div>
+
+        <div className="divide-y divide-line">
+          {work.slice(0, 4).map((w) => (
+            <Link
+              key={w.slug}
+              to={`/work/${w.slug}`}
+              className="group block py-5 transition-colors hover:bg-raised/50 -mx-3 px-3 rounded"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
+                <div className="flex items-baseline gap-2.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent shrink-0 mt-1 sm:mt-0" />
+                  <h3 className="font-serif text-lg font-medium text-text group-hover:text-accent transition-colors">
+                    {w.title}
+                  </h3>
+                </div>
+                <div className="font-mono text-xs font-semibold text-accent shrink-0 sm:text-right">
+                  {w.metric.label}: {w.metric.value}
+                </div>
+              </div>
+
+              <p className="mt-1.5 text-sm text-muted leading-relaxed pl-4 max-w-2xl">
+                {w.summary}
+              </p>
+
+              <div className="mt-2 pl-4 flex flex-wrap items-center gap-2 font-mono text-[11px] text-faint">
+                <span>{w.year}</span>
+                <span>·</span>
+                <span>{w.category}</span>
+                <span>·</span>
+                <span className="text-muted">{w.stack.slice(0, 4).join(", ")}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Interactive Systems Lab (Linear Precision Instrument) */}
+      <section className="py-10 border-b border-line">
+        <div className="mb-6">
+          <p className="label">Interactive Systems Lab</p>
+          <h2 className="mt-1 font-serif text-2xl font-medium text-text">
+            Simulate P99 Tail Latency & Memory Contention
           </h2>
+          <p className="mt-2 text-sm text-muted">
+            Test how prompt sizes, concurrency, and prefix KV-cache reuse impact tail latency and GPU cost.
+          </p>
         </div>
         <LLMSimulator />
       </section>
 
-      {/* Experience Timeline */}
-      <Section
-        label="Experience"
-        title="A decade of distributed backends and production AI systems"
-        action={
-          <Link to="/resume" className="link text-sm text-muted">
-            View full resume →
+      {/* Latest Technical Writing (Charly Webster Post List Style) */}
+      <section className="py-10 border-b border-line">
+        <div className="flex items-baseline justify-between mb-6">
+          <div>
+            <p className="label">Writing</p>
+            <h2 className="mt-1 font-serif text-2xl font-medium text-text">
+              Architecture Notes & Essays
+            </h2>
+          </div>
+          <Link to="/writing" className="text-xs font-mono text-muted hover:text-accent underline underline-offset-2">
+            All essays →
           </Link>
-        }
-      >
-        <ol className="relative ml-1.5 flex flex-col gap-10 border-l border-line pl-8">
-          {experience.map((e, i) => (
-            <li key={e.period} className="relative">
-              <span
-                className={`absolute -left-[2.3rem] top-1.5 h-3 w-3 rounded-full border-2 border-bg ${
-                  i === 0 ? "bg-accent" : "bg-faint"
-                }`}
-                aria-hidden="true"
-              />
-              <p className="font-mono text-sm tabular-nums text-faint">{e.period}</p>
-              <h3 className="mt-1 text-lg font-medium text-text">{e.title}</h3>
-              <p className="mt-1 max-w-prose text-muted">{e.detail}</p>
+        </div>
+
+        <ol className="divide-y divide-line">
+          {articles.map((article) => (
+            <li key={article.slug} className="py-5">
+              <article>
+                <div className="flex items-center gap-2 font-mono text-xs text-faint mb-1.5">
+                  <time>{article.date}</time>
+                  <span>·</span>
+                  <span>{article.readTime}</span>
+                </div>
+                <h3 className="font-serif text-lg font-medium text-text">
+                  <Link
+                    to={`/writing/${article.slug}`}
+                    className="hover:text-accent transition-colors hover:underline underline-offset-2"
+                  >
+                    {article.title}
+                  </Link>
+                </h3>
+                <p className="mt-1.5 text-sm text-muted leading-relaxed">
+                  {article.summary}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <span className="font-mono text-[11px] text-accent">
+                    #{article.topic.toLowerCase()}
+                  </span>
+                  <span className="font-mono text-[11px] text-faint">
+                    #systems
+                  </span>
+                  <span className="font-mono text-[11px] text-faint">
+                    #production
+                  </span>
+                </div>
+              </article>
             </li>
           ))}
         </ol>
-      </Section>
+      </section>
 
-      {/* Writing Section */}
-      <Section
-        label="Writing & Notes"
-        title="Architecture breakdowns and failure post-mortems"
-        action={
-          <Link to="/writing" className="link text-sm text-muted">
-            All 4 technical write-ups →
-          </Link>
-        }
-      >
-        <ul className="card divide-y divide-line">
-          {writing.map((post) => (
-            <li key={post.title} className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 px-6 py-5">
-              <Link to={post.href} className="link font-medium text-text group-hover:text-accent">
-                {post.title}
-              </Link>
-              <span className="font-mono text-xs text-faint">
-                {post.topic} · {post.readTime} · {post.date}
-              </span>
-            </li>
+      {/* A Bit About Me & Engineering Philosophy (Charly Webster Style) */}
+      <section className="py-10">
+        <p className="label">Philosophy</p>
+        <h2 className="mt-1 font-serif text-2xl font-medium text-text">
+          A Bit About How I Work
+        </h2>
+        <div className="mt-4 space-y-4 text-base leading-relaxed text-muted max-w-2xl font-sans">
+          <p>
+            I care about building dependable software and healthy platform foundations: clear architectural direction,
+            profiling before arguing, keeping the hot path boring, and designing systems that survive the requirement nobody has written yet.
+          </p>
+          <p>
+            This site is where I share field notes from production: what worked, what failed under load, and the trade-offs worth remembering.
+          </p>
+        </div>
+
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          {principles.map(([title, detail]) => (
+            <div key={title} className="border-l-2 border-line pl-4 py-1">
+              <h3 className="font-serif text-base font-medium text-text">{title}</h3>
+              <p className="mt-1 text-xs leading-relaxed text-muted">{detail}</p>
+            </div>
           ))}
-        </ul>
-      </Section>
-
-      <Contact />
+        </div>
+      </section>
     </>
   );
 }

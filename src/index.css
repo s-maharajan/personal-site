@@ -2,104 +2,91 @@
 @tailwind components;
 @tailwind utilities;
 
-/* The site is dark only. Blue-black ground, cool greys, one warm accent. */
+/* Modern Editorial Theme (Inspired by Steven Gonsalvez & Charly Webster) */
 :root {
-  --bg: #0a0c11;
-  --surface: #11141b;
-  --raised: #171b24;
-  --text: #eceef3;
-  --muted: #a3aab8;
-  --faint: #7d8494;
-  --line: #222734;
-  --accent: #f0b46c;
+  --bg: #faf8f3;
+  --surface: #ffffff;
+  --raised: #f3efe6;
+  --text: #1a1a1a;
+  --muted: #4a4a4a;
+  --faint: #767676;
+  --line: #c9c5bc;
+  --accent: #8b2635;
+  --accent-secondary: #2c4a6e;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0d0e12;
+  --surface: #14151c;
+  --raised: #1c1e27;
+  --text: #f0f1f5;
+  --muted: #a3a8b6;
+  --faint: #6d7383;
+  --line: #262936;
+  --accent: #e27d86;
+  --accent-secondary: #6ba4e8;
   color-scheme: dark;
 }
 
 @layer base {
   body {
-    @apply bg-bg font-sans text-text antialiased;
+    @apply bg-bg font-sans text-text antialiased transition-colors duration-200;
   }
   h1, h2, h3 {
     text-wrap: balance;
   }
   ::selection {
-    background: color-mix(in srgb, var(--accent) 35%, transparent);
+    background: color-mix(in srgb, var(--accent) 25%, transparent);
     color: var(--text);
   }
   :focus-visible {
     outline: 2px solid var(--accent);
-    outline-offset: 3px;
-    border-radius: 6px;
+    outline-offset: 2px;
   }
 }
 
 @layer components {
+  .headline {
+    @apply font-serif tracking-tight text-text;
+  }
   .label {
-    @apply font-mono text-xs uppercase tracking-[0.14em] text-faint;
+    @apply font-mono text-[11px] uppercase tracking-[0.14em] text-faint;
   }
   .link {
     @apply underline decoration-line decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent;
   }
   .btn {
-    @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors cursor-pointer;
+    @apply inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors cursor-pointer;
   }
   .btn-primary {
-    @apply btn bg-text text-bg hover:bg-accent;
+    @apply btn bg-text text-bg hover:bg-accent hover:text-white;
   }
   .btn-ghost {
-    @apply btn border border-line text-text hover:border-faint hover:bg-surface;
+    @apply btn border border-line text-text hover:border-text hover:bg-raised;
   }
-  .card {
-    @apply rounded-2xl border border-line bg-surface transition-all duration-200;
+  .editorial-card {
+    @apply border-b border-line py-6 transition-colors;
   }
-}
-
-/* A soft glow and fine grid behind the top of every page. */
-.backdrop {
-  background:
-    radial-gradient(60rem 28rem at 15% -10%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%),
-    radial-gradient(50rem 30rem at 95% 0%, rgba(96, 124, 214, 0.1), transparent 70%);
-}
-.backdrop::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: linear-gradient(to bottom, black, transparent 80%);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .fade-in {
-    animation: fade-in 0.4s ease-out both;
+    animation: fade-in 0.35s ease-out both;
   }
   @keyframes fade-in {
-    from { opacity: 0; transform: translateY(6px); }
+    from { opacity: 0; transform: translateY(4px); }
     to { opacity: 1; transform: translateY(0); }
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .bar {
-    transform-origin: left;
-    animation: grow 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-  @keyframes grow {
-    from { transform: scaleX(0); }
-  }
-}
-
-/* Print Styles for Resume and Documentation */
+/* Print Styles for Resume */
 @media print {
   body {
     background: #ffffff !important;
-    color: #111111 !important;
+    color: #000000 !important;
   }
-  .card {
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
+  .print-hidden {
+    display: none !important;
   }
 }

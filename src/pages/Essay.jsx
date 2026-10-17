@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Clock, Calendar, Share2, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Share2, Check } from "lucide-react";
 import { useState } from "react";
 import { site } from "../content/site";
 import { articles, findArticle } from "../content/writing";
@@ -33,67 +33,61 @@ export default function Essay() {
   };
 
   return (
-    <article className="max-w-3xl">
-      <title>{`${article.title} · ${site.name}`}</title>
+    <article className="max-w-2xl mx-auto">
+      <title>{`${article.title} · ${site.fullName || site.name}`}</title>
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pb-6 border-b border-line">
         <Link
           to="/writing"
-          className="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-text"
+          className="inline-flex items-center gap-1.5 text-xs font-mono text-muted transition-colors hover:text-accent"
         >
-          <ArrowLeft className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
-          All articles & notes
+          <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
+          Back to all essays
         </Link>
 
         <button
           type="button"
           onClick={handleShare}
-          className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-xs text-muted transition hover:border-faint hover:text-text"
+          className="inline-flex items-center gap-1.5 rounded border border-line bg-surface px-2.5 py-1 text-xs font-mono text-muted transition hover:border-text hover:text-text"
         >
           {copied ? <Check className="h-3.5 w-3.5 text-accent" /> : <Share2 className="h-3.5 w-3.5" />}
           <span>{copied ? "Link Copied" : "Share"}</span>
         </button>
       </div>
 
-      <header className="mt-10">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full border border-line bg-surface px-2.5 py-0.5 font-mono text-xs text-accent">
-            {article.topic}
-          </span>
-          <div className="flex items-center gap-1.5 font-mono text-xs text-faint">
-            <Calendar className="h-3.5 w-3.5" />
-            <span>{article.date}</span>
-          </div>
-          <div className="flex items-center gap-1.5 font-mono text-xs text-faint">
-            <Clock className="h-3.5 w-3.5" />
-            <span>{article.readTime}</span>
-          </div>
+      <header className="mt-8">
+        <div className="flex items-center gap-2 font-mono text-xs text-faint mb-3">
+          <time>{article.date}</time>
+          <span>·</span>
+          <span>{article.readTime}</span>
+          <span>·</span>
+          <span className="text-accent font-semibold">#{article.topic.toLowerCase()}</span>
         </div>
 
-        <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-tight text-text sm:text-4xl">
+        <h1 className="font-serif text-3xl sm:text-4xl font-medium leading-tight tracking-tight text-text">
           {article.title}
         </h1>
 
-        <p className="mt-4 border-l-2 border-accent pl-4 text-lg italic leading-relaxed text-muted">
+        <p className="mt-4 border-l-2 border-accent pl-4 text-base italic leading-relaxed text-muted">
           {article.excerpt}
         </p>
       </header>
 
       {/* Main Content Sections */}
-      <div className="mt-12 flex flex-col gap-10">
+      <div className="mt-10 flex flex-col gap-8 font-sans">
         {article.content.map((sec, idx) => (
           <section key={idx} className="flex flex-col gap-3">
-            <h2 className="text-xl font-semibold tracking-tight text-text">
+            <h2 className="font-serif text-2xl font-medium tracking-tight text-text">
               {sec.heading}
             </h2>
-            <div className="prose prose-invert max-w-none text-base leading-relaxed text-muted">
+            <div className="text-base leading-relaxed text-muted space-y-4">
               {sec.body.split("\n\n").map((para, pIdx) => {
                 if (para.startsWith("```")) {
                   const cleaned = para.replace(/```python|```/g, "").trim();
                   return (
                     <pre
                       key={pIdx}
-                      className="my-4 overflow-x-auto rounded-xl border border-line bg-surface p-4 font-mono text-xs text-text/90"
+                      className="my-3 overflow-x-auto rounded border border-line bg-surface p-4 font-mono text-xs text-text leading-relaxed"
                     >
                       <code>{cleaned}</code>
                     </pre>
@@ -101,7 +95,7 @@ export default function Essay() {
                 }
                 if (para.startsWith("1.") || para.startsWith("-")) {
                   return (
-                    <div key={pIdx} className="my-2 space-y-1.5 pl-4">
+                    <div key={pIdx} className="my-2 space-y-1.5 pl-4 border-l border-line">
                       {para.split("\n").map((item, itemIdx) => (
                         <p key={itemIdx} className="text-muted">
                           {item}
@@ -118,29 +112,33 @@ export default function Essay() {
       </div>
 
       {/* Author note */}
-      <div className="card mt-16 flex items-center justify-between gap-6 p-6 sm:p-8">
+      <div className="mt-14 border-t border-b border-line py-6 flex items-center justify-between gap-6">
         <div>
-          <span className="label">Written by {site.fullName || site.name}</span>
-          <p className="mt-1 text-sm text-muted">
-            {site.role} specializing in distributed state, high-throughput model serving, and p99 performance.
+          <p className="font-serif text-base font-medium text-text">
+            Written by {site.fullName || site.name}
+          </p>
+          <p className="mt-0.5 text-xs text-muted">
+            {site.role} specializing in distributed state and sub-second model serving.
           </p>
         </div>
-        <Link to="/about" className="btn-ghost shrink-0 text-xs">
-          About Som
+        <Link to="/about" className="text-xs font-mono text-accent hover:underline shrink-0">
+          About Som →
         </Link>
       </div>
 
       {/* Next Article link */}
       <Link
         to={`/writing/${nextArticle.slug}`}
-        className="card group mt-8 flex items-center justify-between gap-6 p-6 hover:border-faint sm:p-8"
+        className="group mt-6 flex items-center justify-between gap-6 p-4 rounded hover:bg-raised/40 transition-colors"
       >
         <div>
-          <p className="label">Next article</p>
-          <p className="mt-2 text-lg font-medium text-text sm:text-xl">{nextArticle.title}</p>
+          <p className="label">Next essay</p>
+          <p className="mt-1 font-serif text-lg font-medium text-text group-hover:text-accent transition-colors">
+            {nextArticle.title}
+          </p>
         </div>
         <ArrowRight
-          className="h-5 w-5 shrink-0 text-faint transition group-hover:translate-x-1 group-hover:text-accent"
+          className="h-4 w-4 shrink-0 text-faint transition group-hover:translate-x-1 group-hover:text-accent"
           strokeWidth={1.75}
           aria-hidden="true"
         />

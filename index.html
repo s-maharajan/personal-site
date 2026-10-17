@@ -3,16 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Som · Principal engineer, AI & platform</title>
-    <meta name="description" content="Som builds distributed systems and AI infrastructure. Case studies on LLM latency, retrieval, streaming, and cost." />
-    <meta property="og:title" content="Som · Principal engineer, AI & platform" />
-    <meta property="og:description" content="Case studies on LLM latency, retrieval, streaming, and cost." />
+    <title>Som · Principal Engineer, AI & Platform</title>
+    <meta name="description" content="Som builds distributed systems, high-throughput model serving runtimes, and agentic retrieval infrastructure that hold up at p99." />
+    <meta property="og:title" content="Som · Principal Engineer, AI & Platform" />
+    <meta property="og:description" content="Distributed systems, LLM inference at scale, hybrid retrieval, and engineering trade-offs." />
     <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#0a0c11" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&display=swap" />
+    <script>
+      (function() {
+        try {
+          const stored = localStorage.getItem('theme');
+          const isDark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
