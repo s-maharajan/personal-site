@@ -5,9 +5,8 @@ import { site } from "../content/site";
 
 const links = [
   { to: "/writing", label: "Writing" },
-  { to: "/work", label: "Work" },
+  { to: "/work", label: "Architecture" },
   { to: "/about", label: "About" },
-  { to: "/resume", label: "Resume" },
 ];
 
 export default function Header({ onOpenPalette }) {
@@ -43,8 +42,8 @@ export default function Header({ onOpenPalette }) {
         </Link>
 
         {/* Minimal Navigation */}
-        <div className="flex items-center gap-4 sm:gap-6">
-          <nav className="flex items-center gap-4 sm:gap-6 text-sm font-sans">
+        <div className="flex items-center gap-5 sm:gap-6">
+          <nav className="flex items-center gap-5 sm:gap-6 text-sm font-sans">
             {links.map((l) => (
               <NavLink
                 key={l.to}

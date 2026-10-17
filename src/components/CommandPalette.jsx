@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ArrowRight, FileText, Briefcase, BookOpen, Mail, Check, Terminal, MessageSquare } from "lucide-react";
-import { GithubIcon, LinkedinIcon } from "./Icons";
+import { Search, ArrowRight, Briefcase, BookOpen, Mail, Check, Terminal, MessageSquare } from "lucide-react";
+import { GithubIcon } from "./Icons";
 import { work } from "../content/work";
 import { articles } from "../content/writing";
 import { tools } from "../content/tools";
@@ -37,7 +37,6 @@ export default function CommandPalette({ isOpen, onClose }) {
     { id: "page-tools", title: `Tools & Open Source (${tools.length} blueprints)`, category: "Navigation", icon: Terminal, action: () => navigate("/tools") },
     { id: "page-banter", title: `Byte-Sized Banter (${banterPosts.length} takes)`, category: "Navigation", icon: MessageSquare, action: () => navigate("/banter") },
     { id: "page-about", title: "Engineering Philosophy & Background", category: "Navigation", icon: ArrowRight, action: () => navigate("/about") },
-    { id: "page-resume", title: "Printable Executive Resume", category: "Navigation", icon: FileText, action: () => navigate("/resume") },
 
     // Case studies
     ...work.map((w) => ({
@@ -100,13 +99,6 @@ export default function CommandPalette({ isOpen, onClose }) {
       category: "Actions",
       icon: GithubIcon,
       action: () => window.open(site.links.github, "_blank"),
-    },
-    {
-      id: "action-linkedin",
-      title: "Open LinkedIn Profile",
-      category: "Actions",
-      icon: LinkedinIcon,
-      action: () => window.open(site.links.linkedin, "_blank"),
     },
   ];
 

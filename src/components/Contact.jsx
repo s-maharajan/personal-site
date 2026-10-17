@@ -1,6 +1,5 @@
-import { ArrowUpRight, Mail, Copy, Check, FileText } from "lucide-react";
+import { ArrowUpRight, Mail, Copy, Check } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { site } from "../content/site";
 
 export default function Contact() {
@@ -15,7 +14,6 @@ export default function Contact() {
   };
 
   const external = [
-    links.linkedin && { label: "LinkedIn", href: links.linkedin },
     links.github && { label: "GitHub", href: links.github },
   ].filter(Boolean);
 
@@ -49,11 +47,6 @@ export default function Contact() {
             </button>
           </div>
         )}
-
-        <Link to="/resume" className="btn-ghost">
-          <FileText className="h-3.5 w-3.5" aria-hidden="true" />
-          <span>Resume</span>
-        </Link>
 
         {external.map((l) => (
           <a

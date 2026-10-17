@@ -5,7 +5,7 @@ import { site } from "../content/site";
 import { articles } from "../content/writing";
 import { work } from "../content/work";
 import { banterPosts } from "../content/banter";
-import { GithubIcon, LinkedinIcon } from "../components/Icons";
+import { GithubIcon } from "../components/Icons";
 
 export default function Home() {
   const [copied, setCopied] = useState(false);
@@ -272,17 +272,6 @@ export default function Home() {
               >
                 <GithubIcon className="h-3.5 w-3.5" />
                 <span>GitHub</span>
-              </a>
-            )}
-            {site.links.linkedin && (
-              <a
-                href={site.links.linkedin}
-                target="_blank"
-                rel="noreferrer"
-                className="btn-ghost"
-              >
-                <LinkedinIcon className="h-3.5 w-3.5" />
-                <span>LinkedIn</span>
               </a>
             )}
           </div>

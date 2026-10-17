@@ -8,7 +8,6 @@ import Essay from "./pages/Essay";
 import Tools from "./pages/Tools";
 import Banter from "./pages/Banter";
 import About from "./pages/About";
-import Resume from "./pages/Resume";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
@@ -24,7 +23,6 @@ export default function App() {
           <Route path="/tools" element={<Tools />} />
           <Route path="/banter" element={<Banter />} />
           <Route path="/about" element={<About />} />
-          <Route path="/resume" element={<Resume />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

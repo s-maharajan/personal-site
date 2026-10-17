@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, FileText, Mail } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
 import { site } from "../content/site";
 import { principles, toolbox, experience } from "../content/about";
 import Contact from "../components/Contact";
@@ -27,12 +27,12 @@ export default function About() {
           <p>I work {site.location.toLowerCase()}.</p>
 
           <div className="pt-2 flex flex-wrap gap-2.5 text-sm font-sans">
-            <Link to="/resume" className="btn-primary">
-              <FileText className="h-3.5 w-3.5" />
-              <span>View Resume</span>
-            </Link>
-            <Link to="/writing" className="btn-ghost">
+            <Link to="/writing" className="btn-primary">
               <span>Read Writing</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+            <Link to="/work" className="btn-ghost">
+              <span>Inspect Architecture</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
