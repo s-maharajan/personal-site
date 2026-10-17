@@ -4,12 +4,14 @@ import { Copy, Check, Mail } from "lucide-react";
 import { site } from "../content/site";
 import { articles } from "../content/writing";
 import { work } from "../content/work";
+import { tools } from "../content/tools";
 import { banterPosts } from "../content/banter";
 import { GithubIcon } from "../components/Icons";
+import SystemsRadar from "../components/SystemsRadar";
 
 export default function Home() {
   const [copied, setCopied] = useState(false);
-  const [activeFilter, setActiveFilter] = useState("all"); // "all" | "essays" | "work" | "notes"
+  const [activeFilter, setActiveFilter] = useState("all");
 
   const handleCopyEmail = async () => {
     await navigator.clipboard.writeText(site.email);
@@ -45,16 +47,27 @@ export default function Home() {
       tag: w.category,
       dotColor: "bg-[#6A9BCC]", // Anthropic Sky Blue
     })),
+    ...tools.map((t) => ({
+      type: "tool",
+      typeLabel: "Blueprint",
+      slug: "/tools",
+      title: `${t.title}: ${t.tagline}`,
+      summary: t.summary,
+      date: t.status,
+      readTime: `${t.language} · ${t.metrics.label}: ${t.metrics.value}`,
+      tag: t.category,
+      dotColor: "bg-[#788C5D]", // Anthropic Cactus Green
+    })),
     ...banterPosts.map((b) => ({
       type: "note",
-      typeLabel: "Note",
-      slug: "#",
+      typeLabel: "Banter",
+      slug: `/banter#${b.slug}`,
       title: b.title,
       summary: b.take,
       date: b.date,
       readTime: b.readTime,
       tag: b.tag,
-      dotColor: "bg-[#788C5D]", // Anthropic Cactus Green
+      dotColor: "bg-[#B58D3D]", // Warm Amber
     })),
   ];
 
@@ -63,6 +76,7 @@ export default function Home() {
     : unifiedFeed.filter((item) => {
         if (activeFilter === "essays") return item.type === "essay";
         if (activeFilter === "work") return item.type === "work";
+        if (activeFilter === "tools") return item.type === "tool";
         if (activeFilter === "notes") return item.type === "note";
         return true;
       });
@@ -145,7 +159,10 @@ export default function Home() {
         </Link>
       </section>
 
-      {/* 3. Unified Dated Feed (Chronological Editorial Stream) */}
+      {/* 3. Interactive Systems Architecture Matrix */}
+      <SystemsRadar />
+
+      {/* 4. Unified Dated Feed (Chronological Editorial Stream) */}
       <section className="flex flex-col gap-6">
         <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between border-b border-line/80 pb-3 gap-3">
           <div className="flex items-center gap-3">
@@ -158,12 +175,13 @@ export default function Home() {
           </div>
 
           {/* Feed Filter Tabs */}
-          <div className="flex items-center gap-1 font-mono text-xs">
+          <div className="flex flex-wrap items-center gap-1 font-mono text-xs">
             {[
               { id: "all", label: "All" },
               { id: "essays", label: "Essays" },
               { id: "work", label: "Architecture" },
-              { id: "notes", label: "Notes" },
+              { id: "tools", label: "Blueprints" },
+              { id: "notes", label: "Banter" },
             ].map((tab) => (
               <button
                 key={tab.id}

@@ -6,6 +6,8 @@ import { site } from "../content/site";
 const links = [
   { to: "/writing", label: "Writing" },
   { to: "/work", label: "Architecture" },
+  { to: "/tools", label: "Tools" },
+  { to: "/banter", label: "Banter" },
   { to: "/about", label: "About" },
 ];
 

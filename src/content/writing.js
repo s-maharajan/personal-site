@@ -290,6 +290,145 @@ By attaching eBPF probes to the Linux kernel CFS (Completely Fair Scheduler), we
       },
     ],
   },
+  {
+    slug: "gpu-memory-virtual-paging",
+    title: "The Database Inside Your GPU: Why KV-Cache Management Is Virtual Memory All Over Again",
+    topic: "Inference",
+    date: "November 2025",
+    readTime: "8 min read",
+    summary:
+      "How modern LLM serving runtimes reinvented operating system page tables, copy-on-write, and TLBs to survive the high-bandwidth memory wall.",
+    excerpt:
+      "Every major innovation in LLM serving over the past 24 months—PagedAttention, Radix-tree caching, and chunked swap spaces—is an explicit rediscovery of 1970s operating systems virtual memory principles applied to HBM3.",
+    content: [
+      {
+        heading: "The KV-Cache Memory Crisis",
+        body: `During autoregressive token generation, an LLM attends to the Key and Value tensor representations of all past tokens in the sequence. For a 70B parameter model with Grouped-Query Attention (GQA), each token requires ~1.2 MB of KV-cache memory per sequence.
+\`\`\`
+KV_Per_Token = 2 * n_layers * n_kv_heads * head_dim * precision_bytes
+\`\`\`
+For a batch of 256 requests running at an 8,192-token context window, the KV-cache alone requires over 250 GB of high-bandwidth memory—exceeding the entire physical capacity of three 80GB H100 GPUs. Worse, naive memory allocators allocate static contiguous buffers up to the maximum potential length, resulting in 60% to 80% internal memory fragmentation.`,
+      },
+      {
+        heading: "PagedAttention as OS Page Tables",
+        body: `The conceptual breakthrough of PagedAttention (vLLM) was treating high-bandwidth GPU memory exactly like an operating system kernel treats physical RAM:
+1. **Physical Blocks (Pages)**: Slice the KV-cache into fixed-size physical memory blocks (typically 16 or 32 tokens per block).
+2. **Virtual Block Table (Page Table)**: Map contiguous logical token indices to non-contiguous physical blocks scattered across GPU HBM.
+3. **Dynamic Demand Paging**: Allocate a new physical block only when the generation sequence crosses a 16-token boundary.
+
+This eliminates external memory fragmentation entirely and drops internal fragmentation to under 4% (limited only to the final block of a sequence).`,
+      },
+      {
+        heading: "Radix Trees and Copy-on-Write (Fork)",
+        body: `When multiple conversational agents share identical system prompts or few-shot examples, allocating independent KV-cache blocks duplicates millions of matrix operations.
+Modern runtimes organize block tables as a **Radix Tree** (prefix tree). When two requests share the same 2,000-token system prompt prefix:
+- Both requests point to the exact same physical memory blocks with a reference counter incremented to 2.
+- The prefill computation is executed exactly once.
+- When request A generates a new token divergent from request B, the runtime triggers **Copy-on-Write (CoW)**: duplicating only the divergent leaf block while keeping the shared prefix blocks unified.`,
+      },
+      {
+        heading: "The Architecture Lesson",
+        body: `When designing high-throughput AI platforms, stop looking at machine learning papers for memory management solutions. Read Maurice Bach's *The Design of the UNIX Operating System* and Jim Gray's *Transaction Processing*. The fundamental trade-offs of paging, eviction policies, and cache coherence have already been solved; our job as systems architects is mapping them cleanly onto GPU tensor cores.`,
+      },
+    ],
+  },
+  {
+    slug: "distributed-locks-are-a-lie",
+    title: "Distributed Locks Are a Lie: Fencing Tokens, Leases, and Monotonic Epochs",
+    topic: "Distributed Systems",
+    date: "September 2025",
+    readTime: "9 min read",
+    summary:
+      "Why Redis SETNX locks cause silent split-brain data corruption during garbage collection pauses, and how monotonic fencing tokens guarantee true linearizability.",
+    excerpt:
+      "Every junior architect implements distributed mutual exclusion with Redis SETNX and a TTL. In the presence of stop-the-world GC pauses or asynchronous network delay, this pattern guarantees silent data corruption.",
+    content: [
+      {
+        heading: "The Anatomy of a Distributed Lock Failure",
+        body: `Consider the classic textbook pattern:
+\`\`\`go
+// Worker 1 acquires lock with a 10-second TTL
+ok := redis.SetNX("lock:invoice:492", workerID, 10*time.Second)
+if ok {
+    // Read invoice state, perform calculation, write result
+    invoice := db.GetInvoice(492)
+    invoice.Status = "PAID"
+    db.Save(invoice)
+}
+\`\`\`
+Here is how it silently corrupts your database in production:
+1. Worker 1 acquires the lock with a 10s lease.
+2. Worker 1 triggers a major Stop-the-World Garbage Collection pause, OS swap thrashing, or an asynchronous TCP stall lasting 11 seconds.
+3. The Redis lock TTL expires. Redis releases the lock.
+4. Worker 2 requests the lock, acquires it legitimately, updates Invoice 492, and commits.
+5. Worker 1 wakes up from the GC pause. Having passed the lock check *before* the pause, it blindly issues its \`db.Save(invoice)\` write, overwriting Worker 2's commit.
+
+This is a textbook distributed split-brain condition, and no amount of heartbeat renewals or Redlock algorithms can save you if the client cannot guarantee atomicity between lock ownership and the storage write.`,
+      },
+      {
+        heading: "The Fix: Monotonic Fencing Tokens",
+        body: `As Martin Kleppmann proved, you cannot rely on client-side time or lock assumptions without storage-layer validation. Every lock grant MUST return a monotonically increasing **Fencing Token** (an epoch counter):
+\`\`\`
+Token = 101 for Worker 1
+Token = 102 for Worker 2
+\`\`\`
+The storage engine (PostgreSQL, DynamoDB, or S3) enforces conditional validation:
+\`\`\`sql
+UPDATE invoices
+SET status = 'PAID', last_fencing_token = 101
+WHERE id = 492 AND last_fencing_token < 101;
+\`\`\`
+When Worker 1 wakes up from its GC pause and attempts to write with Token 101, the database rejects the write because Worker 2 already committed Token 102. Mutual exclusion is verified at the point of persistence, not in a fragile external cache.`,
+      },
+      {
+        heading: "Production Engineering Verdict",
+        body: `Never use Redis locks for data correctness or financial state transitions unless backed by fencing tokens in the write condition. Redis locks are suitable for advisory rate-limiting or duplicate notification suppression where occasional overlapping execution is harmless. For critical state, let your database ACID isolation and fencing tokens do their job.`,
+      },
+    ],
+  },
+  {
+    slug: "cfs-cpu-throttling-post-mortem",
+    title: "Post-Mortem: How Linux CFS CPU Throttling Silently Cascaded Across 40 Microservices",
+    topic: "Observability",
+    date: "March 2025",
+    readTime: "10 min read",
+    summary:
+      "The forensic autopsy of an 80ms multi-thread freeze that saturated upstream Envoy connection pools and triggered a domino failure across production.",
+    excerpt:
+      "Our average CPU utilization was sitting comfortably at 32%. Yet downstream microservices were dropping 15% of requests on 504 Gateway Timeouts. How we tracked the phantom outage to Linux kernel quota management.",
+    content: [
+      {
+        heading: "The Phantom Incident",
+        body: `At 14:15 UTC, alerts fired across our edge API gateways: p99 latency spiked from 35ms to 3.8s, followed by cascading 504 Gateway Timeouts. Dashboard telemetry showed:
+- Database CPU: 24% (healthy)
+- Node Memory: 52% (healthy)
+- Pod Average CPU: 32% (healthy)
+- Network bandwidth: Normal
+
+There was no memory leak, no disk I/O bottleneck, and no slow database queries in PostgreSQL pg_stat_activity. Yet user transactions were dropping like flies.`,
+      },
+      {
+        heading: "Attaching eBPF Probes to the Kernel Scheduler",
+        body: `We attached a custom BCC/eBPF probe to kernel function \`tg_set_cfs_quota\` and \`sched_stat_runtime\`. What we discovered was staggering:
+Kubernetes CPU limits (\`resources.limits.cpu: "2"\`) are implemented via the Linux Completely Fair Scheduler (CFS) quota mechanism over a default 100ms period. A limit of 2 CPUs allows 200ms of cumulative thread run-time per 100ms wall-clock window.
+In high-concurrency Go and Java services:
+1. When 20 concurrent HTTP requests arrive, the Go runtime wakes up 16 OS threads across available CPU cores.
+2. 16 threads running simultaneously burn through the 200ms CFS quota in just **12.5 milliseconds** of wall-clock time.
+3. The Linux kernel immediately puts all 16 threads into an un-interruptible sleep state for the remaining **87.5 milliseconds** of the period.
+
+Every single request was being systematically frozen for 87ms out of every 100ms, backing up Envoy HTTP/2 connection buffers and triggering cascading client retries that DDOS'd the upstream services.`,
+      },
+      {
+        heading: "The Remediation",
+        body: `We implemented three architectural changes:
+1. **Removed CPU Limits on Latency-Sensitive Pods**: Sized pods purely with guaranteed \`resources.requests.cpu\`, letting nodes burst into idle cycles without CFS period throttling.
+2. **Tuned GOMAXPROCS**: Configured \`automaxprocs\` so the Go runtime scheduler aligns its thread count with Kubernetes cgroup quotas instead of the physical host core count.
+3. **Kernel CFS Quota Period Reduction**: On clusters requiring hard multi-tenant limits, reduced \`cpu.cfs_period_us\` from 100ms to 20ms, turning long 80ms pauses into micro-pauses that stay well within socket timeout budgets.
+
+p99 latency instantly collapsed back to 28ms, and zero 504 timeouts occurred under peak traffic.`,
+      },
+    ],
+  },
 ];
 
 export const findArticle = (slug) => articles.find((a) => a.slug === slug);

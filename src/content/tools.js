@@ -114,4 +114,42 @@ export const tools = [
     stack: ["TypeScript", "Tree-sitter", "WASM", "Node.js"],
     metrics: { label: "Retrieval precision boost", value: "+28%" },
   },
+  {
+    slug: "cfs-throttle-probe",
+    title: "cfs-throttle-probe",
+    tagline: "Linux kernel eBPF probe monitoring CFS quota multi-thread freezes in Kubernetes",
+    category: "Observability",
+    language: "C / Go",
+    stars: "1.1k",
+    status: "Active",
+    command: "sudo cfs-throttle-probe --cgroup /sys/fs/cgroup/cpu/kubepods --threshold-ms 20",
+    summary:
+      "Attaches to kernel tracepoints `sched_stat_runtime` and `sched_process_wait` to detect and alert on multi-thread micro-freezes caused by Kubernetes CPU limits before APM alerts or gateway 504 timeouts trigger.",
+    highlights: [
+      "Zero overhead eBPF tracepoint probe running in kernel space.",
+      "Identifies runaway threads burning through CFS period quotas in under 15ms.",
+      "Emits OpenTelemetry metrics directly to Prometheus and Grafana Loki.",
+    ],
+    stack: ["eBPF", "C", "Go", "Kubernetes", "Linux Kernel"],
+    metrics: { label: "Detection latency", value: "< 1ms" },
+  },
+  {
+    slug: "kv-swap-bench",
+    title: "kv-swap-bench",
+    tagline: "High-performance microbenchmark for GPU-to-host PCIe Gen5 KV-cache page swapping",
+    category: "LLM Serving",
+    language: "Rust / CUDA",
+    stars: "740",
+    status: "Active",
+    command: "cargo install kv-swap-bench && kv-swap-bench --gpu-id 0 --block-size-kb 64 --streams 8",
+    summary:
+      "Stresses host-to-device and device-to-host memory copy pipelines over PCIe Gen5 and NVLink. Quantifies the true throughput cliff when swapping KV-cache blocks between GPU HBM and host system RAM in vLLM.",
+    highlights: [
+      "Asynchronous pinned host memory buffer benchmarking across CUDA streams.",
+      "Simulates concurrent prefill chunk transfers during active token decode loops.",
+      "Generates flamegraphs and roofline model charts for memory bandwidth saturation.",
+    ],
+    stack: ["Rust", "CUDA", "PCIe Gen5", "vLLM"],
+    metrics: { label: "PCIe Gen5 bandwidth", value: "58.2 GB/s" },
+  },
 ];

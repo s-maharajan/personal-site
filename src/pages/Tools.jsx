@@ -25,32 +25,35 @@ export default function Tools() {
       <title>{`Tools & Open Source Blueprints · ${site.fullName || site.name}`}</title>
 
       {/* Header */}
-      <div className="border-b border-line pb-6">
-        <span className="label-mono">Open Source & Blueprints</span>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight text-text sm:text-4xl">
-          Systems Tools & Utilities
+      <div className="border-b border-line/70 pb-6">
+        <h1 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-text">
+          Systems Tools & Blueprints
         </h1>
-        <p className="mt-2 max-w-2xl text-base leading-relaxed text-muted font-sans">
+        <p className="mt-2 max-w-prose text-base leading-relaxed text-muted font-sans">
           Production-grade CLI utilities, reverse proxies, and evaluation harnesses built to solve
           real bottlenecks in distributed systems and LLM inference.
         </p>
 
-        {/* Category Filter Pills */}
-        <div className="mt-6 flex flex-wrap gap-1.5 font-mono text-xs">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setSelectedCategory(cat)}
-              className={`rounded-lg px-3 py-1.5 transition ${
-                selectedCategory === cat
-                  ? "bg-text text-bg font-semibold"
-                  : "bg-surface border border-line text-muted hover:border-text hover:text-text"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+        {/* Category Filter Tabs */}
+        <div className="mt-6 flex flex-wrap gap-2">
+          {categories.map((cat) => {
+            const isSelected = selectedCategory === cat;
+            const count = cat === "All" ? tools.length : tools.filter((t) => t.category === cat).length;
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedCategory(cat)}
+                className={`rounded-md px-2.5 py-1 font-mono text-xs transition-colors ${
+                  isSelected
+                    ? "bg-accent text-white font-medium"
+                    : "border border-line bg-surface text-muted hover:border-text hover:text-text"
+                }`}
+              >
+                {cat} <span className="opacity-70 font-normal">({count})</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -59,7 +62,7 @@ export default function Tools() {
         {filteredTools.map((tool) => (
           <div
             key={tool.slug}
-            className="rounded-2xl border border-line bg-surface p-6 transition-all hover:border-accent hover:shadow-sm"
+            className="rounded-xl border border-line bg-surface p-6 transition-all hover:border-accent/80 hover:shadow-sm"
           >
             <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 border-b border-line/60 pb-4">
               <div className="flex items-center gap-3">
@@ -68,7 +71,7 @@ export default function Tools() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="font-mono text-lg font-bold text-text">
+                    <h2 className="font-serif text-xl sm:text-2xl font-normal text-text">
                       {tool.title}
                     </h2>
                     <span className="inline-flex items-center rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[10px] text-accent">

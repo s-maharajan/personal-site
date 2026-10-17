@@ -368,6 +368,127 @@ spec:
     },
     stack: ["Kubernetes", "AWS", "Athena", "Terraform", "Prometheus", "Helm"],
   },
+  {
+    slug: "monolith-decomposition-zero-downtime",
+    category: "Distributed Systems",
+    metric: { value: "0", label: "packet drops" },
+    year: "2024",
+    title: "Zero-Downtime Monolith Decomposition at 4.8M DAU",
+    summary: "Decomposing an 8-year-old core billing monolith into 11 isolated Go microservices using Envoy shadow mirroring and Strangler Fig routing.",
+    tags: ["Microservices", "Migration", "Envoy", "Go"],
+    scaleStats: [
+      { label: "Daily Active Users", value: "4.8M DAU" },
+      { label: "Target Services", value: "11 isolated domains" },
+      { label: "Shadow Verification", value: "180M requests" },
+      { label: "Downtime Recorded", value: "0.00 seconds" },
+    ],
+    problem:
+      "A core billing and entitlement monolith suffered from 45-minute deployment pipelines, tight database lock contention, and cascading failures where a single slow analytics query locked the row-level transactional billing tables during peak renewals.",
+    investigation:
+      "Direct code decoupling was deemed too high-risk for multi-million-dollar billing paths without empirical production parity. We needed an architecture that allowed continuous validation against live customer traffic before committing to any cutover.",
+    architecture: {
+      diagramType: "monolith-migration",
+      steps: [
+        { title: "Strangler Gateway", detail: "Envoy edge proxy parses JWT entitlements and routes endpoints" },
+        { title: "Shadow Traffic Mirroring", detail: "Envoy duplicates 100% of live read/write traffic asynchronously to new Go microservice" },
+        { title: "Diff Verification Harness", detail: "Compares response payloads, status codes, and latency distributions between old and new engines" },
+        { title: "Gradual Traffic Canarification", detail: "Automated weighted routing: 1% -> 5% -> 25% -> 100% with automated circuit breaking" },
+        { title: "Dual-Write Deprecation", detail: "Old monolith endpoints decommissioned and background data sync terminated" },
+      ],
+    },
+    approach: [
+      "Built an automated response differential engine in Go that stripped volatile timestamps and compared JSON AST structures across 180M shadowed production calls.",
+      "Identified and patched 14 subtle semantic edge cases in the legacy monolith where floating-point currency rounding drifted by $0.0001.",
+      "Established independent domain databases with asynchronous CDC outbox synchronization to eliminate shared database dependencies.",
+      "Used Envoy dynamic route configurations with Consul service mesh for instantaneous zero-deploy rollbacks.",
+    ],
+    results: [
+      ["Deployment frequency", "1 every 2 weeks → 18 per day"],
+      ["p99 checkout latency", "1,850ms → 145ms"],
+      ["Data discrepancies", "0 recorded across cutover"],
+    ],
+    tradeoffs: [
+      {
+        alternative: "Big-bang scheduled maintenance window cutover",
+        rejectedBecause: "High risk of unforeseen regression and required taking down global billing for 6 hours.",
+        acceptedTradeoff: "Maintained dual-running infrastructure and shadow comparator proxies for 8 weeks.",
+      },
+    ],
+    codeSnippet: {
+      title: "Envoy Shadow Mirroring Configuration",
+      language: "yaml",
+      code: `route:
+  cluster: legacy-monolith-service
+  request_mirror_policies:
+    - cluster: new-go-billing-canary
+      runtime_fraction:
+        default_value:
+          numerator: 100
+          denominator: HUNDRED
+      trace_sampled: true`,
+    },
+    stack: ["Go", "Envoy", "PostgreSQL", "Consul", "Docker", "Prometheus"],
+  },
+  {
+    slug: "gpu-cluster-cost-governance",
+    category: "Cloud & Cost",
+    metric: { value: "-48%", label: "standby spend" },
+    year: "2024",
+    title: "GPU Cluster Cost Governance: Slashing Standby Spend by 48%",
+    summary: "Architecting a multi-tenant dynamic model weight pre-puller and warm-pool autoscaler across 128x H100 GPUs, saving $1.4M annually.",
+    tags: ["Cloud", "FinOps", "Kubernetes", "vLLM"],
+    scaleStats: [
+      { label: "Hardware Fleet", value: "128× H100 SXM5" },
+      { label: "Annual Savings", value: "$1,420,000" },
+      { label: "Cold Start Time", value: "8.5 min → 32 sec" },
+      { label: "Off-Peak Utilisation", value: "14% → 89%" },
+    ],
+    problem:
+      "Dedicated GPU pods were provisioned per model and per business unit to avoid cold starts. During nighttime and weekend lulls, 128 high-end H100 GPUs sat idle with less than 15% aggregate utilisation, burning over $180,000 in unused compute monthly.",
+    investigation:
+      "Teams kept dedicated pods running because downloading a 140 GB 70B model checkpoint from S3 over standard Kubernetes PVC storage took over 8 minutes. Any autoscaling from zero resulted in massive client timeouts.",
+    architecture: {
+      diagramType: "gpu-cost-governance",
+      steps: [
+        { title: "Dynamic Model Hub DaemonSet", detail: "High-speed NVMe daemonset maintains local sharded model weight caches on each physical host" },
+        { title: "Shared Warm Execution Pool", detail: "Generic vLLM worker pods dynamically load weights from host NVMe via memory-mapped IPC in 30s" },
+        { title: "Queue-Depth Predictive Autoscaler", detail: "KEDA autoscales GPU nodes based on token queue depth velocity rather than lagging CPU metrics" },
+        { title: "Spot/Preemptible Opportunistic Batching", detail: "Routes asynchronous batch jobs and synthetic eval pipelines to cheap spot GPU capacity" },
+      ],
+    },
+    approach: [
+      "Engineered an automated weight pre-seeding pipeline using `safetensors` memory mapping directly from host NVMe RAID0 arrays into GPU VRAM.",
+      "Eliminated S3 network bottlenecks during pod scheduling, reducing cold start from 8.5 minutes down to 32 seconds.",
+      "Consolidated 9 isolated single-tenant GPU clusters into a single unified multi-tenant Kubernetes cluster with strict namespace resource quotas.",
+      "Implemented preemption-aware checkpointing for offline evaluation jobs running on 70% cheaper spot instances.",
+    ],
+    results: [
+      ["Annual compute spend", "-$1.42M savings"],
+      ["Cold start latency", "8.5 min → 32s"],
+      ["Host NVMe read throughput", "22 GB/s saturation"],
+    ],
+    tradeoffs: [
+      {
+        alternative: "Centralized NFS/EFS shared storage for model checkpoints",
+        rejectedBecause: "Network throughput bottleneck throttled concurrent pod boots and introduced severe metadata lock contention.",
+        acceptedTradeoff: "Invested in local NVMe host storage and local daemon cache managers.",
+      },
+    ],
+    codeSnippet: {
+      title: "Fast Memory-Mapped Model Loading in vLLM",
+      language: "python",
+      code: `# Use memory-mapped safetensors directly from host NVMe RAID0 mount
+# Bypasses network file downloads and streams directly to GPU PCIe bus
+model_config = {
+    "model": "/mnt/nvme-cache/models/meta-llama-3.1-70b-instruct",
+    "load_format": "safetensors",
+    "download_dir": "/mnt/nvme-cache",
+    "enforce_eager": False,
+    "max_model_len": 8192
+}`,
+    },
+    stack: ["Kubernetes", "KEDA", "vLLM", "AWS", "Terraform", "Prometheus"],
+  },
 ];
 
 export const findWork = (slug) => work.find((w) => w.slug === slug);

@@ -25,40 +25,47 @@ export default function Banter() {
       <title>{`Byte-Sized Banter & Systems Truths · ${site.fullName || site.name}`}</title>
 
       {/* Header */}
-      <div className="border-b border-line pb-6">
-        <span className="label-mono">Field Notes & Sharp Takes</span>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight text-text sm:text-4xl">
-          Byte-Sized Banter
+      <div className="border-b border-line/70 pb-6">
+        <h1 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-text">
+          Byte-Sized Banter & Systems Truths
         </h1>
-        <p className="mt-2 max-w-2xl text-base leading-relaxed text-muted font-sans">
+        <p className="mt-2 max-w-prose text-base leading-relaxed text-muted font-sans">
           Unvarnished observations from 10+ years in distributed systems, high-concurrency runtimes,
           and production AI infrastructure.
         </p>
 
         {/* Tag Filters */}
-        <div className="mt-6 flex flex-wrap gap-1.5 font-mono text-xs">
-          {tags.map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setSelectedTag(t)}
-              className={`rounded-lg px-3 py-1.5 transition ${
-                selectedTag === t
-                  ? "bg-text text-bg font-semibold"
-                  : "bg-surface border border-line text-muted hover:border-text hover:text-text"
-              }`}
-            >
-              {t}
-            </button>
-          ))}
+        <div className="mt-6 flex flex-wrap gap-2">
+          {tags.map((t) => {
+            const isSelected = selectedTag === t;
+            const count = t === "All" ? banterPosts.length : banterPosts.filter((b) => b.tag === t).length;
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setSelectedTag(t)}
+                className={`rounded-md px-2.5 py-1 font-mono text-xs transition-colors ${
+                  isSelected
+                    ? "bg-accent text-white font-medium"
+                    : "border border-line bg-surface text-muted hover:border-text hover:text-text"
+                }`}
+              >
+                {t} <span className="opacity-70 font-normal">({count})</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Banter Feed */}
-      <div className="flex flex-col divide-y divide-line/60 rounded-2xl border border-line bg-surface">
+      <div className="flex flex-col divide-y divide-line/60 rounded-xl border border-line bg-surface">
         {filteredPosts.map((post) => (
-          <article key={post.slug} className="p-6 transition-colors hover:bg-raised/30">
-            <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-faint mb-2">
+          <article
+            key={post.slug}
+            id={post.slug}
+            className="p-6 transition-colors hover:bg-raised/30 scroll-mt-24"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-faint mb-2.5">
               <div className="flex items-center gap-2">
                 <span className="rounded-md border border-line bg-raised px-2 py-0.5 text-accent font-semibold">
                   #{post.tag.toLowerCase()}
@@ -88,11 +95,11 @@ export default function Banter() {
               </button>
             </div>
 
-            <h2 className="text-lg font-bold text-text mb-2.5">
+            <h2 className="font-serif text-xl sm:text-2xl font-normal text-text mb-2.5">
               {post.title}
             </h2>
 
-            <p className="text-sm leading-relaxed text-muted font-sans">
+            <p className="text-sm leading-relaxed text-muted font-sans max-w-prose">
               {post.take}
             </p>
           </article>

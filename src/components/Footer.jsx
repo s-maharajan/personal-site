@@ -16,6 +16,8 @@ export default function Footer() {
         <nav className="flex flex-wrap items-center gap-x-5 gap-y-1">
           <Link to="/writing" className="hover:text-accent transition-colors">Writing</Link>
           <Link to="/work" className="hover:text-accent transition-colors">Architecture</Link>
+          <Link to="/tools" className="hover:text-accent transition-colors">Tools</Link>
+          <Link to="/banter" className="hover:text-accent transition-colors">Banter</Link>
           <Link to="/about" className="hover:text-accent transition-colors">About</Link>
           {site.links.github && (
             <a href={site.links.github} target="_blank" rel="noreferrer" className="hover:text-accent transition-colors">

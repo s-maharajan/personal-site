@@ -1,6 +1,42 @@
 // Byte-sized banter, unvarnished systems truths, and lessons from production incidents.
 export const banterPosts = [
   {
+    slug: "the-microservices-on-day-1-tax",
+    title: "The 'Microservices on Day 1' Tax",
+    date: "October 16, 2026",
+    readTime: "2 min read",
+    tag: "Architecture",
+    take:
+      "If your 5-person engineering team is managing 28 microservices, Kubernetes Helm charts, Envoy sidecars, and Kafka schema registries for an app doing 80 QPS, you haven't built an architecture; you've built a full-time infrastructure maintenance team that writes business features on weekends.",
+  },
+  {
+    slug: "stop-blaming-the-llm-for-chunking-sins",
+    title: "Stop Blaming the LLM for Chunking Sins",
+    date: "October 11, 2026",
+    readTime: "2 min read",
+    tag: "Retrieval",
+    take:
+      "If you take a 10-page credit agreement, slice it blindly every 512 tokens with a 50-token sliding window, and ask the model 'What are the default penalties?', the LLM will hallucinate because you literally sawed the penalty clause away from the definition of default. Embed document trees, not flat token strips.",
+  },
+  {
+    slug: "kafka-is-not-a-database",
+    title: "Kafka Is an Event Log, Not Your Analytical Database",
+    date: "September 24, 2026",
+    readTime: "2 min read",
+    tag: "Distributed Systems",
+    take:
+      "The moment someone asks 'Can we query Kafka by user_id across the last 90 days?', the architectural answer is an immediate NO. Kafka is an immutable ordered log designed for high-throughput sequential reads and event replication. Stream it to ClickHouse or PostgreSQL for querying; do not build Frankenstein ksqlDB state stores that collapse on broker restarts.",
+  },
+  {
+    slug: "observability-is-not-400-dashboards",
+    title: "Observability Is Not Having 400 Unchecked Dashboards",
+    date: "September 04, 2026",
+    readTime: "2 min read",
+    tag: "Observability",
+    take:
+      "Real observability is being able to ask a novel question during an ongoing production incident—one you never anticipated when writing the code—and get an answer in 60 seconds from distributed traces and high-cardinality span attributes without needing to redeploy with log.Printf statements.",
+  },
+  {
     slug: "gpu-utilization-lies",
     title: "Your GPU Utilization Metric Is Lying to You",
     date: "October 14, 2026",
