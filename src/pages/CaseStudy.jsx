@@ -193,7 +193,7 @@ export default function CaseStudy() {
               href={`mailto:${site.email}?subject=Architecture inquiry regarding ${w.title}`}
               className="mt-2 block font-sans text-xs font-medium text-accent hover:underline"
             >
-              Contact Som →
+              Discuss Architecture →
             </a>
           </div>
         </aside>

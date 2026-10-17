@@ -35,6 +35,10 @@ export default function About() {
               <span>Inspect Architecture</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
+            <Link to="/tools" className="btn-ghost">
+              <span>Explore Blueprints</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
         </div>
       </div>

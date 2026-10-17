@@ -15,7 +15,7 @@ export default function Banter() {
     : banterPosts.filter((b) => b.tag === selectedTag);
 
   const handleCopy = async (take, slug) => {
-    await navigator.clipboard.writeText(`"${take}" — Som Maharajan (${site.email})`);
+    await navigator.clipboard.writeText(`"${take}" — ${site.fullName || site.name}`);
     setCopiedSlug(slug);
     setTimeout(() => setCopiedSlug(null), 2000);
   };

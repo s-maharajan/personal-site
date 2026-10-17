@@ -83,7 +83,7 @@ export default function Essay() {
             <div className="text-sm sm:text-base leading-relaxed text-muted space-y-4">
               {sec.body.split("\n\n").map((para, pIdx) => {
                 if (para.startsWith("```")) {
-                  const cleaned = para.replace(/```python|```go|```/g, "").trim();
+                  const cleaned = para.replace(/^```[a-zA-Z0-9_-]*\n?|```$/g, "").trim();
                   return (
                     <pre
                       key={pIdx}
@@ -122,7 +122,7 @@ export default function Essay() {
           </p>
         </div>
         <Link to="/about" className="text-xs text-accent hover:underline shrink-0 font-medium">
-          About Som →
+          About the Author →
         </Link>
       </div>
 
