@@ -58,12 +58,12 @@ export default function Banter() {
       </div>
 
       {/* Banter Feed */}
-      <div className="flex flex-col divide-y divide-line/60 rounded-xl border border-line bg-surface">
+      <div className="flex flex-col divide-y divide-line/50">
         {filteredPosts.map((post) => (
           <article
             key={post.slug}
             id={post.slug}
-            className="p-6 transition-colors hover:bg-raised/30 scroll-mt-24"
+            className="py-6 first:pt-2 transition-colors scroll-mt-24"
           >
             <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-faint mb-2.5">
               <div className="flex items-center gap-2">
