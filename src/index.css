@@ -1,28 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Anthropic Brand Aesthetic - Warm, editorial, minimal & powerful */
 :root {
-  --fg: #1a1a1a;
-  --muted: #6b6b6b;
-  --bg: #fdfdfc;
-  --link: #1a4fb3;
-  color-scheme: light dark;
+  --bg: #FAF9F5;
+  --surface: #FFFFFF;
+  --raised: #F4F1EA;
+  --text: #141413;
+  --muted: #5C5850;
+  --faint: #8C877D;
+  --line: #E5E0D5;
+  --accent: #D97757;           /* Anthropic Terracotta / Claude Coral */
+  --accent-hover: #C26343;
+  --accent-secondary: #6A9BCC; /* Anthropic Sky Blue */
+  --accent-tertiary: #788C5D;  /* Anthropic Cactus Green */
+  color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root { --fg: #e6e6e6; --muted: #9a9a9a; --bg: #161616; --link: #8ab4f8; }
+
+.dark {
+  --bg: #161514;
+  --surface: #201E1B;
+  --raised: #2A2723;
+  --text: #FAF7F2;
+  --muted: #A6A095;
+  --faint: #736E65;
+  --line: #33302B;
+  --accent: #D97757;
+  --accent-hover: #E28A6D;
+  --accent-secondary: #6A9BCC;
+  --accent-tertiary: #788C5D;
+  color-scheme: dark;
 }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--fg);
-  font: 18px/1.6 Georgia, "Times New Roman", serif;
+
+@layer base {
+  body {
+    @apply bg-bg font-sans text-text antialiased transition-colors duration-150;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+  }
+  ::selection {
+    background: #EAD9D1;
+    color: #141413;
+  }
+  .dark ::selection {
+    background: #472D24;
+    color: #FAF7F2;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 }
-main { max-width: 40rem; margin: 0 auto; padding: 3rem 1rem; }
-header { margin-bottom: 2rem; font-weight: bold; }
-header a { color: var(--fg); text-decoration: none; }
-a { color: var(--link); }
-h1 { font-size: 1.8rem; line-height: 1.25; margin-bottom: 0.25rem; }
-h2 { font-size: 1.15rem; margin-top: 2rem; }
-time { color: var(--muted); font-size: 0.9rem; }
-.posts { list-style: none; padding: 0; }
-.posts li { display: flex; gap: 1rem; margin-bottom: 0.5rem; }
-.posts time { flex: 0 0 9rem; }
-@media (max-width: 30rem) { .posts li { flex-direction: column; gap: 0; } }
-pre, code { font-size: 0.85em; }
+
+@layer components {
+  .label-mono {
+    @apply font-mono text-[11px] tracking-wider uppercase text-faint;
+  }
+  .tag-pill {
+    @apply inline-flex items-center rounded-md border border-line bg-surface px-2 py-0.5 font-mono text-[11px] text-muted;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-mono font-medium transition-all cursor-pointer;
+  }
+  .btn-primary {
+    @apply btn bg-accent text-white hover:bg-accent-hover shadow-sm;
+  }
+  .btn-ghost {
+    @apply btn border border-line bg-surface text-text hover:border-accent hover:text-accent hover:bg-raised;
+  }
+}
+
+/* Subtle article divider */
+.editorial-rule {
+  height: 1px;
+  background-color: var(--line);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fade-in {
+    animation: fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .print-hidden {
+    display: none !important;
+  }
+}
