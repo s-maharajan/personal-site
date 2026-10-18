@@ -18,12 +18,32 @@ export default function Home() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Lead featured story (Anthropic Research editorial style)
-  const leadStory = articles[0]; // "Why your RAG is hallucinating: it's the chunker"
+  // Sort order for the "chronological" feed below. Essays/work/notes carry a
+  // real publish date; tools only carry a status string (e.g. "Active"), so
+  // they have no date to sort by and are stably pushed to the end instead of
+  // interleaved under a fabricated timestamp.
+  const toTimestamp = (type, dateValue) => {
+    if (type === "work") {
+      // "year" is either "2025" or a range like "2023–24"; sort by the later year.
+      const years = dateValue.match(/\d{2,4}/g) || [];
+      const last = years[years.length - 1];
+      const year = last.length === 4 ? last : `20${last}`;
+      return new Date(`July 1, ${year}`).getTime();
+    }
+    const t = new Date(dateValue).getTime();
+    return Number.isNaN(t) ? -Infinity : t;
+  };
 
-  // Unified chronological archive
+  const sortedArticles = [...articles].sort(
+    (a, b) => toTimestamp("essay", b.date) - toTimestamp("essay", a.date)
+  );
+
+  // Lead featured story: the most recently published essay (Anthropic Research editorial style)
+  const leadStory = sortedArticles[0];
+
+  // Unified chronological archive (everything except the lead essay above)
   const archiveItems = [
-    ...articles.slice(1).map((a) => ({
+    ...sortedArticles.slice(1).map((a) => ({
       type: "essay",
       typeLabel: "Essay",
       slug: `/writing/${a.slug}`,
@@ -63,7 +83,7 @@ export default function Home() {
       readTime: b.readTime,
       tag: b.tag,
     })),
-  ];
+  ].sort((a, b) => toTimestamp(b.type, b.date) - toTimestamp(a.type, a.date));
 
   const filteredArchive = activeFilter === "all"
     ? archiveItems
