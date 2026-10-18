@@ -9,10 +9,4 @@ export const site = {
   links: {
     github: "https://github.com/s-maharajan",
   },
-  advisory: {
-    title: "Architecture Reviews & Advisory",
-    description:
-      "I partner with engineering teams, CTOs, and founders on critical architectural challenges: sub-second LLM tail latency, high-throughput model serving runtimes, deterministic event streaming, and cloud infrastructure governance.",
-    availability: "Limited availability for architecture reviews and technical advisory.",
-  },
 };

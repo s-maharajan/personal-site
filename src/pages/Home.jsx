@@ -1,222 +1,101 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Copy, Check, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { site } from "../content/site";
 import { articles } from "../content/writing";
-import { work } from "../content/work";
-import { tools } from "../content/tools";
-import { banterPosts } from "../content/banter";
 import { GithubIcon } from "../components/Icons";
 
+const sortedArticles = [...articles].sort((a, b) => new Date(b.date) - new Date(a.date));
+const topics = ["All", ...new Set(sortedArticles.map((a) => a.topic))];
+
 export default function Home() {
-  const [copied, setCopied] = useState(false);
-  const [activeFilter, setActiveFilter] = useState("all");
-
-  const handleCopyEmail = async () => {
-    await navigator.clipboard.writeText(site.email);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  // Sort order for the feed below. Essays/work/notes carry a real publish
-  // date; tools only carry a status string (e.g. "Active"), so they have no
-  // date to sort by and are stably pushed to the end instead of interleaved
-  // under a fabricated timestamp.
-  const toTimestamp = (type, dateValue) => {
-    if (type === "work") {
-      // "year" is either "2025" or a range like "2023–24"; sort by the later year.
-      const years = dateValue.match(/\d{2,4}/g) || [];
-      const last = years[years.length - 1];
-      const year = last.length === 4 ? last : `20${last}`;
-      return new Date(`July 1, ${year}`).getTime();
-    }
-    const t = new Date(dateValue).getTime();
-    return Number.isNaN(t) ? -Infinity : t;
-  };
-
-  // One flat, reverse-chronological list. Whatever's newest lands on top
-  // because it's newest, not because a "Featured" badge says so.
-  const archiveItems = [
-    ...articles.map((a) => ({
-      type: "essay",
-      typeLabel: "Essay",
-      slug: `/writing/${a.slug}`,
-      title: a.title,
-      summary: a.summary,
-      date: a.date,
-      readTime: a.readTime,
-      tag: a.topic,
-    })),
-    ...work.map((w) => ({
-      type: "work",
-      typeLabel: "Architecture",
-      slug: `/work/${w.slug}`,
-      title: w.title,
-      summary: w.summary,
-      date: w.year,
-      readTime: `${w.metric.label}: ${w.metric.value}`,
-      tag: w.category,
-    })),
-    ...tools.map((t) => ({
-      type: "tool",
-      typeLabel: "Blueprint",
-      slug: "/tools",
-      title: `${t.title} — ${t.tagline}`,
-      summary: t.summary,
-      date: t.status,
-      readTime: `${t.language} · ${t.metrics.label}: ${t.metrics.value}`,
-      tag: t.category,
-    })),
-    ...banterPosts.map((b) => ({
-      type: "note",
-      typeLabel: "Banter",
-      slug: `/banter#${b.slug}`,
-      title: b.title,
-      summary: b.take,
-      date: b.date,
-      readTime: b.readTime,
-      tag: b.tag,
-    })),
-  ].sort((a, b) => toTimestamp(b.type, b.date) - toTimestamp(a.type, a.date));
-
-  const filteredArchive = activeFilter === "all"
-    ? archiveItems
-    : archiveItems.filter((item) => {
-        if (activeFilter === "essays") return item.type === "essay";
-        if (activeFilter === "work") return item.type === "work";
-        if (activeFilter === "tools") return item.type === "tool";
-        if (activeFilter === "notes") return item.type === "note";
-        return true;
-      });
+  const [topic, setTopic] = useState("All");
+  const posts = topic === "All" ? sortedArticles : sortedArticles.filter((a) => a.topic === topic);
 
   return (
     <div className="flex flex-col gap-12 sm:gap-14 pt-2">
-      <title>{`${site.fullName || site.name} · Principal Systems & AI Infrastructure Engineer`}</title>
+      <title>{`${site.fullName || site.name} · ${site.role}`}</title>
 
-      {/* A short, personal opener instead of a magazine masthead */}
+      {/* A short, personal opener */}
       <section className="max-w-prose">
         <p className="font-serif text-xl sm:text-2xl leading-snug text-text">
           {site.tagline}
         </p>
         <p className="mt-2 text-sm text-muted leading-relaxed font-sans">
-          {site.role} · {site.location}. Writing and build notes below, newest first.
+          {site.role} · {site.location}. Notes below, newest first.
         </p>
       </section>
 
-      {/* One flat, reverse-chronological feed */}
+      {/* Posts */}
       <section className="flex flex-col gap-6">
         <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between border-b border-line/70 pb-3 gap-3">
-          <div className="flex items-baseline gap-3">
-            <h2 className="font-serif text-2xl font-normal text-text">
-              Lately
-            </h2>
-            <span className="font-mono text-xs text-faint">
-              ({filteredArchive.length})
-            </span>
-          </div>
+          <h2 className="font-serif text-2xl font-normal text-text">Writing</h2>
 
-          <nav className="flex flex-wrap items-center gap-4 font-mono text-xs" aria-label="Filter">
-            {[
-              { id: "all", label: "All" },
-              { id: "essays", label: "Writing" },
-              { id: "work", label: "Architecture" },
-              { id: "tools", label: "Blueprints" },
-              { id: "notes", label: "Banter" },
-            ].map((tab) => {
-              const isActive = activeFilter === tab.id;
-              return (
+          {topics.length > 2 && (
+            <nav className="flex flex-wrap items-center gap-4 font-mono text-xs" aria-label="Filter by topic">
+              {topics.map((t) => (
                 <button
-                  key={tab.id}
+                  key={t}
                   type="button"
-                  onClick={() => setActiveFilter(tab.id)}
+                  onClick={() => setTopic(t)}
                   className={`transition-colors py-0.5 ${
-                    isActive
+                    topic === t
                       ? "text-accent font-semibold border-b border-accent"
                       : "text-muted hover:text-text"
                   }`}
                 >
-                  {tab.label}
+                  {t}
                 </button>
-              );
-            })}
-          </nav>
+              ))}
+            </nav>
+          )}
         </div>
 
-        {/* Clean Editorial Stream */}
         <div className="flex flex-col divide-y divide-line/50">
-          {filteredArchive.map((item, idx) => (
+          {posts.map((a) => (
             <Link
-              key={idx}
-              to={item.slug}
+              key={a.slug}
+              to={`/writing/${a.slug}`}
               className="group py-6 first:pt-2 transition-colors block cursor-pointer"
             >
               <div className="flex flex-wrap items-center justify-between gap-1 font-mono text-xs text-faint mb-1.5">
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-text">
-                    {item.typeLabel}
-                  </span>
-                  <span>·</span>
-                  <span className="text-accent">#{item.tag.toLowerCase()}</span>
-                </div>
-                <span>{item.date} · {item.readTime}</span>
+                <span className="text-accent">#{a.topic.toLowerCase()}</span>
+                <span>{a.date} · {a.readTime}</span>
               </div>
 
               <h3 className="font-serif text-xl sm:text-2xl text-text group-hover:text-accent transition-colors leading-snug">
-                {item.title}
+                {a.title}
               </h3>
 
               <p className="mt-1.5 text-sm text-muted leading-relaxed font-sans line-clamp-2 max-w-prose">
-                {item.summary}
+                {a.summary}
               </p>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* 3. Quiet Editorial Direct Line */}
+      {/* Say hi */}
       <section className="border-t border-line/70 pt-8 pb-4 font-sans">
-        <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-4">
-          <div className="max-w-prose">
-            <h3 className="font-serif text-lg font-normal text-text">
-              Direct Line
-            </h3>
-            <p className="mt-1 text-xs text-muted leading-relaxed">
-              Available for architecture reviews, low-latency inference audits, and distributed consensus challenges.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-4 text-xs font-mono text-muted shrink-0">
-            <a
-              href={`mailto:${site.email}`}
-              className="text-accent hover:underline font-medium inline-flex items-center gap-1"
-            >
-              <Mail className="h-3 w-3" />
-              <span>{site.email}</span>
-            </a>
-            <span>·</span>
-            <button
-              type="button"
-              onClick={handleCopyEmail}
-              className="hover:text-text transition-colors inline-flex items-center gap-1"
-            >
-              {copied ? <Check className="h-3 w-3 text-accent" /> : <Copy className="h-3 w-3" />}
-              <span>{copied ? "Copied" : "Copy"}</span>
-            </button>
-            {site.links.github && (
-              <>
-                <span>·</span>
-                <a
-                  href={site.links.github}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-accent transition-colors inline-flex items-center gap-1"
-                >
-                  <GithubIcon className="h-3 w-3" />
-                  <span>GitHub</span>
-                </a>
-              </>
-            )}
-          </div>
+        <div className="flex items-center gap-4 text-xs font-mono text-muted">
+          <a href={`mailto:${site.email}`} className="text-accent hover:underline font-medium inline-flex items-center gap-1">
+            <Mail className="h-3 w-3" />
+            <span>{site.email}</span>
+          </a>
+          {site.links.github && (
+            <>
+              <span>·</span>
+              <a
+                href={site.links.github}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-accent transition-colors inline-flex items-center gap-1"
+              >
+                <GithubIcon className="h-3 w-3" />
+                <span>GitHub</span>
+              </a>
+            </>
+          )}
         </div>
       </section>
     </div>

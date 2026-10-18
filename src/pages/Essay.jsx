@@ -38,7 +38,7 @@ export default function Essay() {
 
       <div className="flex items-center justify-between pb-4 border-b border-line/70">
         <Link
-          to="/writing"
+          to="/"
           className="inline-flex items-center gap-1.5 font-sans text-xs text-muted transition-colors hover:text-accent"
         >
           <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />

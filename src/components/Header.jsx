@@ -1,17 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { Search, Sun, Moon } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 import { site } from "../content/site";
 
 const links = [
-  { to: "/writing", label: "Writing" },
-  { to: "/work", label: "Architecture" },
-  { to: "/tools", label: "Tools" },
-  { to: "/banter", label: "Banter" },
   { to: "/about", label: "About" },
 ];
 
-export default function Header({ onOpenPalette }) {
+export default function Header() {
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== "undefined") {
       return document.documentElement.classList.contains("dark");
@@ -37,9 +33,6 @@ export default function Header({ onOpenPalette }) {
         <Link to="/" className="group flex items-baseline gap-2">
           <span className="font-serif text-xl sm:text-2xl font-medium tracking-tight text-text group-hover:text-accent transition-colors">
             {site.fullName || site.name}
-          </span>
-          <span className="font-mono text-[11px] text-faint hidden sm:inline">
-            / Principal Engineer
           </span>
         </Link>
 
@@ -73,18 +66,6 @@ export default function Header({ onOpenPalette }) {
             >
               {isDark ? <Sun className="h-4 w-4 text-accent" /> : <Moon className="h-4 w-4" />}
             </button>
-
-            {onOpenPalette && (
-              <button
-                type="button"
-                onClick={onOpenPalette}
-                className="p-1.5 text-muted hover:text-text rounded-md transition-colors hidden sm:block"
-                title="Search (⌘K)"
-                aria-label="Search site"
-              >
-                <Search className="h-4 w-4" />
-              </button>
-            )}
           </div>
         </div>
       </div>
