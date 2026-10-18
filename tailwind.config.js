@@ -18,9 +18,11 @@ export default {
         "accent-tertiary": "var(--accent-tertiary)",
       },
       fontFamily: {
-        serif: ["Newsreader", "Charter", "Georgia", "serif"],
-        sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
-        mono: ["Geist Mono", "JetBrains Mono", "SFMono-Regular", "monospace"],
+        // Fraunces is the one web font the site loads; everything else is a
+        // system stack, which keeps the page a single font request instead of three.
+        serif: ["Fraunces", "Charter", "Georgia", "serif"],
+        sans: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "system-ui", "sans-serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
       },
       maxWidth: {
         page: "46rem",

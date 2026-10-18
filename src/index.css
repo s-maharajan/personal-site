@@ -2,34 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Anthropic Brand Aesthetic - Warm, editorial, minimal & powerful */
+/* A personal palette: pine, clay, and plum on cool paper. Not borrowed from anyone's brand. */
 :root {
-  --bg: #FAF9F5;
+  --bg: #F3F4EF;
   --surface: #FFFFFF;
-  --raised: #F4F1EA;
-  --text: #141413;
-  --muted: #5C5850;
-  --faint: #8C877D;
-  --line: #E5E0D5;
-  --accent: #D97757;           /* Anthropic Terracotta / Claude Coral */
-  --accent-hover: #C26343;
-  --accent-secondary: #6A9BCC; /* Anthropic Sky Blue */
-  --accent-tertiary: #788C5D;  /* Anthropic Cactus Green */
+  --raised: #E9EBE2;
+  --text: #1B1D1A;
+  --muted: #585F57;
+  --faint: #868E84;
+  --line: #D9DCD3;
+  --accent: #3E6259;           /* pine */
+  --accent-hover: #2F4D45;
+  --accent-secondary: #8A5A3C; /* clay */
+  --accent-tertiary: #6B5B95;  /* plum */
   color-scheme: light;
 }
 
 .dark {
-  --bg: #161514;
-  --surface: #201E1B;
-  --raised: #2A2723;
-  --text: #FAF7F2;
-  --muted: #A6A095;
-  --faint: #736E65;
-  --line: #33302B;
-  --accent: #D97757;
-  --accent-hover: #E28A6D;
-  --accent-secondary: #6A9BCC;
-  --accent-tertiary: #788C5D;
+  --bg: #121410;
+  --surface: #1B1E17;
+  --raised: #242820;
+  --text: #ECEEE7;
+  --muted: #9BA399;
+  --faint: #6E756A;
+  --line: #2A2E25;
+  --accent: #6FA696;
+  --accent-hover: #8FC0B0;
+  --accent-secondary: #C98A5E;
+  --accent-tertiary: #9B8AC4;
   color-scheme: dark;
 }
 
@@ -42,12 +42,12 @@
     text-wrap: balance;
   }
   ::selection {
-    background: #EAD9D1;
-    color: #141413;
+    background: #D3DFD3;
+    color: #1B1D1A;
   }
   .dark ::selection {
-    background: #472D24;
-    color: #FAF7F2;
+    background: #2A4A40;
+    color: #ECEEE7;
   }
   :focus-visible {
     outline: 2px solid var(--accent);

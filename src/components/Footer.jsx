@@ -29,7 +29,6 @@ export default function Footer() {
 
       <div className="mt-6 flex flex-col gap-1 border-t border-line/50 pt-4 text-[11px] text-faint sm:flex-row sm:items-center sm:justify-between">
         <span>© {new Date().getFullYear()} {site.fullName || site.name}. Distributed Systems & AI Infrastructure.</span>
-        <span>Anthropic-inspired aesthetic</span>
       </div>
     </footer>
   );

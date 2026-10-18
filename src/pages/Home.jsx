@@ -18,10 +18,10 @@ export default function Home() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Sort order for the "chronological" feed below. Essays/work/notes carry a
-  // real publish date; tools only carry a status string (e.g. "Active"), so
-  // they have no date to sort by and are stably pushed to the end instead of
-  // interleaved under a fabricated timestamp.
+  // Sort order for the feed below. Essays/work/notes carry a real publish
+  // date; tools only carry a status string (e.g. "Active"), so they have no
+  // date to sort by and are stably pushed to the end instead of interleaved
+  // under a fabricated timestamp.
   const toTimestamp = (type, dateValue) => {
     if (type === "work") {
       // "year" is either "2025" or a range like "2023–24"; sort by the later year.
@@ -34,16 +34,10 @@ export default function Home() {
     return Number.isNaN(t) ? -Infinity : t;
   };
 
-  const sortedArticles = [...articles].sort(
-    (a, b) => toTimestamp("essay", b.date) - toTimestamp("essay", a.date)
-  );
-
-  // Lead featured story: the most recently published essay (Anthropic Research editorial style)
-  const leadStory = sortedArticles[0];
-
-  // Unified chronological archive (everything except the lead essay above)
+  // One flat, reverse-chronological list. Whatever's newest lands on top
+  // because it's newest, not because a "Featured" badge says so.
   const archiveItems = [
-    ...sortedArticles.slice(1).map((a) => ({
+    ...articles.map((a) => ({
       type: "essay",
       typeLabel: "Essay",
       slug: `/writing/${a.slug}`,
@@ -99,57 +93,29 @@ export default function Home() {
     <div className="flex flex-col gap-12 sm:gap-14 pt-2">
       <title>{`${site.fullName || site.name} · Principal Systems & AI Infrastructure Engineer`}</title>
 
-      {/* 1. Commanding Featured Lead Essay */}
-      <section className="border-b border-line/70 pb-10 sm:pb-12">
-        <Link
-          to={`/writing/${leadStory.slug}`}
-          className="group block cursor-pointer"
-        >
-          {/* Metadata Byline */}
-          <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-faint mb-3">
-            <span className="text-accent font-semibold uppercase tracking-wider text-[11px]">
-              Featured Essay
-            </span>
-            <span>·</span>
-            <span>{leadStory.date}</span>
-            <span>·</span>
-            <span>{leadStory.readTime}</span>
-            <span>·</span>
-            <span className="text-accent">#{leadStory.topic.toLowerCase()}</span>
-          </div>
-
-          {/* Headline */}
-          <h1 className="font-serif text-3xl sm:text-4xl md:text-[2.65rem] font-normal tracking-tight text-text group-hover:text-accent transition-colors leading-[1.18] mb-4">
-            {leadStory.title}
-          </h1>
-
-          {/* Excerpt */}
-          <p className="text-base sm:text-lg text-muted leading-relaxed font-sans max-w-prose">
-            {leadStory.summary}
-          </p>
-
-          <div className="mt-4 inline-flex items-center gap-1 font-mono text-xs text-accent font-medium group-hover:translate-x-1 transition-transform">
-            <span>Read full essay</span>
-            <span>→</span>
-          </div>
-        </Link>
+      {/* A short, personal opener instead of a magazine masthead */}
+      <section className="max-w-prose">
+        <p className="font-serif text-xl sm:text-2xl leading-snug text-text">
+          {site.tagline}
+        </p>
+        <p className="mt-2 text-sm text-muted leading-relaxed font-sans">
+          {site.role} · {site.location}. Writing and build notes below, newest first.
+        </p>
       </section>
 
-      {/* 2. Pure Editorial Chronological Archive */}
+      {/* One flat, reverse-chronological feed */}
       <section className="flex flex-col gap-6">
-        {/* Archive Header & Filter Navigation */}
         <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between border-b border-line/70 pb-3 gap-3">
           <div className="flex items-baseline gap-3">
             <h2 className="font-serif text-2xl font-normal text-text">
-              Archive
+              Lately
             </h2>
             <span className="font-mono text-xs text-faint">
-              ({filteredArchive.length} publications)
+              ({filteredArchive.length})
             </span>
           </div>
 
-          {/* Filter Tabs - Clean, Typographical, No Chunky Buttons */}
-          <nav className="flex flex-wrap items-center gap-4 font-mono text-xs" aria-label="Archive filter">
+          <nav className="flex flex-wrap items-center gap-4 font-mono text-xs" aria-label="Filter">
             {[
               { id: "all", label: "All" },
               { id: "essays", label: "Writing" },
