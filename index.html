@@ -19,15 +19,15 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340..480;1,9..144,400&display=swap" />
     <script>
       (function() {
+        let stored;
         try {
-          const stored = localStorage.getItem('theme');
-          const isDark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-          if (isDark) {
-            document.documentElement.classList.add('dark');
-          } else {
-            document.documentElement.classList.remove('dark');
-          }
-        } catch (e) {}
+          stored = localStorage.getItem('theme');
+        } catch {
+          // Follow the system preference when storage is blocked.
+        }
+        const isDark = stored === 'dark' ||
+          (stored !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('dark', isDark);
       })();
     </script>
   </head>

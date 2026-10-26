@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { Sun, Moon } from "lucide-react";
+import { Monitor, Sun, Moon } from "lucide-react";
 import { site } from "../content/site";
 
 const links = [
@@ -8,25 +8,46 @@ const links = [
 ];
 
 export default function Header() {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== "undefined") {
-      return document.documentElement.classList.contains("dark");
+  const [theme, setTheme] = useState(() => {
+    try {
+      const stored = localStorage.getItem("theme");
+      if (stored === "light" || stored === "dark") return stored;
+    } catch {
+      // Storage may be blocked; default to the system preference.
     }
-    return false;
+    return "system";
   });
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark);
-  }, [isDark]);
+    const preference = window.matchMedia("(prefers-color-scheme: dark)");
+    const applyTheme = () => {
+      document.documentElement.classList.toggle(
+        "dark",
+        theme === "dark" || (theme === "system" && preference.matches),
+      );
+    };
+    applyTheme();
+    if (theme === "system") {
+      preference.addEventListener("change", applyTheme);
+      return () => preference.removeEventListener("change", applyTheme);
+    }
+  }, [theme]);
 
-  // Only persist an explicit choice, so visitors who never toggle keep following their OS setting.
-  const toggleTheme = () => {
-    const next = !isDark;
-    setIsDark(next);
+  const nextTheme = { system: "light", light: "dark", dark: "system" }[theme];
+  const ThemeIcon = { system: Monitor, light: Sun, dark: Moon }[theme];
+  const themeLabel = theme[0].toUpperCase() + theme.slice(1);
+  const nextThemeLabel = nextTheme[0].toUpperCase() + nextTheme.slice(1);
+
+  const cycleTheme = () => {
+    setTheme(nextTheme);
     try {
-      localStorage.setItem("theme", next ? "dark" : "light");
+      if (nextTheme === "system") {
+        localStorage.removeItem("theme");
+      } else {
+        localStorage.setItem("theme", nextTheme);
+      }
     } catch {
-      // Storage blocked (private mode, disabled cookies); the toggle still works for this visit.
+      // The switch still works for this visit when storage is blocked.
     }
   };
 
@@ -63,12 +84,12 @@ export default function Header() {
           <div className="flex items-center gap-1 border-l border-line/80 pl-3 sm:pl-4">
             <button
               type="button"
-              onClick={toggleTheme}
-              className="p-1.5 text-muted hover:text-text rounded-md transition-colors"
-              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-              aria-label="Toggle theme"
+              onClick={cycleTheme}
+              className="p-1.5 text-muted hover:text-accent rounded-md transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              title={`Theme: ${themeLabel}. Switch to ${nextThemeLabel}`}
+              aria-label={`Theme: ${themeLabel}. Switch to ${nextThemeLabel}`}
             >
-              {isDark ? <Sun className="h-4 w-4 text-accent" /> : <Moon className="h-4 w-4" />}
+              <ThemeIcon className="h-4 w-4 text-accent" aria-hidden="true" />
             </button>
           </div>
         </div>
