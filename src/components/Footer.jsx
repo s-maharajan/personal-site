@@ -16,6 +16,7 @@ export default function Footer() {
         <nav className="flex flex-wrap items-center gap-x-5 gap-y-1">
           <Link to="/" className="hover:text-accent transition-colors">Writing</Link>
           <Link to="/about" className="hover:text-accent transition-colors">About</Link>
+          <a href="/feed.xml" className="hover:text-accent transition-colors">RSS</a>
           {site.links.github && (
             <a href={site.links.github} target="_blank" rel="noreferrer" className="hover:text-accent transition-colors">
               GitHub

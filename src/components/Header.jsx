@@ -16,15 +16,19 @@ export default function Header() {
   });
 
   useEffect(() => {
-    const root = document.documentElement;
-    if (isDark) {
-      root.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      root.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
+    document.documentElement.classList.toggle("dark", isDark);
   }, [isDark]);
+
+  // Only persist an explicit choice, so visitors who never toggle keep following their OS setting.
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    try {
+      localStorage.setItem("theme", next ? "dark" : "light");
+    } catch {
+      // Storage blocked (private mode, disabled cookies); the toggle still works for this visit.
+    }
+  };
 
   return (
     <header className="pt-8 sm:pt-12 print-hidden">
@@ -59,7 +63,7 @@ export default function Header() {
           <div className="flex items-center gap-1 border-l border-line/80 pl-3 sm:pl-4">
             <button
               type="button"
-              onClick={() => setIsDark((prev) => !prev)}
+              onClick={toggleTheme}
               className="p-1.5 text-muted hover:text-text rounded-md transition-colors"
               title={isDark ? "Switch to light mode" : "Switch to dark mode"}
               aria-label="Toggle theme"

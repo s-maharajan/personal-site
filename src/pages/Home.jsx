@@ -2,10 +2,9 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { site } from "../content/site";
-import { articles } from "../content/writing";
+import { sortedArticles } from "../content/writing";
 import { GithubIcon } from "../components/Icons";
 
-const sortedArticles = [...articles].sort((a, b) => new Date(b.date) - new Date(a.date));
 const topics = ["All", ...new Set(sortedArticles.map((a) => a.topic))];
 
 export default function Home() {

@@ -14,7 +14,7 @@ export default function About() {
           I'm {site.fullName}. I work on distributed systems and AI infrastructure, and I write
           here about the parts of that work that are worth thinking through in public.
         </p>
-        <p>I work {site.location.toLowerCase()}.</p>
+        <p>Location: {site.location}.</p>
       </div>
 
       <div className="pt-2 flex items-center gap-4 text-sm font-mono text-muted">

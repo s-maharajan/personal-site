@@ -432,3 +432,15 @@ p99 latency instantly collapsed back to 28ms, and zero 504 timeouts occurred und
 ];
 
 export const findArticle = (slug) => articles.find((a) => a.slug === slug);
+
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July",
+  "August", "September", "October", "November", "December"];
+
+// Dates are written as "Month YYYY". Parse them explicitly: `new Date("October 2025")`
+// is not a standard format and returns Invalid Date in Safari.
+export const isoMonth = (date) => {
+  const [month, year] = date.split(" ");
+  return `${year}-${String(MONTHS.indexOf(month) + 1).padStart(2, "0")}`;
+};
+
+export const sortedArticles = [...articles].sort((a, b) => isoMonth(b.date).localeCompare(isoMonth(a.date)));

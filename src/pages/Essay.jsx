@@ -2,8 +2,9 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Share2, Check } from "lucide-react";
 import { useState } from "react";
 import { site } from "../content/site";
-import { articles, findArticle } from "../content/writing";
+import { sortedArticles, findArticle, isoMonth } from "../content/writing";
 import NotFound from "./NotFound";
+import Prose from "../components/Prose";
 
 export default function Essay() {
   const { slug } = useParams();
@@ -12,8 +13,9 @@ export default function Essay() {
 
   if (!article) return <NotFound />;
 
-  const currentIndex = articles.indexOf(article);
-  const nextArticle = articles[(currentIndex + 1) % articles.length];
+  // Continue to the next-oldest essay, wrapping back to the newest.
+  const currentIndex = sortedArticles.indexOf(article);
+  const nextArticle = sortedArticles[(currentIndex + 1) % sortedArticles.length];
 
   const handleShare = async () => {
     try {
@@ -59,7 +61,7 @@ export default function Essay() {
         <div className="flex items-center gap-2 font-mono text-xs text-faint">
           <span className="text-accent font-medium">#{article.topic.toLowerCase()}</span>
           <span>·</span>
-          <time>{article.date}</time>
+          <time dateTime={isoMonth(article.date)}>{article.date}</time>
           <span>·</span>
           <span>{article.readTime}</span>
         </div>
@@ -81,31 +83,7 @@ export default function Essay() {
               {sec.heading}
             </h2>
             <div className="text-sm sm:text-base leading-relaxed text-muted space-y-4">
-              {sec.body.split("\n\n").map((para, pIdx) => {
-                if (para.startsWith("```")) {
-                  const cleaned = para.replace(/^```[a-zA-Z0-9_-]*\n?|```$/g, "").trim();
-                  return (
-                    <pre
-                      key={pIdx}
-                      className="my-3 overflow-x-auto rounded-lg border border-line bg-raised/70 p-4 font-mono text-xs text-text leading-relaxed"
-                    >
-                      <code>{cleaned}</code>
-                    </pre>
-                  );
-                }
-                if (para.startsWith("1.") || para.startsWith("-")) {
-                  return (
-                    <div key={pIdx} className="my-2 space-y-1.5 pl-4 border-l border-line text-xs sm:text-sm">
-                      {para.split("\n").map((item, itemIdx) => (
-                        <p key={itemIdx} className="text-muted">
-                          {item}
-                        </p>
-                      ))}
-                    </div>
-                  );
-                }
-                return <p key={pIdx}>{para}</p>;
-              })}
+              <Prose body={sec.body} />
             </div>
           </section>
         ))}
