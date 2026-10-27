@@ -19,7 +19,9 @@ function inline(text) {
   });
 }
 
-function parse(body) {
+// Export the pure parser for unit tests alongside the renderer.
+// eslint-disable-next-line react-refresh/only-export-components
+export function parse(body) {
   const blocks = [];
   const lines = body.split("\n");
   let para = [];

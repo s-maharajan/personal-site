@@ -7,6 +7,7 @@
     "node": "22.x"
   },
   "scripts": {
+    "test": "vitest run",
     "dev": "vite",
     "build": "vite build && node scripts/build-feeds.js",
     "lint": "eslint .",
@@ -19,6 +20,7 @@
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
+    "vitest": "^4.0.0",
     "@eslint/js": "^10.0.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

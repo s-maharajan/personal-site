@@ -7,6 +7,7 @@ A blog: a list of essays, newest first, and a short about page. Built with React
 ```sh
 npm install
 npm run dev      # http://localhost:5173
+npm test         # Vitest unit tests (Node; no browser required)
 npm run lint
 npm run build    # outputs to dist/
 ```
