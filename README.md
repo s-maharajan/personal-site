@@ -5,14 +5,19 @@ A blog: a list of essays, newest first, and a short about page. Built with React
 ## Run it locally
 
 ```sh
-npm install
+npm ci
 npm run dev      # http://localhost:5173
 npm test         # Vitest unit tests (Node; no browser required)
 npm run lint
 npm run build    # outputs to dist/
 ```
 
-Requires Node 22.
+Requires Node 22.12 or newer within Node 22.
+
+`npm test` covers all twelve month conversions, newest-first article ordering,
+required article fields and unique slugs, and Prose parsing and static rendering
+(paragraphs, lists, fenced code, bold, and inline code). Tests run in Node without
+jsdom.
 
 ## Editing content
 
