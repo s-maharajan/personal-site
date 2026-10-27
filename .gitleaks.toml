@@ -1,0 +1,3 @@
+# Extend the built-in rules; do not suppress real credentials.
+[extend]
+useDefault = true

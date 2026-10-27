@@ -25,3 +25,28 @@ dist-ssr
 
 # Vercel
 .vercel
+
+# Local secrets, developer files and generated output
+Thumbs.db
+*.swp
+*.swo
+*~
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.mobileprovision
+/credentials.json
+/service-account*.json
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.vercel/
+
+# Committable templates contain placeholders only (keep after environment rules).
+!.env.example
+!.env.*.example
+!.env.sample
