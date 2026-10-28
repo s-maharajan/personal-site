@@ -1,17 +1,40 @@
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Share2, Check } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { site } from "../content/site";
 import { sortedArticles, findArticle, isoMonth } from "../content/writing";
 import NotFound from "./NotFound";
 import Prose from "../components/Prose";
+import { sectionIds, readingProgress } from "../lib/essay";
 
 export default function Essay() {
   const { slug } = useParams();
   const article = findArticle(slug);
   const [copied, setCopied] = useState(false);
 
+  const contentRef = useRef(null);
+  const progressRef = useRef(null);
+
+  useEffect(() => {
+    if (!article) return;
+    const update = () => {
+      const rect = contentRef.current.getBoundingClientRect();
+      progressRef.current.style.transform = `scaleX(${readingProgress(rect.top, rect.height, window.innerHeight)})`;
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    const observer = new ResizeObserver(update);
+    observer.observe(contentRef.current);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+      observer.disconnect();
+    };
+  }, [article]);
+
   if (!article) return <NotFound />;
+  const ids = sectionIds(article.content);
 
   // Continue to the next-oldest essay, wrapping back to the newest.
   const currentIndex = sortedArticles.indexOf(article);
@@ -36,6 +59,10 @@ export default function Essay() {
 
   return (
     <article className="max-w-prose mx-auto flex flex-col gap-8">
+
+      <div className="reading-progress print-hidden" aria-hidden="true">
+        <div ref={progressRef} className="reading-progress-fill" />
+      </div>
 
       <div className="flex items-center justify-between pb-4 border-b border-line/70">
         <Link
@@ -74,12 +101,26 @@ export default function Essay() {
         </p>
       </header>
 
+      {article.content.length >= 3 && (
+        <nav aria-label="Contents" className="rounded-lg border border-line/70 px-4 py-3 font-sans text-sm">
+          <p className="mb-2 font-mono text-xs text-faint">Contents</p>
+          <ol className="space-y-1">
+            {article.content.map((sec, idx) => (
+              <li key={ids[idx]}>
+                <a href={`#${ids[idx]}`} className="text-muted hover:text-accent hover:underline">{sec.heading}</a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )}
+
       {/* Main Content Sections */}
-      <div className="flex flex-col gap-8 font-sans">
+      <div ref={contentRef} className="flex flex-col gap-8 font-sans">
         {article.content.map((sec, idx) => (
           <section key={idx} className="flex flex-col gap-3">
-            <h2 className="font-serif text-xl sm:text-2xl font-normal tracking-tight text-text">
-              {sec.heading}
+            <h2 id={ids[idx]} className="essay-heading font-serif text-xl sm:text-2xl font-normal tracking-tight text-text">
+              {sec.heading}{" "}
+              <a href={`#${ids[idx]}`} className="heading-anchor text-accent" aria-label={`Link to ${sec.heading}`}>#</a>
             </h2>
             <div className="text-sm sm:text-base leading-relaxed text-muted space-y-4">
               <Prose body={sec.body} />
