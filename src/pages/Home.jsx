@@ -13,7 +13,6 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-12 sm:gap-14 pt-2">
-      <title>{`${site.fullName || site.name} · ${site.role}`}</title>
 
       {/* A short, personal opener */}
       <section className="max-w-prose">

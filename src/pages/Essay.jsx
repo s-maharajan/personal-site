@@ -36,7 +36,6 @@ export default function Essay() {
 
   return (
     <article className="max-w-prose mx-auto flex flex-col gap-8">
-      <title>{`${article.title} · ${site.fullName || site.name}`}</title>
 
       <div className="flex items-center justify-between pb-4 border-b border-line/70">
         <Link

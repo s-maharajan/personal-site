@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useLocation, Outlet } from "react-router-dom";
+import PageMeta from "./PageMeta";
 import Header from "./Header";
 import Footer from "./Footer";
 
@@ -12,6 +13,7 @@ export default function Layout() {
 
   return (
     <div className="relative min-h-screen print:min-h-0 print:overflow-visible print:bg-white">
+      <PageMeta />
       {/* Skip to Content for Accessibility */}
       <a
         href="#main-content"

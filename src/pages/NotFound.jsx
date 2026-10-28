@@ -1,10 +1,8 @@
 import { Link } from "react-router-dom";
-import { site } from "../content/site";
 
 export default function NotFound() {
   return (
     <section className="py-20 text-center flex flex-col items-center">
-      <title>{`Page not found · ${site.fullName || site.name}`}</title>
       <meta name="robots" content="noindex" />
       <p className="font-mono text-5xl sm:text-6xl font-normal text-accent">404</p>
       <h1 className="mt-4 font-serif text-3xl sm:text-4xl font-normal text-text">Page Not Found</h1>

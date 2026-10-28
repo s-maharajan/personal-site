@@ -16,7 +16,8 @@ Requires Node 22.12 or newer within Node 22.
 
 `npm test` covers all twelve month conversions, newest-first article ordering,
 required article fields and unique slugs, and Prose parsing and static rendering
-(paragraphs, lists, fenced code, bold, and inline code). Tests run in Node without
+(paragraphs, lists, fenced code, bold, and inline code), plus server-rendered route
+content and per-page metadata for every essay, home, about, and the 404 fallback. Tests run in Node without
 jsdom.
 
 ## Editing content
@@ -39,7 +40,16 @@ src/
 
 ## Deploying
 
-`vercel.json` builds with `npm run build` and rewrites all routes to `index.html` for client-side routing.
+`npm run build` runs Vite, generates the feeds, sitemap and robots.txt, then
+server-renders `/`, `/about`, and every `/writing/<slug>` into `dist/<route>/index.html`.
+Each page includes its content, title, description, Open Graph tags and canonical URL.
+Essay descriptions use `summary`; canonical and Open Graph URLs use `site.url` in
+`src/content/site.js`. Update that URL when changing the public domain.
+
+The browser hydrates the rendered content and continues to navigate client-side,
+updating page metadata. The inline theme script still applies the saved or system
+theme before paint. `vercel.json` keeps its routing fallback: existing static files
+win, and unmatched URLs serve `index.html` for the client-side 404 page.
 
 ## Secret scanning
 

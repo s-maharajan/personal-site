@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Monitor, Sun, Moon } from "lucide-react";
 import { site } from "../content/site";
@@ -7,16 +7,22 @@ const links = [
   { to: "/about", label: "About" },
 ];
 
+// The server and first hydration render agree; storage is read after hydration.
+const subscribeTheme = () => () => {};
+const readTheme = () => {
+  try {
+    const stored = localStorage.getItem("theme");
+    if (stored === "light" || stored === "dark") return stored;
+  } catch {
+    // Follow the system preference when storage is blocked.
+  }
+  return "system";
+};
+
 export default function Header() {
-  const [theme, setTheme] = useState(() => {
-    try {
-      const stored = localStorage.getItem("theme");
-      if (stored === "light" || stored === "dark") return stored;
-    } catch {
-      // Storage may be blocked; default to the system preference.
-    }
-    return "system";
-  });
+  const storedTheme = useSyncExternalStore(subscribeTheme, readTheme, () => "system");
+  const [selectedTheme, setTheme] = useState(null);
+  const theme = selectedTheme ?? storedTheme;
 
   useEffect(() => {
     const preference = window.matchMedia("(prefers-color-scheme: dark)");
