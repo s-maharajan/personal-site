@@ -36,6 +36,7 @@ export default function Home() {
                   key={t}
                   type="button"
                   onClick={() => setTopic(t)}
+                  aria-pressed={topic === t}
                   className={`transition-colors py-0.5 ${
                     topic === t
                       ? "text-accent font-semibold border-b border-accent"
