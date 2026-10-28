@@ -56,6 +56,18 @@ describe("prerendered routes", () => {
     expect(about.body).toContain(`I'm`.replace("'", "&#x27;"));
   });
 
+  it("exposes filter selection and a first-stop skip link to focusable main content", () => {
+    const { body } = render("/");
+    const filters = body.match(/<button[^>]*aria-pressed="(true|false)"[^>]*>[^<]+<\/button>/g);
+    expect(filters.length).toBeGreaterThan(1);
+    expect(filters.filter((button) => button.includes('aria-pressed="true"'))).toHaveLength(1);
+    expect(filters[0]).toMatch(/aria-pressed="true"[^>]*>All<\/button>/);
+    expect(body.match(/<(?:a|button)\b[^>]*>/)[0]).toContain('href="#main-content"');
+    expect(body).toMatch(/<main id="main-content" tabindex="-1"/);
+    expect(body).not.toMatch(/tabindex="[1-9]/);
+    expect(body).toMatch(/<button[^>]*aria-label="Theme: System\. Switch to Light"/);
+  });
+
   it("shares the site Open Graph image on the home and about pages", () => {
     const image = `${site.url}/og/${SITE_OG_SLUG}.png`;
     for (const path of ["/", "/about"]) {

@@ -92,3 +92,18 @@ on initial load and client navigation, with space above the target heading.
 A thin accent bar at the top tracks progress through the essay body, reaching
 100% when its end enters the viewport. It updates without animation, including
 with reduced motion enabled, and is hidden when printing.
+
+## Accessibility
+
+Lint includes the recommended `eslint-plugin-jsx-a11y` rules. A scoped npm peer
+override keeps the existing ESLint 10 setup: jsx-a11y 6.10.2 declares support only
+through ESLint 9; its recommended rules are verified by `npm run lint` on ESLint 10.
+Topic filters expose selection with `aria-pressed`; the icon-only theme button announces its current
+mode and next action. The first keyboard stop is a visible-on-focus skip link to
+main content, which accepts focus without adding a tab stop. Subsequent Tab stops
+follow document order, with a visible focus outline.
+
+Faint text (including 11–12px metadata) meets WCAG AA's 4.5:1 requirement:
+`#6A7167` on light `#F3F4EF` is 4.55:1, and `#808779` on dark `#121410` is
+4.99:1. On the next-essay card's surface, the ratios are 5.04:1 (light) and
+4.55:1 (dark). The skip link uses the surface and primary text colours in both themes.

@@ -18,7 +18,7 @@ export const palette = {
   raised: "#E9EBE2",
   text: "#1B1D1A",
   muted: "#585F57",
-  faint: "#868E84",
+  faint: "#6A7167",
   line: "#D9DCD3",
   pine: "#3E6259",
   pineDeep: "#2F4D45",
