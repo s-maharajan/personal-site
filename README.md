@@ -10,6 +10,7 @@ npm run dev      # http://localhost:5173
 npm test         # Vitest unit tests (Node; no browser required)
 npm run lint
 npm run build    # outputs to dist/
+npm run og       # re-render the Open Graph cards into dist/og/
 ```
 
 Requires Node 22.12 or newer within Node 22.
@@ -18,7 +19,9 @@ Requires Node 22.12 or newer within Node 22.
 required article fields and unique slugs, and Prose parsing and static rendering
 (paragraphs, lists, fenced code, bold, and inline code), plus server-rendered route
 content and per-page metadata for every essay, home, about, and the 404 fallback. Tests run in Node without
-jsdom.
+jsdom. The Open Graph cards are covered too: the suite renders them, checks every
+file is a 1200x630 PNG, checks the cards carry the title, topic and author, and
+checks the card palette still matches `src/index.css`.
 
 ## Editing content
 
@@ -35,7 +38,10 @@ Content lives in `src/content/`:
 src/
   content/     site, writing
   components/  Layout, Header, Footer, Icons
+  lib/         og (shared Open Graph image paths and sizes)
   pages/       Home, Essay, About, NotFound
+scripts/       build-feeds, build-og, prerender
+fonts/         Fraunces, bundled for the build-time cards
 ```
 
 ## Deploying
@@ -45,6 +51,15 @@ server-renders `/`, `/about`, and every `/writing/<slug>` into `dist/<route>/ind
 Each page includes its content, title, description, Open Graph tags and canonical URL.
 Essay descriptions use `summary`; canonical and Open Graph URLs use `site.url` in
 `src/content/site.js`. Update that URL when changing the public domain.
+
+The build also renders the Open Graph cards: `dist/og/site.png` for the site and
+`dist/og/<slug>.png` for every essay, all 1200x630 PNGs. `scripts/build-og.js`
+draws them with satori and rasterises them with resvg, using the palette from
+`src/index.css` and the Fraunces files in `fonts/`. Nothing is fetched at build
+time, so the build works offline. Every page points at its card with
+`og:image`, `og:image:width`, `og:image:height` and `twitter:card=summary_large_image`;
+essays use their own card, the home and about pages share the site card. Run
+`npm run og` on its own to re-render the cards.
 
 The browser hydrates the rendered content and continues to navigate client-side,
 updating page metadata. The inline theme script still applies the saved or system

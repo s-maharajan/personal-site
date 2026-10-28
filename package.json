@@ -9,7 +9,8 @@
   "scripts": {
     "test": "vitest run",
     "dev": "vite",
-    "build": "vite build && node scripts/build-feeds.js && node scripts/prerender.js",
+    "build": "vite build && node scripts/build-og.js && node scripts/build-feeds.js && node scripts/prerender.js",
+    "og": "node scripts/build-og.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@resvg/resvg-js": "^2.6.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
@@ -30,6 +32,7 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
     "postcss": "^8.5.10",
+    "satori": "^0.63.2",
     "tailwindcss": "^3.4.17",
     "vite": "^8.0.10",
     "vitest": "^5.0.5"

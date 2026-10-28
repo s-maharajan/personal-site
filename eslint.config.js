@@ -18,4 +18,11 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    // Build scripts run in Node, not in the browser.
+    files: ['scripts/**/*.js'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
 ])

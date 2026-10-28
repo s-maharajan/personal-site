@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { render } from "./entry-server";
 import { sortedArticles } from "./content/writing";
 import { site } from "./content/site";
+import { OG_HEIGHT, OG_WIDTH, SITE_OG_SLUG } from "./lib/og";
 
 const escape = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;")
   .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
@@ -24,6 +25,18 @@ describe("prerendered routes", () => {
     expect(body).toContain('Theme: System. Switch to Light');
   });
 
+  it.each(sortedArticles)("points $slug at its own Open Graph image", (article) => {
+    const { head } = render(`/writing/${article.slug}`);
+    const image = `${site.url}/og/${article.slug}.png`;
+    expect(head).toContain(`<meta property="og:image" content="${image}"/>`);
+    expect(head).toContain(`<meta property="og:image:width" content="${OG_WIDTH}"/>`);
+    expect(head).toContain(`<meta property="og:image:height" content="${OG_HEIGHT}"/>`);
+    expect(head).toContain(`<meta name="twitter:card" content="summary_large_image"/>`);
+    expect(head).toContain(`<meta name="twitter:image" content="${image}"/>`);
+    expect(head).not.toContain(`/og/${SITE_OG_SLUG}.png`);
+    expect(head.match(/<meta name="twitter:card"/g)).toHaveLength(1);
+  });
+
   it("renders home and about with distinct metadata and content", () => {
     const home = render("/");
     const about = render("/about");
@@ -34,6 +47,19 @@ describe("prerendered routes", () => {
     expect(about.head).toContain(`href="${site.url}/about"`);
     expect(about.head).not.toBe(home.head);
     expect(about.body).toContain(`I'm`.replace("'", "&#x27;"));
+  });
+
+  it("shares the site Open Graph image on the home and about pages", () => {
+    const image = `${site.url}/og/${SITE_OG_SLUG}.png`;
+    for (const path of ["/", "/about"]) {
+      const { head } = render(path);
+      expect(head).toContain(`<meta property="og:image" content="${image}"/>`);
+      expect(head).toContain(`<meta property="og:image:width" content="${OG_WIDTH}"/>`);
+      expect(head).toContain(`<meta property="og:image:height" content="${OG_HEIGHT}"/>`);
+      expect(head).toContain(`<meta name="twitter:card" content="summary_large_image"/>`);
+      expect(head).toContain(`<meta name="twitter:image" content="${image}"/>`);
+      expect(head.match(/<meta name="twitter:card"/g)).toHaveLength(1);
+    }
   });
 
   it("preserves the unknown-route fallback and noindex metadata", () => {
