@@ -41,7 +41,7 @@ src/
   lib/         og (shared Open Graph image paths and sizes)
   pages/       Home, Essay, About, NotFound
 scripts/       build-feeds, build-og, prerender
-fonts/         Fraunces, bundled for the build-time cards
+fonts/         Fraunces TTF sources and licence (cards and web subsets)
 ```
 
 ## Deploying
@@ -65,6 +65,31 @@ The browser hydrates the rendered content and continues to navigate client-side,
 updating page metadata. The inline theme script still applies the saved or system
 theme before paint. `vercel.json` keeps its routing fallback: existing static files
 win, and unmatched URLs serve `index.html` for the client-side 404 page.
+
+## Performance and response headers
+
+Fraunces is served locally as committed Latin WOFF2 subsets, with no Google Fonts
+stylesheet or third-party font requests. The regular face is preloaded; italic
+loads when used. Vite fingerprints both files under `/assets/`. See
+[fonts/README.md](fonts/README.md) for coverage and offline regeneration.
+Home and the small 404 page load eagerly; Essay and About use `React.lazy` with a
+loading status. The prerenderer supplies eager versions of those pages so the
+initial HTML still contains full content and metadata on every published route.
+
+Vercel sends `Cache-Control: public, max-age=31536000, immutable` for fingerprinted
+`/assets/*` files only. HTML keeps the platform's normal revalidation behaviour.
+All routes receive a CSP restricting resource loads to the same origin, blocking
+embedding with `frame-ancestors 'none'`, and disabling plugins, base URL overrides
+and form submissions. The policy permits the exact inline theme script by SHA-256
+hash; it does not permit arbitrary inline scripts or eval. When editing that
+script in `index.html`, update its hash in `vercel.json` (the security test detects
+a mismatch). The reading-progress bar updates through CSSOM, which the policy
+allows. External social and email links remain normal navigation links.
+
+Responses also set `X-Content-Type-Options: nosniff`,
+`Referrer-Policy: strict-origin-when-cross-origin` and a Permissions Policy
+disabling camera, microphone, geolocation and payment access. These headers are
+applied by Vercel; the Vite development and preview servers do not apply them.
 
 ## Secret scanning
 
