@@ -7,6 +7,7 @@
     "node": "22.x"
   },
   "scripts": {
+    "test": "vitest run",
     "dev": "vite",
     "build": "vite build && node scripts/build-feeds.js",
     "lint": "eslint .",
@@ -30,6 +31,7 @@
     "globals": "^17.5.0",
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.17",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "vitest": "^5.0.5"
   }
 }
