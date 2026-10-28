@@ -76,3 +76,10 @@ Neither review agent found a code defect severe enough to block on its own. Both
 - My own attempt to recompute the CSP hash of the inline script needed approval and was not run. The hash in `vercel.json:23` has not been checked.
 - Line numbers come from reading HEAD and may be off by a line or two (marked `~` where the agents said so).
 - This review changed no code, workflows or config; it wrote only this file.
+
+## Second attempt (re-check)
+
+- **Why the verify step failed.** The check `test -s OUTPUT-*.md` fails whenever more than one `OUTPUT-*.md` exists. This repo has three (`OUTPUT-16.md`, `OUTPUT-17.md`, `OUTPUT-47.md`), so the shell expands the glob to `test -s OUTPUT-16.md OUTPUT-17.md OUTPUT-47.md` and fails with "unexpected operator". The problem is in the check, not in this report. The only way to make the check pass without changing it is to delete the other two notes. The spec says to write only this file, so I didn't delete them (S1 recommends deleting them in a separate change). A check that works with several files: `test -s OUTPUT-47.md && test $(git diff --name-only HEAD~1..HEAD | grep -v ^OUTPUT- | wc -l) -eq 0`, or `for f in OUTPUT-*.md; do test -s "$f" || exit 1; done`.
+- **B1 re-confirmed at HEAD.** `scripts/prerender.js:14` renders only `/`, `/about` and `/writing/<slug>`. `vercel.json:5-7` still rewrites `/(.*)` to `/index.html`, which is the prerendered Home page. Vercel serves real files before it applies rewrites, so known routes are fine, but any other path gets Home with a 200.
+- **Still unverified.** There is still no `node_modules`, and recomputing the CSP hash locally again needed approval and was not run. The verdict stays **NO-GO** until B1 is fixed and B2 (lint, tests and build) has been run.
+- I didn't re-run the kit agents; the findings above come from the first attempt's runs and are unchanged at HEAD (the only commit since is the earlier version of this report).
