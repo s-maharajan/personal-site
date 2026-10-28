@@ -18,8 +18,8 @@ export default {
         "accent-tertiary": "var(--accent-tertiary)",
       },
       fontFamily: {
-        // Fraunces is the one web font the site loads; everything else is a
-        // system stack, which keeps the page a single font request instead of three.
+        // Fraunces is the only web font family; its subsets are served locally.
+        // Everything else uses a system stack.
         serif: ["Fraunces", "Charter", "Georgia", "serif"],
         sans: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "system-ui", "sans-serif"],
         mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],

@@ -1,13 +1,16 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
-import Essay from "./pages/Essay";
-import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 
-export default function App() {
+const LazyEssay = lazy(() => import("./pages/Essay"));
+const LazyAbout = lazy(() => import("./pages/About"));
+
+// Prerendering supplies eager pages so renderToString emits complete content.
+export default function App({ Essay = LazyEssay, About = LazyAbout }) {
   return (
-    <>
+    <Suspense fallback={<p role="status" className="p-8 text-muted">Loading page…</p>}>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
@@ -16,6 +19,6 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
-    </>
+    </Suspense>
   );
 }

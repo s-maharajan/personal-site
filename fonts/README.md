@@ -20,5 +20,21 @@ The family names differ between the files on purpose: satori matches the face
 it draws with by family name, so each file is registered under the name it
 carries internally.
 
-The browser still loads Fraunces from Google Fonts (see `index.html`). These
-files exist for the build-time cards only.
+The browser uses committed WOFF2 subsets in `src/assets/`, generated from the
+Regular and Italic sources above. Both are static 400-weight faces; medium text
+uses the browser's weight matching. The regular face is preloaded in
+`index.html`; `src/index.css` defines both faces with `font-display: swap`.
+The subsets retain available glyphs from Latin / Latin Extended-A (U+0020–007E,
+U+00A0–017F), general punctuation (U+2000–206F), euro, trademark and arrows
+(U+2190–21FF). Characters absent from the source or subset use the system serif
+fallback. The same SIL Open Font License covers these subsets.
+
+To regenerate offline after `npm ci`:
+
+```sh
+node scripts/subset-fonts.js
+```
+
+The script uses the pinned HarfBuzz WASM dependency to subset the local TTFs and
+Node's Brotli encoder to package untransformed WOFF2 tables. Font generation is
+an explicit maintenance step; ordinary builds use the committed files.
