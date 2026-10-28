@@ -5,11 +5,19 @@ import Header from "./Header";
 import Footer from "./Footer";
 
 export default function Layout() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
-  }, [pathname]);
+    // Run after route effects and layout have settled, including hydration.
+    const frame = requestAnimationFrame(() => {
+      let id;
+      try { id = decodeURIComponent(hash.slice(1)); } catch { id = hash.slice(1); }
+      const target = id && document.getElementById(id);
+      if (target) target.scrollIntoView({ behavior: "instant" });
+      else if (!hash) window.scrollTo({ top: 0, behavior: "instant" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [pathname, hash]);
 
   return (
     <div className="relative min-h-screen print:min-h-0 print:overflow-visible print:bg-white">

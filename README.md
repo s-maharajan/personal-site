@@ -81,3 +81,14 @@ gitleaks git . --log-opts="--all" --config .gitleaks.toml --redact --no-banner
 Keep credentials and local environment files out of Git. `.env.example` may contain
 placeholders only. If a real secret is detected, remove it and rotate it; do not
 add a blanket scanner exclusion to make the check pass.
+
+## Reading essays
+
+Essays with three or more sections include a compact Contents list. Section
+headings have shareable `#heading-slug` links, revealed on hover or keyboard focus
+(and always visible on touch devices). Slugs follow heading text, with numeric
+suffixes for duplicates; changing a heading changes its link. Fragment links work
+on initial load and client navigation, with space above the target heading.
+A thin accent bar at the top tracks progress through the essay body, reaching
+100% when its end enters the viewport. It updates without animation, including
+with reduced motion enabled, and is hidden when printing.

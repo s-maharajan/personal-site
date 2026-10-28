@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { render } from "./entry-server";
 import { sortedArticles } from "./content/writing";
+import { sectionIds } from "./lib/essay";
 import { site } from "./content/site";
 import { OG_HEIGHT, OG_WIDTH, SITE_OG_SLUG } from "./lib/og";
 
@@ -20,6 +21,12 @@ describe("prerendered routes", () => {
     expect(head.match(/<title>/g)).toHaveLength(1);
     expect(body).toContain(escape(article.title));
     for (const section of article.content) expect(body).toContain(escape(section.heading));
+    expect(body.includes('aria-label="Contents"')).toBe(article.content.length >= 3);
+    for (const id of sectionIds(article.content)) {
+      expect(body).toContain(`id="${id}"`);
+      expect(body).toContain(`href="#${id}"`);
+    }
+    expect(body).toContain('class="reading-progress print-hidden" aria-hidden="true"');
     expect(body).not.toMatch(/<title>|<meta|rel="canonical"/);
     expect(body).toContain('href="/"');
     expect(body).toContain('Theme: System. Switch to Light');
