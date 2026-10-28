@@ -3,7 +3,6 @@ import { site } from "../content/site";
 export default function About() {
   return (
     <div className="flex flex-col gap-6 max-w-prose">
-      <title>{`About · ${site.fullName || site.name}`}</title>
 
       <h1 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-text">
         About
