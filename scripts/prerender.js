@@ -11,7 +11,8 @@ const server = await createServer({
 });
 try {
   const { render } = await server.ssrLoadModule("/src/entry-server.jsx");
-  for (const path of ["/", "/about", ...sortedArticles.map((a) => `/writing/${a.slug}`)]) {
+  const routes = ["/", "/about", ...sortedArticles.map((a) => `/writing/${a.slug}`)];
+  for (const path of routes) {
     const { head, body } = render(path);
     const directory = new URL(`.${path === "/" ? "/" : `${path}/`}`, out);
     mkdirSync(directory, { recursive: true });
@@ -19,6 +20,7 @@ try {
       .replace("</head>", () => `${head}\n  </head>`)
       .replace('<div id="root"></div>', () => `<div id="root">${body}</div>`));
   }
+  console.log(`prerender: wrote ${routes.length} routes to dist/`);
 } finally {
   await server.close();
 }
