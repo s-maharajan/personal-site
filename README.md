@@ -11,6 +11,7 @@ npm test         # Vitest unit tests (Node; no browser required)
 npm run lint
 npm run build    # outputs to dist/
 npm run og       # re-render the Open Graph cards into dist/og/
+npm run verify   # lint, test, build, then check the build output is complete
 ```
 
 Requires Node 22.12 or newer within Node 22.
@@ -21,7 +22,10 @@ required article fields and unique slugs, and Prose parsing and static rendering
 content and per-page metadata for every essay, home, about, and the 404 fallback. Tests run in Node without
 jsdom. The Open Graph cards are covered too: the suite renders them, checks every
 file is a 1200x630 PNG, checks the cards carry the title, topic and author, and
-checks the card palette still matches `src/index.css`.
+checks the card palette still matches `src/index.css`. The feed, sitemap and
+robots generator is covered as well: the suite checks the XML escaping, that
+every essay appears once and in the right order, that no publication date is
+invalid, and that the three files land on disk.
 
 ## Editing content
 
@@ -40,7 +44,7 @@ src/
   components/  Layout, Header, Footer, Icons
   lib/         og (shared Open Graph image paths and sizes)
   pages/       Home, Essay, About, NotFound
-scripts/       build-feeds, build-og, prerender
+scripts/       build-feeds, build-og, prerender, check-build
 fonts/         Fraunces TTF sources and licence (cards and web subsets)
 ```
 
@@ -90,6 +94,18 @@ Responses also set `X-Content-Type-Options: nosniff`,
 `Referrer-Policy: strict-origin-when-cross-origin` and a Permissions Policy
 disabling camera, microphone, geolocation and payment access. These headers are
 applied by Vercel; the Vite development and preview servers do not apply them.
+
+## Continuous integration
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push and
+pull request. It installs the dependencies with `npm ci`, then lints, tests and
+builds the site, and finally runs `node scripts/check-build.js`, which asserts
+that the build produced a page for every route, a card for every Open Graph
+image and the feed, sitemap and robots files. A second job fails the pipeline
+on a high-severity `npm audit` advisory. Both actions are pinned to a commit
+SHA and the workflow only requests `contents: read`.
+
+`npm run verify` runs the same four steps locally.
 
 ## Secret scanning
 
