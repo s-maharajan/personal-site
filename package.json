@@ -10,6 +10,8 @@
     "test": "vitest run",
     "dev": "vite",
     "build": "vite build && node scripts/build-og.js && node scripts/build-feeds.js && node scripts/prerender.js",
+    "check:build": "node scripts/check-build.js",
+    "verify": "npm run lint && npm test && npm run build && npm run check:build",
     "og": "node scripts/build-og.js",
     "lint": "eslint .",
     "preview": "vite preview"
