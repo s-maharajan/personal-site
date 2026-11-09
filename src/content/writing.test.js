@@ -11,6 +11,15 @@ describe('isoMonth', () => {
     expect(isoMonth(`${month} 2025`)).toBe(`2025-${number}`)
     expect(isoMonth(`${month} 2024`)).toBe(`2024-${number}`)
   })
+
+  it('rejects a date it cannot parse instead of returning month "00"', () => {
+    // A typo used to sort the essay to the top of the site and publish
+    // "Invalid Date" to the feed, so the build has to stop here.
+    expect(() => isoMonth('Sept 2025')).toThrow(/Unrecognised article date/)
+    expect(() => isoMonth('October')).toThrow(/Unrecognised article date/)
+    expect(() => isoMonth('October 25')).toThrow(/Unrecognised article date/)
+    expect(() => isoMonth('')).toThrow(/Unrecognised article date/)
+  })
 })
 
 describe('sortedArticles', () => {

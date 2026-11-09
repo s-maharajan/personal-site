@@ -439,8 +439,16 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July",
 // Dates are written as "Month YYYY". Parse them explicitly: `new Date("October 2025")`
 // is not a standard format and returns Invalid Date in Safari.
 export const isoMonth = (date) => {
-  const [month, year] = date.split(" ");
-  return `${year}-${String(MONTHS.indexOf(month) + 1).padStart(2, "0")}`;
+  const [month, year] = String(date).split(" ");
+  const index = MONTHS.indexOf(month);
+  // An unrecognised month used to fall through as month "00", which sorted the
+  // essay to the top of the site and published "Invalid Date" to the feed.
+  if (index === -1 || !/^\d{4}$/.test(year ?? "")) {
+    throw new Error(
+      `Unrecognised article date "${date}". Expected "Month YYYY", for example "October 2025".`,
+    );
+  }
+  return `${year}-${String(index + 1).padStart(2, "0")}`;
 };
 
 export const sortedArticles = [...articles].sort((a, b) => isoMonth(b.date).localeCompare(isoMonth(a.date)));
