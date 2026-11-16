@@ -38,6 +38,10 @@ const drafts = [
           "Karpathy describes the same idea as a ladder: a raw model, then a prompt, then an agent with goals, memory and tools, then a loop, and finally a graph of agents passing messages along data dependencies. His claim is that a graph of simple agents beats a single clever prompt.",
           "The ladder matters more than the top rung. Each step buys reliability with structure rather than with cleverness, and each step adds cost and moving parts. Most tasks should stop on a lower rung than the one that sounds most impressive.",
         ),
+        diagram: {
+          steps: ["Model", "Prompt", "Agent: goals, memory, tools", "Loop", "Graph of agents"],
+          caption: "Karpathy's ladder. Each rung adds reliability through structure, and also cost and moving parts. Stop at the lowest rung that does the job.",
+        },
       },
       {
         heading: "What makes a loop real",
@@ -45,6 +49,12 @@ const drafts = [
           "A loop is one agent's own cycle: plan, act, verify, repeat. The practical test, from a write-up on loops and approval gates, is simple: a loop is only real if it has a check that can fail. \"No error\" is not a check. A compiler run, a test suite, a schema validation or a comparison against a spec is.",
           "So write the failure condition first, before the work itself. If you cannot say what a failed attempt looks like, the agent cannot either, and the loop becomes a polite way of running once.",
         ),
+        diagram: {
+          steps: [{ label: "Write the failure check first", tone: "accent" }, "Plan", "Act", "Run the check"],
+          loopBack: 1,
+          loopLabel: "Repeat from Plan until the check passes, or stop and escalate to a person.",
+          caption: "A loop is only real if its check can fail. \"No error\" is not a check.",
+        },
       },
       {
         heading: "When a graph earns its place",
@@ -55,6 +65,17 @@ const drafts = [
           "Edges should exist only where one step's output really feeds the next. If you cannot name the variable that crosses an edge, there is no dependency, and you are making a step wait for nothing. That is the core of the \"graphs beat chains\" argument: many multi-agent systems are slow because they run independent steps in a straight line.",
           "The fan-out pattern that follows is worth copying directly: run single-purpose workers in parallel, reduce their results with code, have a fresh skeptic agent verify each finding with a clean context (never the worker's conversation), and synthesise once from what survived.",
         ),
+        diagram: {
+          steps: [
+            "Split into independent units",
+            ["Worker, own context", "Worker, own context", "Worker, own context"],
+            "Merge and dedupe in code",
+            "Skeptic verifies in a fresh context",
+            { label: "Gate on blast radius", tone: "accent" },
+            "Synthesise once",
+          ],
+          caption: "Fan out, reduce with code, verify in a clean context, gate, then synthesise once. A failing unit goes back to its worker on its own, never the whole batch.",
+        },
       },
       {
         heading: "Gate on blast radius, retry by unit",
@@ -102,6 +123,16 @@ const drafts = [
           "1. **Before a PR exists**: the agent must show verification output (tests, build, a screenshot), then a subagent with a fresh context reviews the diff. Findings that keep recurring are fixed at the source, in a skill, a lint rule, CLAUDE.md or an owner-written REVIEW.md.\n2. **On every PR**: several review agents hunt for bugs in parallel, another group votes, and only agreed findings are posted, tagged Important, Nit or Pre-existing. Every finding is fixed or resolved with a reason.\n3. **Security**: a blocking security review.\n4. **The basics**: lint, types, tests and build.",
           "Under all of it sits fast rollback. Layered review is only safe if undoing a change is cheap.",
         ),
+        diagram: {
+          layers: [
+            { label: "Before the PR", detail: "Verification output, then a fresh-context subagent reviews the diff." },
+            { label: "AI review on every PR", detail: "Parallel bug hunters, a vote, and tagged findings that must be fixed or resolved." },
+            { label: "Security review", detail: "Blocking: the merge waits for it." },
+            { label: "Lint, types, tests, build", detail: "The basics, on every change." },
+          ],
+          base: { label: "Fast rollback", detail: "Makes every layer above safe to rely on." },
+          caption: "Each layer catches a different class of problem, so human attention can go where the risk is.",
+        },
       },
       {
         heading: "Let deterministic code do the mechanical work",
@@ -116,6 +147,16 @@ const drafts = [
           "Many agent failures start before any code exists, in an ambiguous plan. Meta's Forum team treated planning as precise, machine-readable specs because ambiguity is what makes agents fail, and they measured success as verified changes that build, pass tests and survive review, not as lines of code.",
           "The Elephant-Goldfish model is a neat way to test a spec. One agent keeps the whole conversation and drafts the document; fresh reviewers get only the document and the files it references. If a reader without the chat history cannot follow the design, the spec is not finished. As one commenter noted, this grades legibility, not correctness, but legibility is exactly what an implementing agent needs.",
         ),
+        diagram: {
+          steps: [
+            "Engineer and an agent with the full conversation",
+            "Draft spec",
+            ["Reviewer with only the document", "Reviewer with only the document"],
+            "Resolve findings",
+            { label: "Approve, then implement", tone: "accent" },
+          ],
+          caption: "The Elephant-Goldfish model. If reviewers without the chat history cannot follow the design, the spec is not finished.",
+        },
       },
       {
         heading: "Keep ownership of the reasoning",
@@ -165,6 +206,15 @@ const drafts = [
           "The other levers are about matching effort to the job:",
           "- Keep the primary model on a frontier model for planning and evaluation, and default subagents, which do well-defined low-reasoning work, to cheaper models.\n- Cap reasoning effort at a medium default instead of the maximum.\n- Compact long contexts automatically before they grow without limit.\n- Use a longer prompt-cache lifetime for interactive sessions, where people pause between turns, and a short one for subagents that finish quickly.",
         ),
+        diagram: {
+          steps: [
+            "Task",
+            { label: "Plan on a frontier model", tone: "accent" },
+            ["Subagent on a cheaper model", "Subagent on a cheaper model", "Decision model for a closed choice"],
+            { label: "Evaluate on a frontier model", tone: "accent" },
+          ],
+          caption: "Spend frontier tokens on planning and evaluation. Route well-defined sub-tasks to cheaper models, and closed choices to a decision model.",
+        },
       },
       {
         heading: "Decision models for closed choices",
@@ -174,6 +224,16 @@ const drafts = [
           "The integration design is as instructive as the model. Ticket events flow from a queue to a function to a hosted model endpoint. A configuration switch with three modes (the old model, both side by side, or the new model) let the team run both on real traffic and compare before switching. That dual-run pattern is a safe way to migrate any model-backed step.",
           "It only fits closed choices from a stable catalogue with short context. Free-form reasoning still belongs to generative models.",
         ),
+        diagram: {
+          steps: [
+            "Ticket event",
+            "Queue",
+            "Function reads the mode switch",
+            ["Mode 1: current model", "Mode 2: both, compared", "Mode 3: decision model"],
+            "Label applied",
+          ],
+          caption: "The dual-run pattern from Amazon's write-up: a three-mode switch lets the old and new model run on real traffic before the cut-over.",
+        },
       },
       {
         heading: "A cost review checklist",
@@ -221,6 +281,16 @@ const drafts = [
           "GitHub Agentic Workflows show what a narrow write path looks like in practice. Agents are read-only by default and run in a sandboxed container behind a firewall. Anything they want to change goes through validated \"safe outputs\" jobs, and a threat-detection job scans proposed changes before they land.",
           "The principle generalises well beyond GitHub: the agent proposes, and a deterministic, permission-limited step applies. That keeps the model's judgement out of the part of the system that holds write access.",
         ),
+        diagram: {
+          steps: [
+            { label: "Untrusted input: web page, issue, document", tone: "dashed" },
+            "Agent in a sandbox: read-only, no secrets",
+            "Proposed change as a safe output",
+            { label: "Deterministic job holds write access", tone: "accent" },
+            "Repository",
+          ],
+          caption: "The agent proposes; a narrow, permission-limited step applies. Credentials never enter the sandbox that reads untrusted content.",
+        },
       },
       {
         heading: "Skills are supply chain",
@@ -234,6 +304,10 @@ const drafts = [
           "Shipping faster with agents does not make security review faster by itself, so automate what can be automated:",
           "- **Repository settings**: GitHub Security Lab's gh-secure turns on branch protection, private vulnerability reporting, secret scanning, Dependabot and code scanning in one command. Run it with `--dry-run` first.\n- **Secrets**: Gitleaks or TruffleHog.\n- **Dependencies**: OSV-Scanner.\n- **CI workflows**: zizmor finds risky GitHub Actions patterns.\n- **Code**: Semgrep rules, plus an AI security review on pull requests. Anthropic's review action is not hardened against prompt injection, so use it on trusted pull requests only.\n- **Agent-led audits**: Cloudflare's security audit skill has a fresh verifier try to disprove each finding before it is reported.",
         ),
+        diagram: {
+          steps: ["Commit", "Secrets scan", "Static analysis and dependency scan", "AI security review on the PR", "Runtime scan"],
+          caption: "Automated checks at every stage, so human review can focus on design and intent.",
+        },
       },
     ],
   },
@@ -278,6 +352,18 @@ const drafts = [
           "1. **Validation**: is the skill safe, well-formed and compatible with the harness? This tier runs security scanners and needs no model.\n2. **Deduplication**: embeddings find guidance that repeats inside a skill or across a catalogue.\n3. **Live evaluation**: run an agent in a sandbox with and without the skill and score the difference.",
           "It can also add a pull-request check for changed skills. The third tier is the important idea: a skill should prove that it helps, not just that it parses.",
         ),
+        diagram: {
+          steps: [
+            "Write or record a skill",
+            "Tier 1: static and security checks",
+            "Tier 2: overlap check",
+            { label: "Tier 3: agent runs with and without it", tone: "accent" },
+            "Merge through a pull request",
+          ],
+          loopBack: 0,
+          loopLabel: "On every model upgrade, audit and prune the skill, then run the checks again.",
+          caption: "A skill should prove that it helps, not just that it parses.",
+        },
       },
       {
         heading: "Capture skills from real work",

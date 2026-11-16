@@ -5,6 +5,7 @@ import { site } from "../content/site";
 import { sortedArticles, findArticle, isoMonth } from "../content/writing";
 import NotFound from "./NotFound";
 import Prose from "../components/Prose";
+import Diagram from "../components/Diagram";
 import { sectionIds, readingProgress } from "../lib/essay";
 
 export default function Essay() {
@@ -125,6 +126,7 @@ export default function Essay() {
             <div className="text-sm sm:text-base leading-relaxed text-muted space-y-4">
               <Prose body={sec.body} />
             </div>
+            {sec.diagram && <Diagram {...sec.diagram} />}
           </section>
         ))}
       </div>

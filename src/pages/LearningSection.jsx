@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { learningSections } from "../content/learning";
 import { findSection, formatDay, latestDate, sourceHost } from "../lib/learning";
 import { inline } from "../components/Prose";
+import Diagram from "../components/Diagram";
 import NotFound from "./NotFound";
 
 function Entry({ entry, number }) {
@@ -30,12 +31,13 @@ function Entry({ entry, number }) {
 
       {entry.summary && <p className="text-base leading-relaxed text-muted">{inline(entry.summary)}</p>}
 
-      {entry.points.length > 0 && (
-        <div>
-          <h3 className="mb-2 font-mono text-xs uppercase tracking-wider text-faint">How it works</h3>
-          <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-muted marker:text-accent">
+      {(entry.flow || entry.points.length > 0) && (
+        <div className="flex flex-col gap-3">
+          <h3 className="font-mono text-xs uppercase tracking-wider text-faint">How it works</h3>
+          {entry.flow && <Diagram {...entry.flow} label={`How ${entry.title} works, step by step`} />}
+          {entry.points.length > 0 && <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-muted marker:text-accent">
             {entry.points.map((p, i) => <li key={i} className="pl-1">{inline(p)}</li>)}
-          </ul>
+          </ul>}
         </div>
       )}
 

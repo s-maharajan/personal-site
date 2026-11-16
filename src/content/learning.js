@@ -22,7 +22,16 @@ export const learningSections = [
           "Build those three first; optimize (caching, parallel tool calls, progress display) later.",
           "Debug by reading only what the agent sees in its context window."
         ],
-        "caveat": "Talk dates from 2025; predictions (multi-agent in production \"by end of this year\") refer to that year. Slide content not visible from audio."
+        "caveat": "Talk dates from 2025; predictions (multi-agent in production \"by end of this year\") refer to that year. Slide content not visible from audio.",
+        "flow": {
+          "steps": [
+            "System prompt with goals and limits",
+            "Model call",
+            "Tool action in environment",
+            "Feedback"
+          ],
+          "loopBack": 1
+        }
       },
       {
         "slug": "karpathy-stanford-llm-to-graph",
@@ -40,7 +49,16 @@ export const learningSections = [
           "100% - Graph: organize multiple agents as data-dependent message passing over a directed graph"
         ],
         "tryIt": "Watch the 1-hour talk, then sketch your current Copilot CLI/agent setup as LLM→Prompt→Agent→Loop→Graph to see which stage you're actually stuck at.",
-        "caveat": "It's a mental model, not a library - no code to run; value only comes from actually applying it to a real agent design."
+        "caveat": "It's a mental model, not a library - no code to run; value only comes from actually applying it to a real agent design.",
+        "flow": {
+          "steps": [
+            "LLM",
+            "Prompt",
+            "Agent",
+            "Loop",
+            "Graph"
+          ]
+        }
       },
       {
         "slug": "loop-vs-graph-engineering-explainer",
@@ -51,7 +69,15 @@ export const learningSections = [
         "takeaway": "Start with one loop for one coherent task; move to a graph only for parallelism, different permissions or human gates.",
         "summary": "Clear definitions: a \"loop\" is one agent's own plan→act→verify→repeat cycle; a \"graph\" is the layer above that wires multiple loops/tools/agents together via explicit nodes and edges. You start with a loop for one coherent task, move to a graph once work needs parallelism, different permissions, or human approval steps.",
         "points": [],
-        "caveat": "High-level framing only, no code or repo attached."
+        "caveat": "High-level framing only, no code or repo attached.",
+        "flow": {
+          "steps": [
+            "Task given to agent",
+            "Plan",
+            "Act",
+            "Verify, repeat or stop"
+          ]
+        }
       },
       {
         "slug": "loops-and-graphs-approval-course",
@@ -68,7 +94,15 @@ export const learningSections = [
           "Two return paths: a short \"correction\" edge sends one failing unit back to be fixed; a long \"learning\" edge turns a confirmed cause into a constraint for the splitter, so future runs don't repeat it",
           "Gate decisions should sort by blast radius (reversible & contained vs reversible-but-wide vs hard-to-reverse/irreversible), not by model confidence score"
         ],
-        "caveat": "No code/repo, just a written framework; needs translating into your own orchestration tooling to be useful."
+        "caveat": "No code/repo, just a written framework; needs translating into your own orchestration tooling to be useful.",
+        "flow": {
+          "steps": [
+            "Splitter cuts work into units",
+            "Workers process units",
+            "Gate checks blast radius",
+            "Approve or send unit back"
+          ]
+        }
       },
       {
         "slug": "agent-graphs-beat-agent-chains",
@@ -85,7 +119,15 @@ export const learningSections = [
           "Verify: a fresh \"skeptic\" agent checks each finding - critically, with its own clean context, never the worker's conversation history",
           "Synthesize once from what survived verification"
         ],
-        "caveat": "The $165K/535K-line case is a single anecdote with no linked source or repro; this is an architectural pattern to borrow, not a tool to install."
+        "caveat": "The $165K/535K-line case is a single anecdote with no linked source or repro; this is an architectural pattern to borrow, not a tool to install.",
+        "flow": {
+          "steps": [
+            "Fan out: parallel agents",
+            "Reduce: plain code",
+            "Verify: fresh context",
+            "Synthesize once"
+          ]
+        }
       },
       {
         "slug": "andrew-ng-graph-engineering-course",
@@ -103,7 +145,15 @@ export const learningSections = [
           "Ends with a full multi-agent graph system"
         ],
         "tryIt": "Watch the video, then follow the companion guide the poster references (not fetched in this research).",
-        "caveat": "2 hours long, no repo or written guide fetched here - would need to watch to extract anything concrete."
+        "caveat": "2 hours long, no repo or written guide fetched here - would need to watch to extract anything concrete.",
+        "flow": {
+          "steps": [
+            "Single agent",
+            "Loop engineering",
+            "Graph engineering",
+            "Self-rewriting graph system"
+          ]
+        }
       },
       {
         "slug": "strands-decider-at-amazon",
@@ -120,7 +170,16 @@ export const learningSections = [
           "Label descriptions were rewritten as 1-2 sentence options to fit a 4,096-token window."
         ],
         "tryIt": "`pip install strands-decider`",
-        "caveat": "Only fits closed choices from a stable catalog with short context. Vendor blog. Needs GPU hosting."
+        "caveat": "Only fits closed choices from a stable catalog with short context. Vendor blog. Needs GPU hosting.",
+        "flow": {
+          "steps": [
+            "Ticket event",
+            "SQS queue",
+            "Lambda reads AppConfig mode",
+            "SageMaker decider endpoint",
+            "Label applied"
+          ]
+        }
       },
       {
         "slug": "gemini-decision-1",
@@ -134,7 +193,15 @@ export const learningSections = [
           "You send state plus a question with options; the model returns its choice (see section m for how decision models work).",
           "Inputs can be image, audio, video or PDF; 256K context window."
         ],
-        "caveat": "\"1K questions\" is not explained in the post. No accuracy data captured."
+        "caveat": "\"1K questions\" is not explained in the post. No accuracy data captured.",
+        "flow": {
+          "steps": [
+            "Input: text, image, PDF",
+            "Question with options",
+            "Gemini Decision 1",
+            "Chosen option"
+          ]
+        }
       }
     ]
   },
@@ -161,7 +228,16 @@ export const learningSections = [
           "Context: Anthropic's monorepo went from about 2,500 changes per day in May to more than 30,000 in September."
         ],
         "tryIt": "run `/code-review` or `/security-review` inside Claude Code",
-        "caveat": "Code Review for Claude Code is on Team and Enterprise plans. Numbers are self-reported by the vendor. Research text stopped after layer 4."
+        "caveat": "Code Review for Claude Code is on Team and Enterprise plans. Numbers are self-reported by the vendor. Research text stopped after layer 4.",
+        "flow": {
+          "steps": [
+            "Author plus Claude verify locally",
+            "Subagent diff review",
+            "AI PR review with voting",
+            "Blocking security review and CI",
+            "Human check where risk is"
+          ]
+        }
       },
       {
         "slug": "critical-thinking-with-agents",
@@ -178,7 +254,16 @@ export const learningSections = [
           "Self-check questions: Did I form a hypothesis before asking? Am I using it to help me think or to replace thinking? What would have to be true for this to be wrong? Have I heard the counter-argument (ask another model to argue the opposite)? Would I bet on this in front of its maintainer? What am I no longer practising?",
           "Verification is the new bottleneck: give the agent a way to verify (tests, property tests, app interaction), but beware \"surrendered verification\" - a green check written with the same mistake as the feature proves nothing. Define \"verified\" upfront."
         ],
-        "caveat": "Opinion essay, no data. The article text was truncated in research, so the ending is not covered."
+        "caveat": "Opinion essay, no data. The article text was truncated in research, so the ending is not covered.",
+        "flow": {
+          "steps": [
+            "Write hypothesis first",
+            "Delegate to agent",
+            "Agent verifies with tests",
+            "Ask what the check did not prove",
+            "Own the decision"
+          ]
+        }
       },
       {
         "slug": "uber-software-factory-cost",
@@ -197,7 +282,16 @@ export const learningSections = [
           "Use a 1-hour prompt-cache TTL for interactive sessions (vs 5 min) since engineers often go idle >5 min between turns; keep subagents on 5-min TTL since their tasks are short"
         ],
         "tryIt": "Start small - build a 10-20 example benchmark from your own recent PRs/tasks and compare 2 models on cost vs pass rate before committing to one everywhere.",
-        "caveat": "These are Uber's own numbers on Uber's own codebase/scale - explicitly stated as not directly transferable; replicating this needs a real benchmark harness and multi-model routing setup, which is itself a project, not a config change."
+        "caveat": "These are Uber's own numbers on Uber's own codebase/scale - explicitly stated as not directly transferable; replicating this needs a real benchmark harness and multi-model routing setup, which is itself a project, not a config change.",
+        "flow": {
+          "steps": [
+            "Real PRs / work",
+            "Benchmark harness",
+            "Try frontier + open-weight models",
+            "Pick Pareto-optimal model",
+            "Re-check as models shift"
+          ]
+        }
       },
       {
         "slug": "meta-forum-ai-native-engineering",
@@ -214,7 +308,16 @@ export const learningSections = [
           "Operating model: Rules (permanent instructions, added after a mistake repeats twice), Skills, Agents, Commands (chained workflows) and Hooks (e.g. lint after every agent turn)",
           "Gave agents tools to inspect the live view hierarchy instead of text descriptions; a separate sandbox build flavor keeps prototype code out of production"
         ],
-        "caveat": "Internal Meta tooling; no numbers on overall speed-up in the readable text."
+        "caveat": "Internal Meta tooling; no numbers on overall speed-up in the readable text.",
+        "flow": {
+          "steps": [
+            "Engineer sets goal and spec",
+            "Agent plans and codes",
+            "Build, tests, UI checks",
+            "Agent fixes and repeats",
+            "Engineer reviews PR with evidence"
+          ]
+        }
       },
       {
         "slug": "airbnb-airchat-async-agents",
@@ -282,7 +385,16 @@ export const learningSections = [
           "If that isn't enough, ask for a bespoke narrated explainer video (needs an API key, e.g. ElevenLabs, or a free local alternative)"
         ],
         "tryIt": "Ask your agent: \"Explain this in ASD-STE100, then as a diagram if that's clearer.\"",
-        "caveat": "Video generation step needs an API key (cost) and is described as \"just starting to work\" - least mature rung of the ladder."
+        "caveat": "Video generation step needs an API key (cost) and is described as \"just starting to work\" - least mature rung of the ladder.",
+        "flow": {
+          "steps": [
+            "Plain text answer",
+            "Controlled English",
+            "Diagram",
+            "HTML page",
+            "Explainer video"
+          ]
+        }
       },
       {
         "slug": "elephant-goldfish-model-spec-review",
@@ -300,7 +412,16 @@ export const learningSections = [
           "Seven skills: brainstorming, drafting, independent review, resolution, codebase docs and doc drift checks."
         ],
         "tryIt": "`claude plugin marketplace add google/elephant-goldfish-model && claude plugin install egm@egm`, then `/egm:egm-review docs/designs/<doc>.md`",
-        "caveat": "As one commenter says, it grades legibility, not correctness: a clear spec can still be wrong about the world. Licence not stated."
+        "caveat": "As one commenter says, it grades legibility, not correctness: a clear spec can still be wrong about the world. Licence not stated.",
+        "flow": {
+          "steps": [
+            "Engineer and Elephant agent",
+            "Draft spec",
+            "Fresh Goldfish reviewers",
+            "Findings",
+            "Engineer approves"
+          ]
+        }
       },
       {
         "slug": "ai-coding-dictionary",
@@ -337,7 +458,15 @@ export const learningSections = [
           "Stacking all three layers together, not any single fix"
         ],
         "tryIt": "Read the Claude Opus 5 system card (page 73) for the actual benchmark numbers before relying on this for anything sensitive.",
-        "caveat": "Anthropic self-reported (\"surprisingly positive\"), independent benchmark exists; \"largely solved\" is not \"solved\" - still worth sandboxing agents with real credentials."
+        "caveat": "Anthropic self-reported (\"surprisingly positive\"), independent benchmark exists; \"largely solved\" is not \"solved\" - still worth sandboxing agents with real credentials.",
+        "flow": {
+          "steps": [
+            "Agent fetches webpage",
+            "Input probes scan content",
+            "Intent classifier checks instructions",
+            "Model ignores injected command"
+          ]
+        }
       },
       {
         "slug": "perplexity-space-sandbox",
@@ -355,7 +484,16 @@ export const learningSections = [
           "Credentials and outbound traffic are controlled from outside the VM"
         ],
         "tryIt": "Follow docs/installation.md to deploy in a local Kind cluster.",
-        "caveat": "Repo created 2026-10-01, so it is young. Needs Kubernetes knowledge for the default setup."
+        "caveat": "Repo created 2026-10-01, so it is young. Needs Kubernetes knowledge for the default setup.",
+        "flow": {
+          "steps": [
+            "Your app",
+            "Create sandbox from template",
+            "Start command session",
+            "Read output and exit code",
+            "Pause, suspend or delete"
+          ]
+        }
       },
       {
         "slug": "digitalocean-managed-agents",
@@ -372,7 +510,15 @@ export const learningSections = [
           "You choose from 75+ open and proprietary models, billed through one DigitalOcean account",
           "Sessions can be closed and resumed later from another device, continuing the same agent state"
         ],
-        "tryIt": "See the getting-started prompts in DigitalOcean's blog post: https://do.co/4ysh3it"
+        "tryIt": "See the getting-started prompts in DigitalOcean's blog post: https://do.co/4ysh3it",
+        "flow": {
+          "steps": [
+            "Developer starts agent",
+            "Runs in isolated microVM",
+            "Pauses when idle, resumes on demand",
+            "Billed only for active CPU time"
+          ]
+        }
       },
       {
         "slug": "open-source-security-review-stack",
@@ -388,7 +534,16 @@ export const learningSections = [
           "Classic: Semgrep (rules), Gitleaks and TruffleHog (secrets), OSV-Scanner (vulnerable deps), zizmor (GitHub Actions holes), Nuclei (running services)."
         ],
         "tryIt": "`gitleaks git .` (check the Gitleaks README for current syntax)",
-        "caveat": "The claude-code-security-review README says it is not hardened against prompt injection; use only on trusted PRs. Incident figures are from the post, not verified."
+        "caveat": "The claude-code-security-review README says it is not hardened against prompt injection; use only on trusted PRs. Incident figures are from the post, not verified.",
+        "flow": {
+          "steps": [
+            "Commit",
+            "Secrets scan",
+            "SAST and deps scan",
+            "AI security review on PR",
+            "Runtime scan in prod"
+          ]
+        }
       },
       {
         "slug": "gh-secure-github-cli-extension",
@@ -407,7 +562,15 @@ export const learningSections = [
           "Also usable from GitHub Copilot CLI or Copilot App as a tool an AI assistant can call"
         ],
         "tryIt": "`gh extension install GitHubSecurityLab/gh-secure && gh secure status`",
-        "caveat": "Needs repo admin/maintainer permissions; no license listed on the repo (check before vendoring/forking); always run `--dry-run` first on repos with existing custom branch rules, since the tool warns about but does not fully reconcile overlapping rulesets."
+        "caveat": "Needs repo admin/maintainer permissions; no license listed on the repo (check before vendoring/forking); always run `--dry-run` first on repos with existing custom branch rules, since the tool warns about but does not fully reconcile overlapping rulesets.",
+        "flow": {
+          "steps": [
+            "gh secure command",
+            "Checks current repo settings",
+            "Enables selected security features",
+            "Hardened repo"
+          ]
+        }
       }
     ]
   },
@@ -433,7 +596,16 @@ export const learningSections = [
           "Ready-made workflows in [githubnext/agentics](https://github.com/githubnext/agentics) (★1046): Issue Triage, Repo Assist, CI Doctor, CI Coach, Grumpy Reviewer and more."
         ],
         "tryIt": "follow the [quickstart](https://github.github.com/gh-aw/setup/quick-start/), then `gh aw add-wizard`",
-        "caveat": "README notes a past security advisory in some versions - stay on a current release. AI credit costs; the README says it complements, not replaces, deterministic CI."
+        "caveat": "README notes a past security advisory in some versions - stay on a current release. AI credit costs; the README says it complements, not replaces, deterministic CI.",
+        "flow": {
+          "steps": [
+            "Markdown workflow file",
+            "gh aw compile",
+            "Actions YAML",
+            "Sandboxed agent run",
+            "Safe outputs to repo"
+          ]
+        }
       },
       {
         "slug": "claude-opus-5-5-prompt-audit",
@@ -451,7 +623,15 @@ export const learningSections = [
           "Users report it finding ~70 improvable patterns and applying fixes across an entire project tree"
         ],
         "tryIt": "`/claude-api prompt-audit` (run inside Claude Code)",
-        "caveat": "Skill rewrites your instruction files in place - review the diff before committing; some skills in the repo (docx/pdf/pptx/xlsx) are source-available, not open source, this particular skill folder's license should be checked before reuse."
+        "caveat": "Skill rewrites your instruction files in place - review the diff before committing; some skills in the repo (docx/pdf/pptx/xlsx) are source-available, not open source, this particular skill folder's license should be checked before reuse.",
+        "flow": {
+          "steps": [
+            "Run /claude-api prompt-audit",
+            "Scans CLAUDE.md, AGENTS.md, skills",
+            "Flags outdated anti-patterns",
+            "Rewrites to suit Opus 5.5"
+          ]
+        }
       },
       {
         "slug": "nvidia-skillevaluator",
@@ -467,7 +647,16 @@ export const learningSections = [
           "Tier 3 Live Evaluation: runs a supported agent in a sandbox (Docker by default) with and without the skill and scores the difference.",
           "A `ci init` command opens a PR that checks changed skills on every pull request."
         ],
-        "caveat": "Tier 3 needs model access, an agent and Docker. The LLM rubric sends skill text to NVIDIA's hosted endpoint. A scanner that cannot run makes the result `INCOMPLETE`."
+        "caveat": "Tier 3 needs model access, an agent and Docker. The LLM rubric sends skill text to NVIDIA's hosted endpoint. A scanner that cannot run makes the result `INCOMPLETE`.",
+        "flow": {
+          "steps": [
+            "Skill folder",
+            "Tier 1 static checks",
+            "Tier 2 overlap check",
+            "Tier 3 agent runs with and without",
+            "Score and report"
+          ]
+        }
       },
       {
         "slug": "skill-recorder-record-to-agent-skill",
@@ -483,7 +672,16 @@ export const learningSections = [
           "Analyze: the Copilot CLI rebuilds one intent plus ordered steps, which you edit.",
           "Create: generate a Skill or an Automation, preferring native tools like `gh` or `web_fetch` over replaying clicks."
         ],
-        "caveat": "Needs a GitHub account with Copilot access. Records your screen, so sensitive data may end up in the recording sent to Copilot. No license listed in the repo. The README says review gives visibility, not a security guarantee."
+        "caveat": "Needs a GitHub account with Copilot access. Records your screen, so sensitive data may end up in the recording sent to Copilot. No license listed in the repo. The README says review gives visibility, not a security guarantee.",
+        "flow": {
+          "steps": [
+            "Record task once",
+            "Local capture of clicks and terminal",
+            "Copilot builds intent and steps",
+            "Edit steps",
+            "SKILL.md or scheduled automation"
+          ]
+        }
       },
       {
         "slug": "five-public-ai-configs",
@@ -495,7 +693,16 @@ export const learningSections = [
         "summary": "A roundup of skill packs (reusable agent instructions). The most useful for engineering: Pocock's small composable skills, Osmani's spec-to-ship slash commands, and Cloudflare's multi-agent security audit.",
         "points": [],
         "tryIt": "`copilot plugin marketplace add mattpocock/skills`",
-        "caveat": "Star counts in the post are out of date. No licences shown in metadata. Post's claim about Osmani's role was not verified."
+        "caveat": "Star counts in the post are out of date. No licences shown in metadata. Post's claim about Osmani's role was not verified.",
+        "flow": {
+          "steps": [
+            "Recon and coverage ledger",
+            "Isolated hunters",
+            "Fresh verifier disproves",
+            "findings.json",
+            "REPORT.md"
+          ]
+        }
       },
       {
         "slug": "matt-pocock-home-repo",
@@ -511,7 +718,15 @@ export const learningSections = [
           "The agent clones or opens the target repos on demand."
         ],
         "tryIt": "Add `For <name>, clone <owner>/<repo> to a local folder>` lines to an AGENTS.md.",
-        "caveat": "The agent gets access to every pointed repo; keep secrets out of the home repo."
+        "caveat": "The agent gets access to every pointed repo; keep secrets out of the home repo.",
+        "flow": {
+          "steps": [
+            "Agent starts in home repo",
+            "Reads AGENTS.md pointers",
+            "Clones other repos locally",
+            "Cross-repo changes"
+          ]
+        }
       },
       {
         "slug": "asd-ste100-skill-repo",
@@ -529,7 +744,15 @@ export const learningSections = [
           "Can explain itself: ask \"which rules did it break\" for a before/after table"
         ],
         "tryIt": "`git clone https://github.com/danyuchn/asd-ste100-skill`",
-        "caveat": "It's a style linter, not a correctness checker - it doesn't verify the rewrite preserved meaning."
+        "caveat": "It's a style linter, not a correctness checker - it doesn't verify the rewrite preserved meaning.",
+        "flow": {
+          "steps": [
+            "Dense agent output",
+            "ASD-STE100 skill rules",
+            "Rewritten plain sentences",
+            "Unambiguous agent-to-agent text"
+          ]
+        }
       },
       {
         "slug": "impeccable-skill-in-perplexity-computer",
@@ -547,7 +770,16 @@ export const learningSections = [
           "Started from Anthropic's frontend-design skill"
         ],
         "tryIt": "`npx impeccable install`",
-        "caveat": "No licence shown in research output - check before use. The free credits are Perplexity-specific and end Oct 31."
+        "caveat": "No licence shown in research output - check before use. The free credits are Perplexity-specific and end Oct 31.",
+        "flow": {
+          "steps": [
+            "npx impeccable install",
+            "impeccable init writes PRODUCT.md",
+            "audit or critique",
+            "polish fixes",
+            "Less generic UI"
+          ]
+        }
       },
       {
         "slug": "claude-code-modernization-plugin",
@@ -565,7 +797,16 @@ export const learningSections = [
           "Leaves the original code untouched; human approval at critical steps"
         ],
         "tryIt": "`/plugin install code-modernization@claude-plugins-official`",
-        "caveat": "v1.0.0. The directory README says to trust a plugin before installing it."
+        "caveat": "v1.0.0. The directory README says to trust a plugin before installing it.",
+        "flow": {
+          "steps": [
+            "Legacy code",
+            "Extract business rules and plan",
+            "Rewrite code",
+            "Compare old vs new outputs",
+            "Verification report"
+          ]
+        }
       }
     ]
   },
@@ -592,7 +833,15 @@ export const learningSections = [
           "Respects `.gitignore` like ripgrep when run inside a Git repo"
         ],
         "tryIt": "`tgrep index . && tgrep -- \"pattern\" .`",
-        "caveat": "No license listed in repo metadata - check before relying on it in anything redistributed; index can be stale without the server running; Rust toolchain needed to build from source if no binary release is used."
+        "caveat": "No license listed in repo metadata - check before relying on it in anything redistributed; index can be stale without the server running; Rust toolchain needed to build from source if no binary release is used.",
+        "flow": {
+          "steps": [
+            "Source files",
+            "Trigram index built",
+            "Query narrowed to candidate files",
+            "Regex verifies matches"
+          ]
+        }
       },
       {
         "slug": "aws-emulator-local-aws-apis",
@@ -608,7 +857,15 @@ export const learningSections = [
           "Agent mode: an `aws-emulator` skill lets a coding agent set it up (AWS CLI 2.35.0+)."
         ],
         "tryIt": "`aws agent-toolkit add-skill --skill-name aws-emulator --region us-east-1`",
-        "caveat": "Not for production or security testing (README). Licence not stated."
+        "caveat": "Not for production or security testing (README). Licence not stated.",
+        "flow": {
+          "steps": [
+            "Your code or tests",
+            "AWS CLI or SDK",
+            "Local AWS Emulator",
+            "Emulated resources"
+          ]
+        }
       },
       {
         "slug": "github-actions-parallel-steps",
@@ -624,7 +881,16 @@ export const learningSections = [
           "`cancel` stops a background step (e.g. a test service)",
           "`parallel` groups steps to run together, then waits"
         ],
-        "caveat": "Check the workflow syntax docs for current details."
+        "caveat": "Check the workflow syntax docs for current details.",
+        "flow": {
+          "steps": [
+            "Job starts",
+            "Background service step",
+            "Parallel build steps",
+            "wait-all",
+            "cancel service and finish"
+          ]
+        }
       },
       {
         "slug": "alibaba-open-code-review",
@@ -642,7 +908,15 @@ export const learningSections = [
           "Benchmarked on AACR-Bench: 200 real PRs across 50 OSS repos, 10 languages, 1,505 human-annotated ground-truth issues"
         ],
         "tryIt": "configure a model endpoint, then run `ocr scan` per the repo's quick start.",
-        "caveat": "Benchmark numbers are self-reported by Alibaba; recall is explicitly lower (more missed issues) in exchange for fewer false positives; LICENSE not yet classified on GitHub - confirm terms before using at work."
+        "caveat": "Benchmark numbers are self-reported by Alibaba; recall is explicitly lower (more missed issues) in exchange for fewer false positives; LICENSE not yet classified on GitHub - confirm terms before using at work.",
+        "flow": {
+          "steps": [
+            "Git diff",
+            "Deterministic file/rule engine",
+            "LLM review agent",
+            "Line-level comments"
+          ]
+        }
       },
       {
         "slug": "cloudflare-tunnel-free-localhost-sharing",
@@ -659,7 +933,15 @@ export const learningSections = [
           "It can also tunnel raw TCP (SSH, RDP) via `cloudflared access`, not just HTTP."
         ],
         "tryIt": "`cloudflared tunnel --url http://localhost:8080`",
-        "caveat": "TryCloudflare URLs are temporary/random and meant for quick tests, not production. No license listed on the repo (check before redistribution). Exposes your local service to the public internet while the tunnel is up - don't point it at anything sensitive."
+        "caveat": "TryCloudflare URLs are temporary/random and meant for quick tests, not production. No license listed on the repo (check before redistribution). Exposes your local service to the public internet while the tunnel is up - don't point it at anything sensitive.",
+        "flow": {
+          "steps": [
+            "Local app on localhost:PORT",
+            "cloudflared client",
+            "Cloudflare network",
+            "Public HTTPS URL"
+          ]
+        }
       },
       {
         "slug": "rea-reverse-engineer-skill",
@@ -676,7 +958,16 @@ export const learningSections = [
           "Analysis runs locally; the same tools are available as a `rea` CLI"
         ],
         "tryIt": "`npx rea-agents setup`",
-        "caveat": "Reverse engineering third-party apps can break licence terms. Setup edits your agent config. Beware copycat repos and packages."
+        "caveat": "Reverse engineering third-party apps can break licence terms. Setup edits your agent config. Beware copycat repos and packages.",
+        "flow": {
+          "steps": [
+            "You ask agent about a feature",
+            "Agent calls REA via MCP",
+            "REA inspects app or binary locally",
+            "Evidence and explanation",
+            "Agent builds similar feature"
+          ]
+        }
       },
       {
         "slug": "15-repos-for-your-agent-stack",
@@ -705,7 +996,15 @@ export const learningSections = [
           "Approved output is saved as an editable page inside a \"Space\" (a shared document workspace), with autosave and revision checks"
         ],
         "tryIt": "`git clone https://github.com/CopilotKit/OpenDots && cat docs/SETUP.md`",
-        "caveat": "Early-stage template, not a hosted product - conversations need CopilotKit Intelligence (hosted or self-hosted/licensed); computer tools require you to stand up the pinned services yourself."
+        "caveat": "Early-stage template, not a hosted product - conversations need CopilotKit Intelligence (hosted or self-hosted/licensed); computer tools require you to stand up the pinned services yourself.",
+        "flow": {
+          "steps": [
+            "Ask a Dot",
+            "Dot browses or computes",
+            "Human reviews and approves",
+            "Saved as Space page"
+          ]
+        }
       },
       {
         "slug": "helix-foundry-open-source-ontology",
@@ -756,7 +1055,15 @@ export const learningSections = [
           "`legacy-scan` checks existing code for old patterns with native replacements."
         ],
         "tryIt": "`npx modern-web-guidance@latest install`",
-        "caveat": "No licence shown in repo metadata. The skill only acts on new code; use legacy-scan for old code."
+        "caveat": "No licence shown in repo metadata. The skill only acts on new code; use legacy-scan for old code.",
+        "flow": {
+          "steps": [
+            "Agent writes web code",
+            "Skill searches guides",
+            "Guide loaded into context",
+            "Modern native code"
+          ]
+        }
       }
     ]
   },
@@ -782,7 +1089,16 @@ export const learningSections = [
           "Supports up to 512k tokens of context; 256k recommended"
         ],
         "tryIt": "Download from `huggingface.co/RecursiveSI/flint` and run with Ollama or LM Studio.",
-        "caveat": "Benchmarks are the vendor's own. Needs more guidance than big closed models; split work into small tasks."
+        "caveat": "Benchmarks are the vendor's own. Needs more guidance than big closed models; split work into small tasks.",
+        "flow": {
+          "steps": [
+            "Eureka Machine proposes ideas",
+            "Train 40B MoE model",
+            "4-bit quantize plus distill",
+            "Custom local kernels",
+            "Fast coding model on laptop"
+          ]
+        }
       },
       {
         "slug": "macos-27-free-terminal-llm",
@@ -799,7 +1115,15 @@ export const learningSections = [
           "`fm serve` gives an OpenAI-compatible endpoint on localhost"
         ],
         "tryIt": "`fm respond \"your question\"`",
-        "caveat": "Needs `sudo` once. Tiny 4,096-token context. Only macOS 27 on Apple Silicon."
+        "caveat": "Needs `sudo` once. Tiny 4,096-token context. Only macOS 27 on Apple Silicon.",
+        "flow": {
+          "steps": [
+            "Text or file via pipe",
+            "fm respond",
+            "On-device Apple model",
+            "Answer or JSON"
+          ]
+        }
       },
       {
         "slug": "hassabis-ai-for-science-and-agi",
