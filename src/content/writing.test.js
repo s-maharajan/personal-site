@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { articles, isoMonth, sortedArticles } from './writing'
+import { AREAS, articles, isoMonth, sortedArticles } from './writing'
 
 describe('isoMonth', () => {
   it.each([
@@ -14,19 +14,26 @@ describe('isoMonth', () => {
 })
 
 describe('sortedArticles', () => {
-  it('contains every article once, newest first, in a separate array', () => {
+  it('contains every article once, AI first, then newest first, in a separate array', () => {
     expect(sortedArticles).not.toBe(articles)
     expect(sortedArticles).toHaveLength(articles.length)
     expect(new Set(sortedArticles)).toEqual(new Set(articles))
     // Derive the expected order independently of isoMonth and the production sort.
     const months = ['January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December']
-    const rank = ({ date }) => {
+    const rank = ({ area, date }) => {
       const [month, year] = date.split(' ')
-      return Number(year) * 12 + months.indexOf(month)
+      return AREAS.indexOf(area) * 1e6 - (Number(year) * 12 + months.indexOf(month))
     }
-    expect(sortedArticles).toEqual([...articles].sort((a, b) => rank(b) - rank(a)))
-    expect(articles[0].slug).toBe('apache-camel-integration-patterns-as-code')
+    expect(sortedArticles).toEqual([...articles].sort((a, b) => rank(a) - rank(b)))
+  })
+
+  it('always puts AI essays before every other area', () => {
+    expect(articles.every(({ area }) => AREAS.includes(area))).toBe(true)
+    expect(AREAS[0]).toBe('AI')
+    const areas = sortedArticles.map(({ area }) => area)
+    expect(areas[0]).toBe('AI')
+    expect(areas.lastIndexOf('AI')).toBeLessThan(areas.findIndex((area) => area !== 'AI'))
   })
 })
 
