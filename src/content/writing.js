@@ -1,11 +1,299 @@
-// Essays. Each one draws together several notes from the learning log and
-// credits them: `sources` lists learning entry slugs, and a "Sources" section
-// with links to the originals is added automatically from those entries.
+// Essays. Each one credits what it draws on: `sources` lists learning entry
+// slugs and `references` lists outside documentation ({ title, url, source }).
+// A "Sources" section linking to both is added automatically.
 import { learningSections } from "./learning.js";
 
 const p = (...paragraphs) => paragraphs.join("\n\n");
+const code = (lang, ...lines) => ["```" + lang, ...lines, "```"].join("\n");
 
 const drafts = [
+  {
+    slug: "apache-camel-integration-patterns-as-code",
+    title: "Apache Camel: integration patterns as code",
+    topic: "Integration",
+    date: "November 2026",
+    summary:
+      "Camel turns the classic enterprise integration patterns into routes you can read, test and run anywhere Java runs. Routes, the patterns that matter most, failure handling, testing, and where model calls fit.",
+    excerpt:
+      "Most integration bugs are not exotic. They are a message processed twice, a retry that never stops, or a failure nobody can see. Camel's value is that it gives each of those problems a named, tested pattern.",
+    sources: ["strands-decider-at-amazon", "gemini-decision-1"],
+    references: [
+      { title: "Enterprise Integration Patterns", url: "https://www.enterpriseintegrationpatterns.com/", source: "Gregor Hohpe and Bobby Woolf" },
+      { title: "Enterprise Integration Patterns in Camel", url: "https://camel.apache.org/components/latest/eips/enterprise-integration-patterns.html", source: "Apache Camel docs" },
+      { title: "Error handler", url: "https://camel.apache.org/manual/error-handler.html", source: "Apache Camel docs" },
+      { title: "AdviceWith", url: "https://camel.apache.org/manual/advice-with.html", source: "Apache Camel docs" },
+      { title: "Camel JBang", url: "https://camel.apache.org/manual/camel-jbang.html", source: "Apache Camel docs" },
+      { title: "LangChain4j Chat component", url: "https://camel.apache.org/components/latest/langchain4j-chat-component.html", source: "Apache Camel docs" },
+    ],
+    content: [
+      {
+        heading: "What Camel is, and what it is not",
+        body: p(
+          "Apache Camel is an open-source integration framework. It implements the patterns from Gregor Hohpe and Bobby Woolf's book Enterprise Integration Patterns (routers, splitters, aggregators, dead letter channels and many more) and connects them to hundreds of components: Kafka, JMS, HTTP, files, databases, cloud services and SaaS APIs.",
+          "It is a library, not a server. Camel runs inside your application, on Spring Boot, Quarkus or plain Java, and Camel JBang lets you run a single route file from the command line while prototyping. That makes it a natural fit for cloud deployment: each integration is a small service in a container, built, tested and deployed like any other.",
+          "The trade-off is ownership. Camel gives you the patterns and the connectors; you own the runtime, the deployment, the monitoring and the on-call.",
+        ),
+      },
+      {
+        heading: "Routes: the unit of integration",
+        body: p(
+          "A route reads from one endpoint, applies a series of steps, and writes to one or more endpoints. Endpoints are URIs, so swapping a file drop for a Kafka topic is usually a one-line change. This route reads orders, drops duplicates and sends each order to a queue based on its priority:",
+          code(
+            "java",
+            "public class OrderRoutes extends RouteBuilder {",
+            "  @Override",
+            "  public void configure() {",
+            '    from("kafka:orders?groupId=order-router")',
+            '      .routeId("order-router")',
+            '      .idempotentConsumer(jsonpath("$.orderId"), idempotentRepository)',
+            "      .choice()",
+            '        .when(jsonpath("$.priority").isEqualTo("HIGH"))',
+            '          .to("jms:queue:orders.priority")',
+            "        .otherwise()",
+            '          .to("jms:queue:orders.standard")',
+            "      .end();",
+            "  }",
+            "}",
+          ),
+          "The same route can be written in YAML or XML. The Java DSL is easiest to refactor and test; YAML suits teams that generate or review routes as configuration.",
+        ),
+        diagram: {
+          steps: [
+            "Kafka topic: orders",
+            "Idempotent consumer drops duplicates by orderId",
+            "Content-based router reads priority",
+            { either: ["Priority queue", "Standard queue"] },
+          ],
+          caption: "The route above as patterns: consume, de-duplicate, route by content.",
+        },
+      },
+      {
+        heading: "The patterns that earn their keep",
+        body: p(
+          "Camel implements dozens of patterns. A handful cover most real work:",
+          "- **Content-based router**: `choice()` and `when()` send each message where it belongs.\n- **Idempotent consumer**: brokers deliver at least once, so duplicates will arrive. Use a persistent repository (JDBC, Redis, Infinispan or Kafka), not the in-memory one, so restarts do not forget what was processed.\n- **Splitter and aggregator**: break a large payload into units, process them, and reassemble with a completion size or timeout.\n- **Dead letter channel**: where a message goes after its retries run out, so it is parked rather than lost.\n- **Circuit breaker**: `circuitBreaker()` with Resilience4j stops hammering a failing dependency and runs a fallback instead.\n- **Wire tap**: send a copy of a message to an audit or shadow path without slowing the main flow.",
+          "Splitting a large file line by line, with streaming so it never loads fully into memory, looks like this:",
+          code(
+            "java",
+            'from("file:inbox?antInclude=*.csv")',
+            '  .split(body().tokenize("\\n")).streaming()',
+            '    .to("direct:validate-line")',
+            "  .end()",
+            '  .log("Processed ${header.CamelFileName}");',
+          ),
+        ),
+      },
+      {
+        heading: "Make failure boring",
+        body: p(
+          "The most important design decision in any integration is what happens when a step fails. Separate transient failures (timeouts, a broker restarting) from permanent ones (a malformed message). Retry the first with growing delays; never retry the second.",
+          code(
+            "java",
+            'errorHandler(deadLetterChannel("jms:queue:orders.dlq")',
+            "  .maximumRedeliveries(5)",
+            "  .redeliveryDelay(1000)",
+            "  .useExponentialBackOff()",
+            "  .retryAttemptedLogLevel(LoggingLevel.WARN));",
+            "",
+            "onException(ValidationException.class)",
+            "  .handled(true)",
+            "  .maximumRedeliveries(0)",
+            '  .to("jms:queue:orders.invalid");',
+          ),
+          "A dead letter queue is only useful if someone looks at it. Alert on its depth, record why each message landed there, and have a tested way to replay messages once the cause is fixed.",
+        ),
+        diagram: {
+          steps: [
+            "Consume message",
+            "Process",
+            "Redeliver with exponential back-off",
+            { label: "Dead letter queue after the last attempt", tone: "accent" },
+            "Alert, fix, replay",
+          ],
+          loopBack: 1,
+          loopLabel: "Transient failures go back to Process with growing delays. Permanent failures, such as validation errors, skip the retries.",
+          caption: "Retries for transient failures, a visible place for everything else.",
+        },
+      },
+      {
+        heading: "Test routes like code",
+        body: p(
+          "Routes are code, so they deserve unit tests. `AdviceWith` rewires a route for a test: replace the real consumer with a direct endpoint and swap brokers for mock endpoints that record what they receive.",
+          code(
+            "java",
+            "@Override",
+            "public boolean isUseAdviceWith() {",
+            "  return true; // start the context only after advising",
+            "}",
+            "",
+            "@Test",
+            "void routesHighPriorityOrders() throws Exception {",
+            '  AdviceWith.adviceWith(context, "order-router", a -> {',
+            '    a.replaceFromWith("direct:orders");',
+            '    a.mockEndpointsAndSkip("jms:*");',
+            "  });",
+            "  context.start();",
+            "",
+            '  getMockEndpoint("mock:jms:queue:orders.priority").expectedMessageCount(1);',
+            '  template.sendBody("direct:orders", Map.of("orderId", "A1", "priority", "HIGH"));',
+            "  MockEndpoint.assertIsSatisfied(context);",
+            "}",
+          ),
+          "Test the routing decisions, the error paths and the idempotency in isolation. Then keep a smaller set of integration tests against real brokers in containers.",
+        ),
+      },
+      {
+        heading: "Operate it like any other service",
+        body: p(
+          "Because Camel lives inside a normal application, it plugs into the operational tooling you already have. Expose route metrics through Micrometer, trace messages across services with OpenTelemetry, and publish health checks so the platform restarts or stops routing to an unhealthy instance.",
+          "Give every route a stable `routeId`. It becomes the name in metrics, traces, logs and tests, and it is what people search for at three in the morning.",
+        ),
+      },
+      {
+        heading: "Where Camel meets AI",
+        body: p(
+          "A call to a model is, from an integration point of view, just another endpoint: slow, occasionally failing, and metered. Camel's LangChain4j components let a route call a model like any other endpoint, so the patterns above apply unchanged: timeouts, retries with back-off, circuit breakers and idempotency.",
+          "This matters most for classification steps. Amazon engineers replaced a large general model with a small decision model for ticket labelling and report a cost drop of about 98%, and Google now offers a decision model in the Gemini API. The safe way to make that kind of switch is a pattern Camel already has: keep the current model on the main path and use a wire tap to send a copy of each message to the candidate, then compare decisions before cutting over.",
+        ),
+        diagram: {
+          steps: [
+            "Inbound message",
+            ["Current model decides (main path)", "Candidate model via wire tap (shadow)"],
+            "Compare decisions offline",
+            { label: "Switch the route when the candidate matches", tone: "accent" },
+          ],
+          caption: "Shadow testing a model change with a wire tap: real traffic, no risk to the main path.",
+        },
+      },
+      {
+        heading: "Camel or MuleSoft?",
+        body: p(
+          "Both implement the same patterns, so the choice is less about features than about operating model.",
+          "- **Camel** suits teams that are strong in Java and run their own platform on Kubernetes. It is open source under the Apache License, code-first, and every integration is a normal service you build, test and operate yourself.\n- **MuleSoft** suits organisations where many teams publish and consume APIs and need a shared catalogue, policies, monitoring and low-code tooling as a managed platform, and are prepared to pay for it.",
+          "Plenty of organisations run both: MuleSoft for governed, reusable APIs between business systems, and Camel inside services that need embedded routing close to the code.",
+        ),
+      },
+    ],
+  },
+  {
+    slug: "mulesoft-api-led-integration-for-agents",
+    title: "MuleSoft in the agent era: API-led integration still does the heavy lifting",
+    topic: "Integration",
+    date: "November 2026",
+    summary:
+      "Agents need governed, reusable access to enterprise systems, which is what API-led connectivity was designed for. The model, the Mule 4 practices that matter, moving off Mule 3, and what MuleSoft is adding for agents.",
+    excerpt:
+      "Every agent demo eventually needs to read an order, update a customer or check stock. The hard part is not the model; it is safe, governed access to systems of record. That has been MuleSoft's job for years.",
+    sources: [],
+    references: [
+      { title: "DataWeave documentation", url: "https://docs.mulesoft.com/dataweave/latest/", source: "MuleSoft docs" },
+      { title: "Error handling in Mule 4", url: "https://docs.mulesoft.com/mule-runtime/latest/error-handling", source: "MuleSoft docs" },
+      { title: "Migrating from Mule 3 to Mule 4", url: "https://docs.mulesoft.com/mule-runtime/latest/migration-intro", source: "MuleSoft docs" },
+      { title: "Apply Open Policies to AWS API Gateway", url: "https://blogs.mulesoft.com/news/apply-open-policies-to-aws-api-gateway/", source: "MuleSoft blog" },
+      { title: "Direct Telemetry Stream from Managed Omni Gateways", url: "https://blogs.mulesoft.com/news/direct-telemetry-stream-from-managed-omni-gateways/", source: "MuleSoft blog" },
+      { title: "Orchestrate Copilot Studio agents with the A2A bridge", url: "https://blogs.mulesoft.com/news/orchestrate-copilot-studio-agents-with-the-a2a-bridge/", source: "MuleSoft blog" },
+      { title: "What's new with Agent Broker", url: "https://blogs.mulesoft.com/automation/build-test-and-run-trusted-agent-orchestrations-faster-whats-new-with-agent-broker/", source: "MuleSoft blog" },
+      { title: "Agentic KPI Framework", url: "https://blogs.mulesoft.com/agentic-perspectives/agentic-kpi-framework-from-orchestration-to-measurable-control/", source: "MuleSoft blog" },
+    ],
+    content: [
+      {
+        heading: "The platform in one paragraph",
+        body: p(
+          "MuleSoft's Anypoint Platform has a few parts worth naming. The **Mule runtime** runs integration applications built from flows. **Anypoint Code Builder** and **Anypoint Studio** are where you build them. **Exchange** is the catalogue where teams publish and find reusable assets: API specifications, connectors and fragments. **API Manager** applies policies such as rate limiting, client ID enforcement and token validation at the gateway. **Runtime Manager** deploys to CloudHub, Runtime Fabric or your own servers, and **Anypoint Monitoring** collects the metrics and logs.",
+        ),
+      },
+      {
+        heading: "API-led connectivity, briefly",
+        body: p(
+          "API-led connectivity organises integration into three layers, each with a different job:",
+          "- **System APIs** unlock a system of record and hide its quirks, so nobody else has to learn them.\n- **Process APIs** combine data and business rules across systems: \"place an order\" rather than \"insert three rows in the ERP\".\n- **Experience APIs** shape that data for one kind of consumer: a mobile app, a partner, and increasingly an agent.",
+          "The point is reuse and change isolation. When the ERP is replaced, only its system API changes. The pitfall is applying the layers by rule. A process API that only passes a call through adds latency, cost and another deployment for no benefit, so add a layer where there is real reuse or real logic.",
+        ),
+        diagram: {
+          layers: [
+            { label: "Experience APIs", detail: "Shaped for one consumer: web, mobile, partner or agent." },
+            { label: "Process APIs", detail: "Business capabilities that orchestrate several systems." },
+            { label: "System APIs", detail: "Stable interfaces over each system of record." },
+          ],
+          base: { label: "Shared platform", detail: "Exchange, API Manager policies and monitoring across every layer." },
+          caption: "Three layers, each isolating the one below it from change.",
+        },
+      },
+      {
+        heading: "DataWeave is the part worth mastering",
+        body: p(
+          "DataWeave, MuleSoft's functional transformation language, is where most integration logic ends up. It reads and writes JSON, XML, CSV and more with the same expressions:",
+          code(
+            "dataweave",
+            "%dw 2.0",
+            "output application/json",
+            "---",
+            "payload.orders map (order) -> {",
+            "  id: order.orderId,",
+            '  customer: upper(order.customer.name default ""),',
+            "  total: order.lines reduce ((line, sum = 0) -> sum + line.qty * line.price),",
+            '  priority: if (order.express == true) "HIGH" else "STANDARD"',
+            "}",
+          ),
+          "Three habits pay off. Keep non-trivial transformations in their own `.dwl` modules rather than inline in flows. Unit test them with MUnit, including the empty and malformed cases. And for large payloads, make sure the transformation can stream instead of loading everything into memory.",
+        ),
+      },
+      {
+        heading: "Error handling in Mule 4",
+        body: p(
+          "Mule 4 errors are typed, such as `HTTP:CONNECTIVITY` or `HTTP:TIMEOUT`, and each error handler chooses between two behaviours. **On Error Propagate** handles the error and re-throws it, so transactions roll back and the caller sees a failure. **On Error Continue** handles it and lets the flow complete as if it succeeded. Choosing the wrong one is a common source of silently lost messages.",
+          "**Until Successful** retries a block for transient failures and raises `MULE:RETRY_EXHAUSTED` when it gives up:",
+          code(
+            "xml",
+            '<flow name="sync-order">',
+            '  <http:listener config-ref="api-httpListener" path="/orders" />',
+            '  <until-successful maxRetries="3" millisBetweenRetries="2000">',
+            '    <http:request config-ref="erp" method="POST" path="/orders" />',
+            "  </until-successful>",
+            "  <error-handler>",
+            '    <on-error-propagate type="MULE:RETRY_EXHAUSTED">',
+            '      <jms:publish config-ref="broker" destination="orders.dlq" />',
+            "    </on-error-propagate>",
+            "  </error-handler>",
+            "</flow>",
+          ),
+          "Until Successful retries on any error, so validate the request before it. A malformed order should be rejected once, not sent to the ERP four times.",
+        ),
+      },
+      {
+        heading: "Moving off Mule 3",
+        body: p(
+          "Mule 3 applications do not run on Mule 4 unchanged. Expressions move from MEL to DataWeave 2, error handling is redesigned around typed errors, connectors become separately versioned extensions, and streaming is repeatable by default. MuleSoft's migration assistant converts projects as a starting point, but the output still needs review.",
+          "A safer path than a big-bang rewrite:",
+          "1. Inventory applications by business domain and traffic, and retire what nobody uses.\n2. Write contract tests against the current Mule 3 behaviour before converting anything.\n3. Migrate one domain at a time, starting with low-risk system APIs.\n4. Run old and new side by side on real traffic and compare responses before switching consumers.",
+          "That last step is the same dual-run pattern that works for model migrations: never switch on a hunch when you can compare on real traffic.",
+        ),
+      },
+      {
+        heading: "What MuleSoft is adding for agents",
+        body: p(
+          "MuleSoft's recent announcements are mostly about making the same governed layers usable by agents. As reported on the MuleSoft blog:",
+          "- **Copilot Studio agents and A2A**: a generally available bridge lets Copilot Studio agents join A2A (agent-to-agent) workflows without custom adapters. Check identity propagation and failure handling before relying on it.\n- **Agent Broker**: aims to shorten the build, publish and deploy loop when testing changes to agent orchestrations.\n- **One policy, many gateways**: a policy from the policy library can be applied across Omni Gateway, Apigee, Azure API Management, Kong and, since 4 November 2026, AWS API Gateway.\n- **Direct telemetry**: Managed Omni Gateway can stream telemetry directly instead of routing it through Anypoint's OpenTelemetry exporter.\n- **Agentic KPIs**: a framework arguing that scaling agents needs measures of effectiveness, efficiency, governance and safety, not more workflows.",
+        ),
+        diagram: {
+          steps: [
+            "Agent",
+            { label: "Gateway policies: identity, rate limits, audit", tone: "accent" },
+            "Experience API shaped for the agent",
+            "Process APIs",
+            "System APIs",
+          ],
+          caption: "Agents should reach systems of record through the same governed layers as every other consumer, never directly.",
+        },
+      },
+      {
+        heading: "Practical guidance",
+        body: p(
+          "1. Give agents their own experience APIs with narrow scopes, read-only by default. Writes should go through a small number of explicit, validated operations.\n2. Require idempotency keys on every write API. Agents retry, and so do networks.\n3. Publish specifications in Exchange with clear descriptions and examples. Agents read them, so vague descriptions become wrong tool calls.\n4. Apply rate limits and a client identity per agent, so one misbehaving agent cannot take a system of record down and you can see which agent did what.\n5. Measure agent traffic like any other consumer: error rates, latency and cost per business outcome, not just call counts.",
+        ),
+      },
+    ],
+  },
   {
     slug: "loops-first-graphs-second",
     title: "Loops first, graphs second: a working model for agent systems",
@@ -229,7 +517,7 @@ const drafts = [
             "Ticket event",
             "Queue",
             "Function reads the mode switch",
-            ["Mode 1: current model", "Mode 2: both, compared", "Mode 3: decision model"],
+            { either: ["Mode 1: current model", "Mode 2: both, compared", "Mode 3: decision model"] },
             "Label applied",
           ],
           caption: "The dual-run pattern from Amazon's write-up: a three-mode switch lets the old and new model run on real traffic before the cut-over.",
@@ -386,16 +674,21 @@ const drafts = [
 
 const entriesBySlug = new Map(learningSections.flatMap((s) => s.entries.map((e) => [e.slug, { ...e, section: s }])));
 
-const sourcesSection = (slugs) => ({
+const sourcesSection = (slugs = [], references = []) => ({
   heading: "Sources",
   body: [
-    "These notes from my learning log informed this essay. Figures are as reported by each source.",
-    slugs
-      .map((slug) => {
+    slugs.length
+      ? "These sources informed this essay, including notes from my learning log. Figures are as reported by each source."
+      : "Further reading. Figures and product details are as reported by each source.",
+    [
+      ...slugs.map((slug) => {
         const entry = entriesBySlug.get(slug);
         if (!entry) throw new Error(`Unknown learning entry in essay sources: ${slug}`);
-        return `- [${entry.title}](${entry.url}) (${entry.source})`;
-      })
+        return { title: entry.title, url: entry.url, source: entry.source };
+      }),
+      ...references,
+    ]
+      .map((ref) => `- [${ref.title}](${ref.url}) (${ref.source})`)
       .join("\n"),
   ].join("\n\n"),
 });
@@ -405,7 +698,7 @@ const words = (article) =>
 
 // Published essays, each with its sources section and a read time from its length.
 export const articles = drafts.map((draft) => {
-  const article = { ...draft, content: [...draft.content, sourcesSection(draft.sources)] };
+  const article = { ...draft, content: [...draft.content, sourcesSection(draft.sources, draft.references)] };
   return { ...article, readTime: `${Math.max(1, Math.round(words(article) / 220))} min read` };
 });
 

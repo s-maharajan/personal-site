@@ -7,7 +7,10 @@ import { render } from "../entry-server";
 
 const html = (props) => renderToStaticMarkup(<Diagram {...props} />);
 const label = (n) => (typeof n === "string" ? n : n.label);
-const validStep = (step) => (Array.isArray(step) ? step.length >= 2 && step.every(validStep) : Boolean(label(step)?.trim()));
+const validStep = (step) =>
+  Array.isArray(step) ? step.length >= 2 && step.every(validStep)
+    : step?.either ? step.either.length >= 2 && step.either.every(validStep)
+      : Boolean(label(step)?.trim());
 
 const flows = [
   ...learningSections.flatMap((s) => s.entries.filter((e) => e.flow).map((e) => [`learning ${e.slug}`, e.flow])),
@@ -31,6 +34,13 @@ describe("Diagram", () => {
     expect(out).toContain("in parallel");
     expect(out).toContain("Repeats from step 01: Split");
     expect(out).toContain('class="sr-only">Diagram</figcaption>');
+  });
+
+  it("labels alternative branches as one of, not parallel", () => {
+    const out = html({ steps: ["Router", { either: ["Queue A", "Queue B"] }, "Done"] });
+    expect(out).toContain('aria-label="Step 2, one of"');
+    expect(out).toContain(">one of</span>");
+    expect(out).not.toContain("in parallel");
   });
 
   it("renders layers with a base", () => {

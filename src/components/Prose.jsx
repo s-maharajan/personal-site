@@ -4,7 +4,9 @@
 
 const LIST_ITEM = /^(\d+\.|-)\s+/;
 
-const INLINE = /(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\(https?:\/\/[^)\s]+\))/g;
+// Bare https URLs become links too; trailing punctuation stays outside the link.
+const BARE_URL = /^https:\/\/[^\s<>()[\]]*[^\s<>()[\].,;:!?'"]$/;
+const INLINE = /(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\(https?:\/\/[^)\s]+\)|https:\/\/[^\s<>()[\]]*[^\s<>()[\].,;:!?'"])/g;
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function inline(text) {
@@ -24,6 +26,13 @@ export function inline(text) {
       return (
         <a key={i} href={link[2]} target="_blank" rel="noreferrer" className="text-accent underline underline-offset-2 hover:text-accent-hover">
           {link[1]}
+        </a>
+      );
+    }
+    if (BARE_URL.test(part)) {
+      return (
+        <a key={i} href={part} target="_blank" rel="noreferrer" className="break-all text-accent underline underline-offset-2 hover:text-accent-hover">
+          {part}
         </a>
       );
     }

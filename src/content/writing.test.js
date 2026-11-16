@@ -26,7 +26,7 @@ describe('sortedArticles', () => {
       return Number(year) * 12 + months.indexOf(month)
     }
     expect(sortedArticles).toEqual([...articles].sort((a, b) => rank(b) - rank(a)))
-    expect(articles[0].slug).toBe('loops-first-graphs-second')
+    expect(articles[0].slug).toBe('apache-camel-integration-patterns-as-code')
   })
 })
 
@@ -54,10 +54,16 @@ describe('published articles', () => {
 
 describe('essays drawn from the learning log', () => {
   it.each(articles)('$slug credits its sources with links', (article) => {
-    expect(article.sources.length).toBeGreaterThanOrEqual(3)
+    const count = article.sources.length + (article.references?.length ?? 0)
+    expect(count).toBeGreaterThanOrEqual(3)
     const sources = article.content.at(-1)
     expect(sources.heading).toBe('Sources')
-    expect(sources.body.match(/^- \[[^\]]+\]\(https:\/\/[^)]+\)/gm)).toHaveLength(article.sources.length)
+    expect(sources.body.match(/^- \[[^\]]+\]\(https:\/\/[^)]+\)/gm)).toHaveLength(count)
+  })
+
+  it('covers integration with Camel and MuleSoft essays', () => {
+    const integration = articles.filter(({ topic }) => topic === 'Integration').map(({ slug }) => slug)
+    expect(integration).toEqual(['apache-camel-integration-patterns-as-code', 'mulesoft-api-led-integration-for-agents'])
   })
 
   it.each(articles)('$slug has a read time that matches its length', (article) => {

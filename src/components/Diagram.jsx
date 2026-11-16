@@ -3,12 +3,16 @@ import { ArrowDown, ArrowRight, RotateCcw } from "lucide-react";
 // Small, dependency-free diagrams that render on the server and follow the theme.
 //
 // Flow:   { steps, loopBack?, loopLabel?, caption? }
-//         A step is a label, a node object { label, tone }, or an array of
-//         those for work that runs in parallel. tone is "accent" (privileged or
-//         key step) or "dashed" (untrusted or external).
+//         A step is a label, a node object { label, tone }, an array of those
+//         for work that runs in parallel, or { either: [...] } when exactly one
+//         branch is taken. tone is "accent" (privileged or key step) or
+//         "dashed" (untrusted or external).
 // Layers: { layers: [{ label, detail }], base?: { label, detail }, caption? }
 
 const node = (n) => (typeof n === "string" ? { label: n } : n);
+// A group of nodes in one step: parallel work or alternative branches.
+const group = (step) =>
+  Array.isArray(step) ? { nodes: step, note: "in parallel" } : step?.either ? { nodes: step.either, note: "one of" } : null;
 const pad = (i) => String(i + 1).padStart(2, "0");
 
 const toneClass = {
@@ -31,17 +35,17 @@ function Flow({ steps, loopBack, loopLabel }) {
     <>
       <ol className="flex flex-col gap-1 sm:flex-row sm:items-stretch">
         {steps.map((step, i) => {
-          const parallel = Array.isArray(step);
+          const branches = group(step);
           return (
             <li key={i} className="flex flex-1 flex-col items-stretch gap-1 sm:flex-row sm:items-center">
-              {parallel ? (
+              {branches ? (
                 <div className="flex flex-1 flex-col gap-1">
-                  <ul className="flex flex-col gap-1" aria-label={`Step ${i + 1}, in parallel`}>
-                    {step.map((n, j) => (
+                  <ul className="flex flex-col gap-1" aria-label={`Step ${i + 1}, ${branches.note}`}>
+                    {branches.nodes.map((n, j) => (
                       <li key={j} className="flex"><Node item={node(n)} number={j === 0 ? pad(i) : null} /></li>
                     ))}
                   </ul>
-                  <span className="text-center font-mono text-[10px] text-faint">in parallel</span>
+                  <span className="text-center font-mono text-[10px] text-faint">{branches.note}</span>
                 </div>
               ) : (
                 <Node item={node(step)} number={pad(i)} />

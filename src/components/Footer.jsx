@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
 import { site } from "../content/site";
 import { learningSections } from "../content/learning";
+import { allEntries } from "../lib/learning";
+
+// The year of the newest content, so the prerendered page and the browser agree.
+const year = allEntries[0].date.slice(0, 4);
 import { navLinks } from "../content/nav";
 
 export default function Footer() {
@@ -38,7 +42,7 @@ export default function Footer() {
       </div>
 
       <p className="mt-10 border-t border-line pt-4 font-mono text-xs text-faint">
-        © {new Date().getFullYear()} {site.handle} · Built with React and Vite, hosted on Vercel.
+        © {year} {site.handle} · Built with React and Vite, hosted on Vercel.
       </p>
     </footer>
   );

@@ -1,6 +1,9 @@
 # personal-site
 
-A blog: a list of essays, newest first, and a short about page. Built with React 19, Vite, Tailwind CSS, and React Router 7, deployed on Vercel.
+The personal site of s-maharajan, live at https://s-maharajan.vercel.app: essays on
+integration, cloud and AI, a section-by-section learning log, and a short about page.
+Built with React 19, Vite, Tailwind CSS and React Router 7, prerendered to static HTML
+and deployed on Vercel. Two themes, light and dark.
 
 ## Run it locally
 
@@ -15,13 +18,19 @@ npm run og       # re-render the Open Graph cards into dist/og/
 
 Requires Node 22.12 or newer within Node 22.
 
-`npm test` covers all twelve month conversions, newest-first article ordering,
-required article fields and unique slugs, and Prose parsing and static rendering
-(paragraphs, lists, fenced code, bold, and inline code), plus server-rendered route
-content and per-page metadata for every essay, home, about, and the 404 fallback. Tests run in Node without
-jsdom. The Open Graph cards are covered too: the suite renders them, checks every
-file is a 1200x630 PNG, checks the cards carry the title, topic and author, and
-checks the card palette still matches `src/index.css`.
+`npm test` runs in Node without jsdom. It covers:
+
+- content: essay and learning fields, unique slugs, newest-first ordering, sources
+  on every essay, no redaction markers or work-internal wording, no email address and
+  no full name on any page;
+- rendering: Prose (paragraphs, lists, fenced code, bold, inline code, links and bare
+  https links), diagrams, and every prerendered route with its metadata;
+- the build: Open Graph cards (1200x630 PNGs whose palette matches `src/index.css`),
+  the CSP hash of the theme script, caching and redirects in `vercel.json`, and colour
+  contrast in both themes.
+
+[CI](.github/workflows/ci.yml) runs lint, tests and the build on every push and pull
+request.
 
 ## Editing content
 
@@ -29,22 +38,30 @@ Content lives in `src/content/`:
 
 | File | What it holds |
 | --- | --- |
-| `site.js` | Name, role, tagline, location and social links. No email address is published. |
-| `writing.js` | Published essays, listed at `/writing` and shown at `/writing/<slug>`. |
+| `site.js` | Handle, role, headline, tagline, location and social links. No email address or full name is published. |
+| `writing.js` | Published essays, listed at `/writing` and shown at `/writing/<slug>`. Each essay lists `sources` (learning entry slugs) and `references` (outside links); a Sources section is added from them. A section can carry a `diagram`. |
 | `learning.js` | The learning log: curated notes grouped into sections, shown at `/learning` and `/learning/<section>`. |
 | `nav.js` | Header and footer navigation. |
 
 `learning.js` was curated from the private `daily-learning` notes: only items rated
 worth keeping, de-duplicated, grouped into sections, each with a one-line takeaway, a
-summary, how it works, a way to try it, caveats and the public source link. Edit it by
-hand; each entry needs a unique `slug` within its section.
+summary, how it works, a way to try it, caveats and the public source link. Most
+entries also have a `flow`: the step-by-step "how it works" diagram from the original
+note. Edit it by hand; each entry needs a unique `slug` within its section.
+
+Diagrams use `src/components/Diagram.jsx`, with no diagram library. A flow is
+`{ steps, loopBack?, loopLabel?, caption? }`, where a step is a label, a
+`{ label, tone }` object (`tone` is `"accent"` or `"dashed"`), or an array of steps
+that run in parallel. A layered diagram is `{ layers: [{ label, detail }], base?, caption? }`.
+Diagrams render on the server, follow the theme, and read left to right on wide
+screens and top to bottom on phones.
 
 ## Structure
 
 ```
 src/
   content/     site, writing, learning, nav
-  components/  Layout, Header, Footer, Icons
+  components/  Layout, Header, Footer, Prose, Diagram, PostList, SectionCard, PageMeta, Icons
   lib/         og (Open Graph paths and sizes), learning (dates, sorting), essay
   pages/       Home, Writing, Essay, Learning, LearningSection, About, NotFound
 scripts/       build-feeds, build-og, prerender
@@ -75,6 +92,7 @@ updating page metadata. There are two themes, light and dark. The inline theme s
 applies the saved theme, or the system preference, before paint; the header button
 toggles between them and saves the choice. `vercel.json` uses `cleanUrls`, so `/about`
 serves `about/index.html`, and unknown paths get `404.html` with a real 404 status.
+URLs of essays that were removed redirect permanently to `/writing`.
 
 The site is the Vercel project `s-maharajan`, served at https://s-maharajan.vercel.app.
 
@@ -84,7 +102,7 @@ Fraunces is served locally as committed Latin WOFF2 subsets, with no Google Font
 stylesheet or third-party font requests. The regular face is preloaded; italic
 loads when used. Vite fingerprints both files under `/assets/`. See
 [fonts/README.md](fonts/README.md) for coverage and offline regeneration.
-Home and the small 404 page load eagerly; Essay and About use `React.lazy` with a
+Home and the small 404 page load eagerly; the other pages use `React.lazy` with a
 loading status. The prerenderer supplies eager versions of those pages so the
 initial HTML still contains full content and metadata on every published route.
 
@@ -135,12 +153,12 @@ with reduced motion enabled, and is hidden when printing.
 Lint includes the recommended `eslint-plugin-jsx-a11y` rules. A scoped npm peer
 override keeps the existing ESLint 10 setup: jsx-a11y 6.10.2 declares support only
 through ESLint 9; its recommended rules are verified by `npm run lint` on ESLint 10.
-Topic filters expose selection with `aria-pressed`; the icon-only theme button announces its current
-mode and next action. The first keyboard stop is a visible-on-focus skip link to
-main content, which accepts focus without adding a tab stop. Subsequent Tab stops
-follow document order, with a visible focus outline.
+Topic filters expose selection with `aria-pressed`. The theme button has a fixed
+label ("Switch between light and dark theme"), and CSS shows the matching icon, so the
+prerendered markup never depends on the stored theme. The first keyboard stop is a
+visible-on-focus skip link to main content. Diagrams are ordered lists of steps with a
+caption, so screen readers get the steps in order.
 
-Faint text (including 11–12px metadata) meets WCAG AA's 4.5:1 requirement:
-`#6A7167` on light `#F3F4EF` is 4.55:1, and `#808779` on dark `#121410` is
-4.99:1. On the next-essay card's surface, the ratios are 5.04:1 (light) and
-4.55:1 (dark). The skip link uses the surface and primary text colours in both themes.
+Small text meets WCAG AA's 4.5:1 in both themes: faint text on the page, surface and
+raised backgrounds, and the accent colour as link text and as a button fill. The
+tests compute these ratios from the colour tokens in `src/index.css`.

@@ -57,3 +57,16 @@ describe("static site security and caching", () => {
     expect(html + css).not.toMatch(/fonts\.(googleapis|gstatic)\.com/);
   });
 });
+
+describe("redirects for removed essays", () => {
+  it("sends old essay URLs to the writing index without shadowing current essays", async () => {
+    const { articles } = await import("../src/content/writing.js");
+    expect(config.redirects).toHaveLength(1);
+    const [{ source, destination, permanent }] = config.redirects;
+    expect(destination).toBe("/writing");
+    expect(permanent).toBe(true);
+    const slugs = source.match(/^\/writing\/:slug\(([^)]+)\)$/)[1].split("|");
+    expect(slugs).toContain("why-rag-hallucinates-chunking");
+    for (const { slug } of articles) expect(slugs).not.toContain(slug);
+  });
+});
