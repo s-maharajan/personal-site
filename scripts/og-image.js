@@ -150,7 +150,7 @@ export const siteCard = () =>
           },
           site.handle,
         ),
-        text({ fontSize: "26px", lineHeight: "36px", color: palette.muted }, site.role),
+        text({ fontSize: "26px", lineHeight: "36px", color: palette.muted }, site.title),
       ),
       rule("96px"),
       text(

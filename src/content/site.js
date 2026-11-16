@@ -3,7 +3,9 @@ export const site = {
   name: "Som",
   // Shown on every page and in titles. The full name is not shown on the site.
   handle: "s-maharajan",
-  role: "Principal Engineer · Integration, Cloud & AI",
+  // Job title alone sits above the home headline, which already names the focus areas.
+  title: "Principal Software Engineer",
+  role: "Principal Software Engineer · Integration, Cloud & AI",
   headline: "Integration, cloud & AI.",
   location: "Remote / London & Worldwide",
   url: "https://s-maharajan.vercel.app",

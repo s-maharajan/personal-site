@@ -126,3 +126,12 @@ describe("profile links", () => {
     expect(body).not.toMatch(/\bTCS\b|Tata|Marks (&amp;|and) Spencer|\bM&amp;S\b|Standard Chartered|Stockley|Clayfin|\+44|linkedin\.com\/in\/[^"]*"[^>]*>[^<]*Somasundaram/i);
   });
 });
+
+describe("home hero", () => {
+  it("does not repeat the focus areas above the headline", () => {
+    const { body } = render("/");
+    const hero = body.match(/<section class="flex flex-col gap-6[\s\S]*?<\/h1>/)[0];
+    expect(hero).toContain(">Principal Software Engineer</p>");
+    expect(hero.match(/Integration, cloud &amp; AI/gi)).toHaveLength(1);
+  });
+});

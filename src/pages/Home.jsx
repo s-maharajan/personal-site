@@ -41,7 +41,7 @@ export default function Home() {
     <div className="flex flex-col gap-20 sm:gap-24">
       {/* Hero */}
       <section className="flex flex-col gap-6 pt-6 sm:pt-10">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">{site.role}</p>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">{site.title}</p>
         <h1 className="font-serif text-3xl sm:text-5xl leading-[1.1] tracking-tight text-text">
           {site.headline}
         </h1>

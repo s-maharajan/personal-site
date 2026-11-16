@@ -68,7 +68,7 @@ describe("Open Graph images", () => {
   it("shows the name, role and tagline on the site card", () => {
     const texts = textsOf(siteCard());
     expect(texts).toContain(site.handle);
-    expect(texts).toContain(site.role);
+    expect(texts).toContain(site.title);
     expect(texts).toContain(site.tagline);
   });
 
