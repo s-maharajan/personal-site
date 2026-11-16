@@ -99,14 +99,13 @@ describe("privacy", () => {
 });
 
 describe("name placement", () => {
-  it.each(routes)("shows the handle at the top and the full name only in the footer on %s", (path) => {
+  it.each(routes)("shows the handle, never the full name, on %s", (path) => {
     const { head, body } = render(path);
     const header = body.match(/<header[\s\S]*?<\/header>/)[0];
     const footer = body.match(/<footer[\s\S]*?<\/footer>/)[0];
     expect(header).toContain(site.handle);
-    expect(header).not.toContain(site.fullName);
-    expect(footer).toContain(site.fullName);
-    expect(body.replace(footer, "")).not.toContain(site.fullName);
+    expect(footer).toContain(site.handle);
+    expect(body).not.toContain(site.fullName);
     expect(head).not.toContain(site.fullName);
   });
 });

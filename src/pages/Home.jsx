@@ -38,7 +38,6 @@ export default function Home() {
           {site.headline}
         </h1>
         <p className="font-serif text-xl sm:text-2xl leading-snug text-muted italic">{site.tagline}</p>
-        <p className="max-w-prose text-base leading-relaxed text-muted">{site.bio}</p>
         <div className="flex flex-wrap items-center gap-3 pt-1 text-sm">
           <Link to="/learning" className="btn-primary">Browse the learning log</Link>
           {site.links.github && (
@@ -112,7 +111,7 @@ export default function Home() {
       <section aria-labelledby="writing-heading">
         <SectionHeading
           title={<span id="writing-heading">Latest writing</span>}
-          intro="Longer essays on integration, AI and cloud."
+          intro="Longer essays on integration, cloud and AI."
           to="/writing"
           linkLabel="All posts"
         />

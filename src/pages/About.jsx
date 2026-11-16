@@ -4,8 +4,8 @@ import { learningSections } from "../content/learning";
 
 const focus = [
   ["Integration", "APIs, events and messaging that connect systems and keep data consistent across them."],
-  ["AI", "Agents, retrieval and evaluation, and how teams build with AI every day."],
   ["Cloud", "Cloud-native platforms, delivery pipelines and the security around them."],
+  ["AI", "Agents, retrieval and evaluation, and how teams build with AI every day."],
 ];
 
 export default function About() {
@@ -19,7 +19,7 @@ export default function About() {
 
       <div className="flex flex-col gap-4 text-base leading-relaxed text-muted">
         <p>
-          I work on integration, AI and cloud, and I write
+          I work on integration, cloud and AI, and I write
           here about the parts of that work that are worth thinking through in public.
         </p>
         <p>

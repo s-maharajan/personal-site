@@ -8,7 +8,7 @@ export default function Footer() {
     <footer className="mt-24 border-t border-line pt-10 pb-12 print-hidden font-sans text-sm text-muted">
       <div className="grid gap-8 sm:grid-cols-[1.4fr_1fr_1fr]">
         <div className="flex flex-col gap-2">
-          <span className="font-serif text-lg text-text">{site.fullName}</span>
+          <span className="font-serif text-lg text-text">{site.handle}<span className="text-accent">.</span></span>
           <p className="max-w-xs leading-relaxed">{site.tagline}</p>
         </div>
 
@@ -38,7 +38,7 @@ export default function Footer() {
       </div>
 
       <p className="mt-10 border-t border-line pt-4 font-mono text-xs text-faint">
-        © {new Date().getFullYear()} {site.fullName}. Built with React and Vite, hosted on Vercel.
+        © {new Date().getFullYear()} {site.handle} · Built with React and Vite, hosted on Vercel.
       </p>
     </footer>
   );
