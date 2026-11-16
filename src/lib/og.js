@@ -10,3 +10,4 @@ export const ogFileName = (slug) => `${slug}.png`;
 export const ogImagePath = (slug) => `/${OG_DIR}/${ogFileName(slug)}`;
 export const ogImageUrl = (slug, base) =>
   `${String(base).replace(/\/+$/, "")}${ogImagePath(slug)}`;
+export const learningOgSlug = (sectionSlug) => `learning-${sectionSlug}`;

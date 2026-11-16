@@ -3,6 +3,8 @@
 import { writeFileSync } from "node:fs";
 import { site } from "../src/content/site.js";
 import { sortedArticles, isoMonth } from "../src/content/writing.js";
+import { learningSections } from "../src/content/learning.js";
+import { latestDate } from "../src/lib/learning.js";
 
 const out = new URL("../dist/", import.meta.url);
 const base = site.url.replace(/\/$/, "");
@@ -20,6 +22,18 @@ const items = sortedArticles
       <category>${escape(a.topic)}</category>
       <description>${escape(a.summary)}</description>
     </item>`,
+  )
+  .concat(
+    learningSections.map(
+      (s) => `    <item>
+      <title>${escape(`Learning: ${s.title}`)}</title>
+      <link>${base}/learning/${s.slug}</link>
+      <guid>${base}/learning/${s.slug}</guid>
+      <pubDate>${new Date(`${latestDate(s)}T00:00:00Z`).toUTCString()}</pubDate>
+      <category>Learning</category>
+      <description>${escape(s.description)}</description>
+    </item>`,
+    ),
   )
   .join("\n");
 
@@ -39,7 +53,14 @@ ${items}
 `,
 );
 
-const urls = ["/", "/about", ...sortedArticles.map((a) => `/writing/${a.slug}`)];
+const urls = [
+  "/",
+  "/writing",
+  "/learning",
+  "/about",
+  ...learningSections.map((s) => `/learning/${s.slug}`),
+  ...sortedArticles.map((a) => `/writing/${a.slug}`),
+];
 writeFileSync(
   new URL("sitemap.xml", out),
   `<?xml version="1.0" encoding="UTF-8"?>

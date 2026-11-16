@@ -1,11 +1,13 @@
 // Writes the Open Graph images into dist/og/: site.png for the site and
-// <slug>.png for every essay. Runs after `vite build`, because the build
+// <slug>.png for every essay and learning-<section>.png for every learning section. Runs after `vite build`, because the build
 // empties dist/ before it copies the public assets over.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { articles } from "../src/content/writing.js";
+import { learningSections } from "../src/content/learning.js";
+import { formatDay, latestDate } from "../src/lib/learning.js";
 import { site } from "../src/content/site.js";
-import { OG_DIR, SITE_OG_SLUG, ogFileName } from "../src/lib/og.js";
+import { OG_DIR, SITE_OG_SLUG, learningOgSlug, ogFileName } from "../src/lib/og.js";
 import { essayCard, renderOgPng, siteCard } from "./og-image.js";
 
 export const buildOgImages = async (outDir) => {
@@ -33,6 +35,21 @@ export const buildOgImages = async (outDir) => {
           topic: article.topic,
           date: article.date,
           readTime: article.readTime,
+          author: site.fullName || site.name,
+        }),
+      ),
+    );
+  }
+
+  for (const section of learningSections) {
+    write(
+      learningOgSlug(section.slug),
+      await renderOgPng(
+        essayCard({
+          title: `${section.title}: ${section.kicker}`,
+          topic: "Learning",
+          date: formatDay(latestDate(section)),
+          readTime: `${section.entries.length} notes`,
           author: site.fullName || site.name,
         }),
       ),

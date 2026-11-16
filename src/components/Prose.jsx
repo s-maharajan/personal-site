@@ -1,18 +1,30 @@
 // Renders the small markdown subset used in essay bodies: paragraphs,
-// fenced code blocks, ordered/unordered lists, **bold** and `inline code`.
+// fenced code blocks, ordered/unordered lists, **bold**, `inline code` and
+// [links](https://...).
 
 const LIST_ITEM = /^(\d+\.|-)\s+/;
 
-function inline(text) {
-  return text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).map((part, i) => {
+const INLINE = /(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\(https?:\/\/[^)\s]+\))/g;
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function inline(text) {
+  return text.split(INLINE).map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return <strong key={i} className="font-semibold text-text">{part.slice(2, -2)}</strong>;
     }
     if (part.startsWith("`") && part.endsWith("`") && part.length > 1) {
       return (
-        <code key={i} className="rounded bg-raised/80 px-1 py-0.5 font-mono text-[0.85em] text-text">
+        <code key={i} className="rounded bg-raised px-1 py-0.5 font-mono text-[0.85em] text-text">
           {part.slice(1, -1)}
         </code>
+      );
+    }
+    const link = part.match(/^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/);
+    if (link) {
+      return (
+        <a key={i} href={link[2]} target="_blank" rel="noreferrer" className="text-accent underline underline-offset-2 hover:text-accent-hover">
+          {link[1]}
+        </a>
       );
     }
     return part;

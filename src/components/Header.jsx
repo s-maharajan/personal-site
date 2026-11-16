@@ -1,84 +1,62 @@
-import { useState, useEffect, useSyncExternalStore } from "react";
+import { useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { Monitor, Sun, Moon } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 import { site } from "../content/site";
+import { navLinks } from "../content/nav";
 
-const links = [
-  { to: "/about", label: "About" },
-];
 
-// The server and first hydration render agree; storage is read after hydration.
-const subscribeTheme = () => () => {};
-const readTheme = () => {
+const storedTheme = () => {
   try {
-    const stored = localStorage.getItem("theme");
-    if (stored === "light" || stored === "dark") return stored;
+    return localStorage.getItem("theme");
   } catch {
-    // Follow the system preference when storage is blocked.
+    return null;
   }
-  return "system";
 };
 
 export default function Header() {
-  const storedTheme = useSyncExternalStore(subscribeTheme, readTheme, () => "system");
-  const [selectedTheme, setTheme] = useState(null);
-  const theme = selectedTheme ?? storedTheme;
-
+  // The pre-paint script in index.html sets the first theme. Until someone
+  // picks one, keep following the system preference.
   useEffect(() => {
     const preference = window.matchMedia("(prefers-color-scheme: dark)");
-    const applyTheme = () => {
-      document.documentElement.classList.toggle(
-        "dark",
-        theme === "dark" || (theme === "system" && preference.matches),
-      );
+    const follow = () => {
+      if (!storedTheme()) document.documentElement.classList.toggle("dark", preference.matches);
     };
-    applyTheme();
-    if (theme === "system") {
-      preference.addEventListener("change", applyTheme);
-      return () => preference.removeEventListener("change", applyTheme);
-    }
-  }, [theme]);
+    preference.addEventListener("change", follow);
+    return () => preference.removeEventListener("change", follow);
+  }, []);
 
-  const nextTheme = { system: "light", light: "dark", dark: "system" }[theme];
-  const ThemeIcon = { system: Monitor, light: Sun, dark: Moon }[theme];
-  const themeLabel = theme[0].toUpperCase() + theme.slice(1);
-  const nextThemeLabel = nextTheme[0].toUpperCase() + nextTheme.slice(1);
-
-  const cycleTheme = () => {
-    setTheme(nextTheme);
+  const toggleTheme = () => {
+    const dark = !document.documentElement.classList.contains("dark");
+    document.documentElement.classList.toggle("dark", dark);
     try {
-      if (nextTheme === "system") {
-        localStorage.removeItem("theme");
-      } else {
-        localStorage.setItem("theme", nextTheme);
-      }
+      localStorage.setItem("theme", dark ? "dark" : "light");
     } catch {
       // The switch still works for this visit when storage is blocked.
     }
   };
 
   return (
-    <header className="pt-8 sm:pt-12 print-hidden">
-      <div className="flex items-center justify-between border-b border-line/70 pb-5">
-        {/* Author Wordmark */}
-        <Link to="/" className="group flex items-baseline gap-2">
-          <span className="font-serif text-xl sm:text-2xl font-medium tracking-tight text-text group-hover:text-accent transition-colors">
-            {site.fullName || site.name}
+    <header className="pt-6 sm:pt-10 print-hidden">
+      <div className="flex items-center justify-between gap-4">
+        <Link to="/" className="group flex items-center gap-3" aria-label={`${site.fullName}, home`}>
+          <span className="font-serif text-2xl font-medium tracking-tight text-text">
+            {site.initials}<span className="text-accent">.</span>
+          </span>
+          <span className="hidden sm:inline font-sans text-sm text-muted group-hover:text-text transition-colors">
+            {site.fullName}
           </span>
         </Link>
 
-        {/* Minimal Navigation */}
-        <div className="flex items-center gap-5 sm:gap-6">
-          <nav className="flex items-center gap-5 sm:gap-6 text-sm font-sans">
-            {links.map((l) => (
+        <div className="flex items-center gap-1 sm:gap-2">
+          <nav aria-label="Main" className="flex items-center gap-0.5 sm:gap-1 text-sm font-sans">
+            {navLinks.map((l) => (
               <NavLink
                 key={l.to}
                 to={l.to}
+                end={l.end}
                 className={({ isActive }) =>
-                  `transition-colors ${
-                    isActive
-                      ? "text-accent font-medium"
-                      : "text-muted hover:text-text"
+                  `rounded-md px-2 py-1 transition-colors ${l.end ? "hidden sm:inline" : ""} ${
+                    isActive ? "text-text font-medium bg-raised" : "text-muted hover:text-text"
                   }`
                 }
               >
@@ -87,17 +65,16 @@ export default function Header() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-1 border-l border-line/80 pl-3 sm:pl-4">
-            <button
-              type="button"
-              onClick={cycleTheme}
-              className="p-1.5 text-muted hover:text-accent rounded-md transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-              title={`Theme: ${themeLabel}. Switch to ${nextThemeLabel}`}
-              aria-label={`Theme: ${themeLabel}. Switch to ${nextThemeLabel}`}
-            >
-              <ThemeIcon className="h-4 w-4 text-accent" aria-hidden="true" />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="ml-1 rounded-md border border-line p-1.5 text-muted transition-colors hover:border-accent hover:text-accent"
+            title="Switch between light and dark theme"
+            aria-label="Switch between light and dark theme"
+          >
+            <Moon className="theme-icon-dark h-4 w-4" aria-hidden="true" />
+            <Sun className="theme-icon-light h-4 w-4" aria-hidden="true" />
+          </button>
         </div>
       </div>
     </header>

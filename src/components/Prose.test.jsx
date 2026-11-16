@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
-import Prose, { parse } from './Prose'
+import Prose, { inline, parse } from './Prose'
 
 describe('Prose parser', () => {
   it('joins paragraph lines and separates paragraphs at blank lines', () => {
@@ -56,5 +56,21 @@ describe('Prose renderer', () => {
     )
     expect(html).toMatch(/<pre[^>]*><code>&lt;div&gt;\n\n\*\*literal\*\*<\/code><\/pre>/)
     expect(html).not.toContain('<strong')
+  })
+})
+
+describe('inline markdown', () => {
+  it('renders https links as external links and leaves other brackets alone', () => {
+    const html = renderToStaticMarkup(<p>{inline('See [agentics](https://github.com/githubnext/agentics) and [x](javascript:alert(1)).')}</p>)
+    expect(html).toContain('<a href="https://github.com/githubnext/agentics" target="_blank" rel="noreferrer"')
+    expect(html).toContain('>agentics</a>')
+    expect(html).not.toContain('href="javascript')
+    expect(html).toContain('[x](javascript:alert(1))')
+  })
+
+  it('still renders bold and code', () => {
+    const html = renderToStaticMarkup(<p>{inline('**bold** and `code`')}</p>)
+    expect(html).toContain('<strong')
+    expect(html).toContain('<code')
   })
 })

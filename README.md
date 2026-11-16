@@ -30,16 +30,23 @@ Content lives in `src/content/`:
 | File | What it holds |
 | --- | --- |
 | `site.js` | Name, role, tagline, location, email, and social links. |
-| `writing.js` | Published essays, shown on the home page and at `/writing/<slug>`. |
+| `writing.js` | Published essays, listed at `/writing` and shown at `/writing/<slug>`. |
+| `learning.js` | The learning log: curated notes grouped into sections, shown at `/learning` and `/learning/<section>`. |
+| `nav.js` | Header and footer navigation. |
+
+`learning.js` was curated from the private `daily-learning` notes: only items rated
+worth keeping, de-duplicated, grouped into sections, each with a one-line takeaway, a
+summary, how it works, a way to try it, caveats and the public source link. Edit it by
+hand; each entry needs a unique `slug` within its section.
 
 ## Structure
 
 ```
 src/
-  content/     site, writing
+  content/     site, writing, learning, nav
   components/  Layout, Header, Footer, Icons
-  lib/         og (shared Open Graph image paths and sizes)
-  pages/       Home, Essay, About, NotFound
+  lib/         og (Open Graph paths and sizes), learning (dates, sorting), essay
+  pages/       Home, Writing, Essay, Learning, LearningSection, About, NotFound
 scripts/       build-feeds, build-og, prerender
 fonts/         Fraunces TTF sources and licence (cards and web subsets)
 ```
@@ -47,13 +54,15 @@ fonts/         Fraunces TTF sources and licence (cards and web subsets)
 ## Deploying
 
 `npm run build` runs Vite, generates the feeds, sitemap and robots.txt, then
-server-renders `/`, `/about`, and every `/writing/<slug>` into `dist/<route>/index.html`.
+server-renders `/`, `/writing`, `/learning`, `/about`, every `/learning/<section>` and
+every `/writing/<slug>` into `dist/<route>/index.html` (the list is `routes` in
+`src/entry-server.jsx`), plus `dist/404.html`.
 Each page includes its content, title, description, Open Graph tags and canonical URL.
 Essay descriptions use `summary`; canonical and Open Graph URLs use `site.url` in
 `src/content/site.js`. Update that URL when changing the public domain.
 
 The build also renders the Open Graph cards: `dist/og/site.png` for the site and
-`dist/og/<slug>.png` for every essay, all 1200x630 PNGs. `scripts/build-og.js`
+`dist/og/<slug>.png` for every essay, `dist/og/learning-<section>.png` for every learning section, all 1200x630 PNGs. `scripts/build-og.js`
 draws them with satori and rasterises them with resvg, using the palette from
 `src/index.css` and the Fraunces files in `fonts/`. Nothing is fetched at build
 time, so the build works offline. Every page points at its card with
@@ -62,9 +71,12 @@ essays use their own card, the home and about pages share the site card. Run
 `npm run og` on its own to re-render the cards.
 
 The browser hydrates the rendered content and continues to navigate client-side,
-updating page metadata. The inline theme script still applies the saved or system
-theme before paint. `vercel.json` keeps its routing fallback: existing static files
-win, and unmatched URLs serve `index.html` for the client-side 404 page.
+updating page metadata. There are two themes, light and dark. The inline theme script
+applies the saved theme, or the system preference, before paint; the header button
+toggles between them and saves the choice. `vercel.json` uses `cleanUrls`, so `/about`
+serves `about/index.html`, and unknown paths get `404.html` with a real 404 status.
+
+The site is the Vercel project `s-maharajan`, served at https://s-maharajan.vercel.app.
 
 ## Performance and response headers
 

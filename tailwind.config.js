@@ -25,7 +25,7 @@ export default {
         mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
       },
       maxWidth: {
-        page: "46rem",
+        page: "50rem",
         prose: "42rem",
       },
     },

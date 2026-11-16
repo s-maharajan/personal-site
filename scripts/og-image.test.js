@@ -3,6 +3,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildOgImages } from "./build-og.js";
+import { learningSections } from "../src/content/learning.js";
 import { essayCard, loadFonts, palette, siteCard } from "./og-image.js";
 import { articles } from "../src/content/writing.js";
 import { site } from "../src/content/site.js";
@@ -29,12 +30,13 @@ describe("Open Graph images", () => {
     rmSync(dir, { recursive: true, force: true });
   });
 
-  it("writes a 1200x630 PNG for the site and for every essay", async () => {
+  it("writes a 1200x630 PNG for the site, every essay and every learning section", async () => {
     const written = await buildOgImages(join(dir, "og"));
 
     expect(written).toEqual([
       "site.png",
       ...articles.map((article) => `${article.slug}.png`),
+      ...learningSections.map((section) => `learning-${section.slug}.png`),
     ]);
 
     for (const name of written) {

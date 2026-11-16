@@ -13,17 +13,17 @@ import { site } from "../src/content/site.js";
 // Mirrors the palette in src/index.css. scripts/og-image.test.js compares the
 // two so the cards cannot drift away from the site colours.
 export const palette = {
-  paper: "#F3F4EF",
+  paper: "#FBFAF7",
   surface: "#FFFFFF",
-  raised: "#E9EBE2",
-  text: "#1B1D1A",
-  muted: "#585F57",
-  faint: "#6A7167",
-  line: "#D9DCD3",
-  pine: "#3E6259",
-  pineDeep: "#2F4D45",
-  clay: "#8A5A3C",
-  plum: "#6B5B95",
+  raised: "#F2F0EA",
+  text: "#17171A",
+  muted: "#4E4E55",
+  faint: "#66666D",
+  line: "#E3E0D8",
+  pine: "#B13F12",
+  pineDeep: "#8E3009",
+  clay: "#3F5F8A",
+  plum: "#4F6B45",
 };
 
 // The name matches the family name inside each file so satori and any other

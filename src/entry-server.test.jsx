@@ -28,8 +28,8 @@ describe("prerendered routes", () => {
     }
     expect(body).toContain('class="reading-progress print-hidden" aria-hidden="true"');
     expect(body).not.toMatch(/<title>|<meta|rel="canonical"/);
-    expect(body).toContain('href="/"');
-    expect(body).toContain('Theme: System. Switch to Light');
+    expect(body).toContain('href="/writing"');
+    expect(body).toContain('aria-label="Switch between light and dark theme"');
   });
 
   it.each(sortedArticles)("points $slug at its own Open Graph image", (article) => {
@@ -49,7 +49,8 @@ describe("prerendered routes", () => {
     const about = render("/about");
     expect(home.head).toContain(escape(`${site.fullName} · ${site.role}`));
     expect(home.head).toContain(`href="${site.url}/"`);
-    expect(home.body).toContain('aria-label="Filter by topic"');
+    expect(home.body).toContain(escape(site.headline));
+    expect(home.body).toContain('href="/learning"');
     expect(about.head).toContain(`<title>About · ${site.fullName}</title>`);
     expect(about.head).toContain(`href="${site.url}/about"`);
     expect(about.head).not.toBe(home.head);
@@ -57,15 +58,26 @@ describe("prerendered routes", () => {
   });
 
   it("exposes filter selection and a first-stop skip link to focusable main content", () => {
-    const { body } = render("/");
+    const { body } = render("/writing");
+    expect(body).toContain('role="group" aria-label="Filter by topic"');
     const filters = body.match(/<button[^>]*aria-pressed="(true|false)"[^>]*>[^<]+<\/button>/g);
     expect(filters.length).toBeGreaterThan(1);
     expect(filters.filter((button) => button.includes('aria-pressed="true"'))).toHaveLength(1);
     expect(filters[0]).toMatch(/aria-pressed="true"[^>]*>All<\/button>/);
+    for (const article of sortedArticles) expect(body).toContain(`href="/writing/${article.slug}"`);
     expect(body.match(/<(?:a|button)\b[^>]*>/)[0]).toContain('href="#main-content"');
     expect(body).toMatch(/<main id="main-content" tabindex="-1"/);
     expect(body).not.toMatch(/tabindex="[1-9]/);
-    expect(body).toMatch(/<button[^>]*aria-label="Theme: System\. Switch to Light"/);
+  });
+
+  it("renders the theme toggle without depending on the stored theme", () => {
+    // The server cannot know the visitor's theme, so the markup must be the same
+    // either way; CSS shows the right icon once the pre-paint script runs.
+    const { body } = render("/");
+    const toggle = body.match(/<button[^>]*aria-label="Switch between light and dark theme"[^>]*>[\s\S]*?<\/button>/)[0];
+    expect(toggle).toContain("theme-icon-dark");
+    expect(toggle).toContain("theme-icon-light");
+    expect(toggle).not.toContain("aria-pressed");
   });
 
   it("shares the site Open Graph image on the home and about pages", () => {
@@ -85,6 +97,13 @@ describe("prerendered routes", () => {
     const { head, body } = render("/writing/missing");
     expect(head).toContain("Page not found");
     expect(head).toContain('<meta name="robots" content="noindex"/>');
-    expect(body).toContain("Page Not Found");
+    expect(body).toContain("Page not found");
+    expect(head).not.toContain('rel="canonical"');
+  });
+
+  it("renders the 404 page used for unknown paths", () => {
+    const { head, body } = render("/404");
+    expect(head).toContain("Page not found");
+    expect(body).toContain('href="/learning"');
   });
 });

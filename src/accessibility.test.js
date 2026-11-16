@@ -24,3 +24,16 @@ describe("small-text contrast", () => {
     expect(contrast(token("text"), token("surface"))).toBeGreaterThanOrEqual(4.5);
   });
 });
+
+describe("accent contrast", () => {
+  it.each([":root", ".dark"])("keeps accent links and filled buttons readable in %s", (selector) => {
+    const block = css.slice(css.indexOf(`${selector} {`)).split("}")[0];
+    const token = (name) => block.match(new RegExp(`--${name}:\\s*(#[0-9a-f]{6})`, "i"))[1];
+    // Accent is used for small links and labels, and as a button fill under bg-coloured text.
+    expect(contrast(token("accent"), token("bg"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(token("accent"), token("surface"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(token("accent"), token("raised"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(token("muted"), token("raised"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(token("faint"), token("raised"))).toBeGreaterThanOrEqual(4.5);
+  });
+});

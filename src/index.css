@@ -18,34 +18,36 @@
 @tailwind components;
 @tailwind utilities;
 
-/* A personal palette: pine, clay, and plum on cool paper. Not borrowed from anyone's brand. */
+/* Two themes. Light: warm paper with ink and an ember accent. Dark: graphite with the same ember, lifted. */
 :root {
-  --bg: #F3F4EF;
+  --bg: #FBFAF7;
   --surface: #FFFFFF;
-  --raised: #E9EBE2;
-  --text: #1B1D1A;
-  --muted: #585F57;
-  --faint: #6A7167;
-  --line: #D9DCD3;
-  --accent: #3E6259;           /* pine */
-  --accent-hover: #2F4D45;
-  --accent-secondary: #8A5A3C; /* clay */
-  --accent-tertiary: #6B5B95;  /* plum */
+  --raised: #F2F0EA;
+  --text: #17171A;
+  --muted: #4E4E55;
+  --faint: #66666D;
+  --line: #E3E0D8;
+  --accent: #B13F12;           /* ember */
+  --accent-hover: #8E3009;
+  --accent-secondary: #3F5F8A; /* slate blue */
+  --accent-tertiary: #4F6B45;  /* moss */
+  --selection: #F5D7C8;
   color-scheme: light;
 }
 
 .dark {
-  --bg: #121410;
-  --surface: #1B1E17;
-  --raised: #242820;
-  --text: #ECEEE7;
-  --muted: #9BA399;
-  --faint: #808779;
-  --line: #2A2E25;
-  --accent: #6FA696;
-  --accent-hover: #8FC0B0;
-  --accent-secondary: #C98A5E;
-  --accent-tertiary: #9B8AC4;
+  --bg: #0F1013;
+  --surface: #16181C;
+  --raised: #1D2026;
+  --text: #EDEDEF;
+  --muted: #B0B0B8;
+  --faint: #8F8F98;
+  --line: #2A2D34;
+  --accent: #F2905A;
+  --accent-hover: #F7B08A;
+  --accent-secondary: #8FB0DA;
+  --accent-tertiary: #9CC08E;
+  --selection: #5A2E18;
   color-scheme: dark;
 }
 
@@ -58,12 +60,8 @@
     text-wrap: balance;
   }
   ::selection {
-    background: #D3DFD3;
-    color: #1B1D1A;
-  }
-  .dark ::selection {
-    background: #2A4A40;
-    color: #ECEEE7;
+    background: var(--selection);
+    color: var(--text);
   }
   :focus-visible {
     outline: 2px solid var(--accent);
@@ -73,10 +71,10 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-mono font-medium transition-all cursor-pointer;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-sans font-medium transition-all cursor-pointer;
   }
   .btn-primary {
-    @apply btn bg-accent text-white hover:bg-accent-hover shadow-sm;
+    @apply btn bg-accent text-bg hover:bg-accent-hover shadow-sm;
   }
   .btn-ghost {
     @apply btn border border-line bg-surface text-text hover:border-accent hover:text-accent hover:bg-raised;
@@ -104,9 +102,16 @@
   }
 }
 
-.essay-heading {
+.essay-heading,
+.learning-entry {
   scroll-margin-top: 1.5rem;
 }
+/* Theme toggle shows the theme you would switch to; CSS decides, so the
+   prerendered markup never disagrees with the client. */
+.theme-icon-dark { display: inline; }
+.theme-icon-light { display: none; }
+.dark .theme-icon-dark { display: none; }
+.dark .theme-icon-light { display: inline; }
 .heading-anchor {
   opacity: 0;
   text-decoration: none;
