@@ -1,6 +1,6 @@
 // Curated from my private daily-learning notes: only the items worth keeping,
 // grouped into sections. Summaries describe public sources, linked per entry.
-// Generated once, then edited by hand.
+// New picks are added by scripts/import-learning.js; edit by hand as needed.
 export const learningSections = [
   {
     "slug": "agent-architecture",

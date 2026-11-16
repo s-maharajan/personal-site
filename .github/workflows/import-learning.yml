@@ -1,0 +1,59 @@
+name: Import learning
+
+# Pulls new ✅ picks from the private daily-learning notes into the learning log, then
+# verifies and pushes; Vercel deploys the push. The daily-learning repo is read with a
+# read-only deploy key that works for that one repo only.
+on:
+  schedule:
+    - cron: "17 */3 * * *" # every 3 hours
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: import-learning
+  cancel-in-progress: false
+
+jobs:
+  import:
+    name: Import new daily-learning picks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Checkout daily-learning notes
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: smaharajan/daily-learning
+          ssh-key: ${{ secrets.DAILY_LEARNING_DEPLOY_KEY }}
+          path: daily-learning
+          sparse-checkout: site/notes
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Import
+        run: |
+          node scripts/import-learning.js daily-learning/site/notes
+          rm -rf daily-learning
+      - name: Verify, commit and push
+        run: |
+          if git diff --quiet; then
+            echo "Nothing new."
+            exit 0
+          fi
+          npm run lint
+          npm test
+          npm run build
+          git config user.name "s-maharajan"
+          git config user.email "26522719+s-maharajan@users.noreply.github.com"
+          git add src/content/learning.js scripts/learning-seen.json
+          git commit -m "Import new daily-learning picks"
+          git push

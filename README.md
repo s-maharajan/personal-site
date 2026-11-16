@@ -53,6 +53,21 @@ summary, how it works, a way to try it, caveats and the public source link. Most
 entries also have a `flow`: the step-by-step "how it works" diagram from the original
 note. Edit it by hand; each entry needs a unique `slug` within its section.
 
+New picks arrive automatically. [Import learning](.github/workflows/import-learning.yml)
+runs every 3 hours (or on demand). It reads `site/notes` from `smaharajan/daily-learning`
+with a read-only deploy key, adds each new ✅ pick with
+[`scripts/import-learning.js`](scripts/import-learning.js), then lints, tests, builds and
+pushes; Vercel deploys the push. The importer takes the title, source, summary, how it
+works, try-it, caveats and diagram from the note, uses the "At a glance" line as the
+takeaway, and picks a section by keywords (move an entry by hand if it lands in the
+wrong one). Picks with redaction markers lose those lines, or are skipped when a required
+field has one. `scripts/learning-seen.json` holds hashes of every source already
+considered, so a pick is imported once and entries removed by hand stay removed.
+
+One-time setup: add the public half of a fresh SSH key as a read-only deploy key on
+`smaharajan/daily-learning`, and the private half as the `DAILY_LEARNING_DEPLOY_KEY`
+Actions secret here.
+
 Diagrams use `src/components/Diagram.jsx`, with no diagram library. A flow is
 `{ steps, loopBack?, loopLabel?, caption? }`, where a step is a label, a
 `{ label, tone }` object (`tone` is `"accent"` or `"dashed"`), or an array of steps
