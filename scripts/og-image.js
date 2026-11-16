@@ -126,7 +126,7 @@ export const siteCard = () =>
       box(
         { flexDirection: "column", gap: "22px" },
         rule("72px", palette.pineDeep, "3px"),
-        text({ fontSize: "25px", letterSpacing: "1px", color: palette.paper }, "personal-site"),
+        text({ fontSize: "25px", letterSpacing: "1px", color: palette.paper }, site.handle),
       ),
     ),
     // Name, role and tagline
@@ -185,7 +185,7 @@ export const essayCard = ({ title, topic, date, readTime, author }) => {
       box(
         { alignItems: "center", gap: "16px" },
         chips(),
-        text({ fontSize: "26px", color: palette.faint }, "personal-site"),
+        text({ fontSize: "26px", color: palette.faint }, site.handle),
       ),
       text({ fontSize: "26px", color: palette.faint }, date),
     ),

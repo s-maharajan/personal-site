@@ -8,7 +8,7 @@ import { OG_HEIGHT, OG_WIDTH, SITE_OG_SLUG, learningOgSlug, ogImageUrl } from ".
 // eslint-disable-next-line react-refresh/only-export-components
 export function pageMeta(pathname) {
   const path = pathname.replace(/\/+$/, "") || "/";
-  const author = site.fullName || site.name;
+  const author = site.handle;
   const article = path.startsWith("/writing/") ? findArticle(path.slice(9)) : null;
   const section = path.startsWith("/learning/") ? findSection(path.slice(10)) : null;
   const base = { path, ogSlug: SITE_OG_SLUG, ogAlt: `${author} — ${site.role}`, description: site.tagline };

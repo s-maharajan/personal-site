@@ -8,9 +8,7 @@ export default function Footer() {
     <footer className="mt-24 border-t border-line pt-10 pb-12 print-hidden font-sans text-sm text-muted">
       <div className="grid gap-8 sm:grid-cols-[1.4fr_1fr_1fr]">
         <div className="flex flex-col gap-2">
-          <span className="font-serif text-lg text-text">
-            {site.initials}<span className="text-accent">.</span>
-          </span>
+          <span className="font-serif text-lg text-text">{site.fullName}</span>
           <p className="max-w-xs leading-relaxed">{site.tagline}</p>
         </div>
 

@@ -19,7 +19,7 @@ export default function About() {
 
       <div className="flex flex-col gap-4 text-base leading-relaxed text-muted">
         <p>
-          I&apos;m {site.fullName}. I work on integration, AI and cloud, and I write
+          I work on integration, AI and cloud, and I write
           here about the parts of that work that are worth thinking through in public.
         </p>
         <p>

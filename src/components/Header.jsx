@@ -37,25 +37,22 @@ export default function Header() {
 
   return (
     <header className="pt-6 sm:pt-10 print-hidden">
-      <div className="flex items-center justify-between gap-4">
-        <Link to="/" className="group flex items-center gap-3" aria-label={`${site.fullName}, home`}>
-          <span className="font-serif text-2xl font-medium tracking-tight text-text">
-            {site.initials}<span className="text-accent">.</span>
-          </span>
-          <span className="hidden sm:inline font-sans text-sm text-muted group-hover:text-text transition-colors">
-            {site.fullName}
+      <div className="flex items-center justify-between gap-2 sm:gap-4">
+        <Link to="/" className="group" aria-label={`${site.handle}, home`}>
+          <span className="whitespace-nowrap font-serif text-lg sm:text-2xl font-medium tracking-tight text-text group-hover:text-accent transition-colors">
+            {site.handle}<span className="text-accent">.</span>
           </span>
         </Link>
 
-        <div className="flex items-center gap-1 sm:gap-2">
-          <nav aria-label="Main" className="flex items-center gap-0.5 sm:gap-1 text-sm font-sans">
+        <div className="flex items-center gap-0.5 sm:gap-2">
+          <nav aria-label="Main" className="flex items-center sm:gap-1 text-[13px] sm:text-sm font-sans">
             {navLinks.map((l) => (
               <NavLink
                 key={l.to}
                 to={l.to}
                 end={l.end}
                 className={({ isActive }) =>
-                  `rounded-md px-2 py-1 transition-colors ${l.end ? "hidden sm:inline" : ""} ${
+                  `rounded-md px-1 sm:px-2 py-1 transition-colors ${l.end ? "hidden sm:inline" : ""} ${
                     isActive ? "text-text font-medium bg-raised" : "text-muted hover:text-text"
                   }`
                 }
@@ -68,7 +65,7 @@ export default function Header() {
           <button
             type="button"
             onClick={toggleTheme}
-            className="ml-1 rounded-md border border-line p-1.5 text-muted transition-colors hover:border-accent hover:text-accent"
+            className="ml-0.5 sm:ml-1 rounded-md border border-line p-1 sm:p-1.5 text-muted transition-colors hover:border-accent hover:text-accent"
             title="Switch between light and dark theme"
             aria-label="Switch between light and dark theme"
           >

@@ -133,7 +133,7 @@ export default function Essay() {
       <div className="mt-8 rounded-xl border border-line/80 bg-raised/40 p-5 flex items-center justify-between gap-4 font-sans">
         <div>
           <p className="text-sm font-medium text-text">
-            Written by {site.fullName || site.name}
+            Written by {site.handle}
           </p>
           <p className="mt-0.5 text-xs text-muted">
             {site.role} · Focus on integration, AI and cloud.

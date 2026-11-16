@@ -1,7 +1,8 @@
 // Everything personal about the site lives here.
 export const site = {
   name: "Som",
-  initials: "SM",
+  // Shown at the top of every page and in titles; the full name appears only in the footer.
+  handle: "s-maharajan",
   fullName: "Somasundaram Maharajan",
   role: "Principal Engineer · Integration, AI & Cloud",
   headline: "Integration, AI & cloud.",

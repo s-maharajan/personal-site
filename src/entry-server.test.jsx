@@ -12,9 +12,9 @@ describe("prerendered routes", () => {
   it.each(sortedArticles)("renders $slug with its own metadata and full essay", (article) => {
     const path = `/writing/${article.slug}`;
     const { head, body } = render(path);
-    expect(head).toContain(`<title>${escape(`${article.title} · ${site.fullName}`)}</title>`);
+    expect(head).toContain(`<title>${escape(`${article.title} · ${site.handle}`)}</title>`);
     expect(head).toContain(`<meta name="description" content="${escape(article.summary)}"/>`);
-    expect(head).toContain(`<meta property="og:title" content="${escape(`${article.title} · ${site.fullName}`)}"/>`);
+    expect(head).toContain(`<meta property="og:title" content="${escape(`${article.title} · ${site.handle}`)}"/>`);
     expect(head).toContain(`<meta property="og:description" content="${escape(article.summary)}"/>`);
     expect(head).toContain(`<meta property="og:url" content="${site.url}${path}"/>`);
     expect(head).toContain(`<link rel="canonical" href="${site.url}${path}"/>`);
@@ -47,11 +47,11 @@ describe("prerendered routes", () => {
   it("renders home and about with distinct metadata and content", () => {
     const home = render("/");
     const about = render("/about");
-    expect(home.head).toContain(escape(`${site.fullName} · ${site.role}`));
+    expect(home.head).toContain(escape(`${site.handle} · ${site.role}`));
     expect(home.head).toContain(`href="${site.url}/"`);
     expect(home.body).toContain(escape(site.headline));
     expect(home.body).toContain('href="/learning"');
-    expect(about.head).toContain(`<title>About · ${site.fullName}</title>`);
+    expect(about.head).toContain(`<title>About · ${site.handle}</title>`);
     expect(about.head).toContain(`href="${site.url}/about"`);
     expect(about.head).not.toBe(home.head);
     expect(about.body).toContain(`I'm`.replace("'", "&#x27;"));
