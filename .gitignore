@@ -50,3 +50,4 @@ coverage/
 !.env.example
 !.env.*.example
 !.env.sample
+.env*
