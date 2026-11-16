@@ -6,6 +6,7 @@ import { allEntries } from "../lib/learning";
 // The year of the newest content, so the prerendered page and the browser agree.
 const year = allEntries[0].date.slice(0, 4);
 import { navLinks } from "../content/nav";
+import { profile } from "../content/profile";
 
 export default function Footer() {
   return (
@@ -26,6 +27,14 @@ export default function Footer() {
             {site.links.github && (
               <li><a href={site.links.github} target="_blank" rel="noreferrer" className="hover:text-accent transition-colors">GitHub</a></li>
             )}
+            {site.links.linkedin && (
+              <li><a href={site.links.linkedin} target="_blank" rel="noreferrer" className="hover:text-accent transition-colors">LinkedIn</a></li>
+            )}
+            {profile.openSource.map((project) => (
+              <li key={project.name}>
+                <a href={project.url} target="_blank" rel="noreferrer" className="font-mono text-xs hover:text-accent transition-colors">{project.name}</a>
+              </li>
+            ))}
           </ul>
         </nav>
 

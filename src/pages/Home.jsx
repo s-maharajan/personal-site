@@ -1,21 +1,29 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { site } from "../content/site";
+import { profile } from "../content/profile";
 import { sortedArticles } from "../content/writing";
 import { learningSections } from "../content/learning";
 import { allEntries, entryCount, entryPath, formatDay } from "../lib/learning";
-import { GithubIcon } from "../components/Icons";
+import { GithubIcon, LinkedinIcon } from "../components/Icons";
+import { ArrowUpRight } from "lucide-react";
 import SectionCard from "../components/SectionCard";
 import PostList from "../components/PostList";
 
-function SectionHeading({ title, intro, to, linkLabel }) {
+function SectionHeading({ title, intro, to, linkLabel, external = false }) {
   return (
     <div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <h2 className="font-serif text-2xl sm:text-3xl text-text">{title}</h2>
         {intro && <p className="mt-1 text-sm text-muted">{intro}</p>}
       </div>
-      {to && (
+      {to && external && (
+        <a href={to} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-1 text-sm text-accent hover:text-accent-hover">
+          {linkLabel}
+          <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+        </a>
+      )}
+      {to && !external && (
         <Link to={to} className="group inline-flex items-center gap-1 text-sm text-accent hover:text-accent-hover">
           {linkLabel}
           <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
@@ -34,7 +42,7 @@ export default function Home() {
       {/* Hero */}
       <section className="flex flex-col gap-6 pt-6 sm:pt-10">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">{site.role}</p>
-        <h1 className="font-serif text-4xl sm:text-6xl leading-[1.05] tracking-tight text-text">
+        <h1 className="font-serif text-3xl sm:text-5xl leading-[1.1] tracking-tight text-text">
           {site.headline}
         </h1>
         <p className="font-serif text-xl sm:text-2xl leading-snug text-muted italic">{site.tagline}</p>
@@ -45,12 +53,17 @@ export default function Home() {
               <GithubIcon className="h-3.5 w-3.5" /> GitHub
             </a>
           )}
+          {site.links.linkedin && (
+            <a href={site.links.linkedin} target="_blank" rel="noreferrer" className="btn-ghost">
+              <LinkedinIcon className="h-3.5 w-3.5" /> LinkedIn
+            </a>
+          )}
         </div>
         <dl className="mt-4 grid grid-cols-3 gap-4 border-y border-line py-5 font-sans">
           {[
+            [profile.years, "years in integration"],
             [sortedArticles.length, "essays"],
             [entryCount, "curated notes"],
-            [learningSections.length, "learning sections"],
           ].map(([value, label]) => (
             <div key={label}>
               <dt className="sr-only">{label}</dt>
@@ -116,6 +129,36 @@ export default function Home() {
           linkLabel="All posts"
         />
         <PostList posts={rest.slice(0, 4)} numbered />
+      </section>
+
+      {/* Open source */}
+      <section aria-labelledby="open-source-heading">
+        <SectionHeading
+          title={<span id="open-source-heading">Open source</span>}
+          intro="Small tools I build and use every day."
+          to={site.links.github}
+          linkLabel="More on GitHub"
+          external
+        />
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {profile.openSource.map((project) => (
+            <li key={project.name}>
+              <a
+                href={project.url}
+                target="_blank"
+                rel="noreferrer"
+                className="group flex h-full flex-col gap-2 rounded-2xl border border-line bg-surface p-5 transition-colors hover:border-accent"
+              >
+                <span className="flex items-center justify-between font-mono text-sm text-text group-hover:text-accent">
+                  {project.name}
+                  <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                </span>
+                <span className="text-sm leading-relaxed text-muted">{project.description}</span>
+                <span className="mt-auto pt-1 font-mono text-xs text-faint">{project.stack}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   );

@@ -10,5 +10,6 @@ export const site = {
   tagline: "Connecting systems, data and AI on the cloud, built to stay reliable.",
   links: {
     github: "https://github.com/smaharajan",
+    linkedin: "https://www.linkedin.com/in/somasundaram-ms",
   },
 };

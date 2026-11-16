@@ -8,6 +8,171 @@ const code = (lang, ...lines) => ["```" + lang, ...lines, "```"].join("\n");
 
 const drafts = [
   {
+    slug: "agents-for-integration-migration",
+    title: "Agents for integration migration: discover, map, modernise, operate",
+    topic: "Migration",
+    area: "AI",
+    date: "November 2026",
+    summary:
+      "Middleware migrations stall on what nobody can see. Agents are good at the evidence work, inventorying flows and mapping dependencies, so people can spend their judgement on the decisions that carry risk.",
+    excerpt:
+      "Migrating a middleware estate is rarely blocked by the new technology. It is blocked by the old landscape: queues nobody owns, file transfers nobody documented, and consumers nobody knew existed.",
+    sources: [
+      "agent-graphs-beat-agent-chains",
+      "loops-and-graphs-approval-course",
+      "elephant-goldfish-model-spec-review",
+      "claude-code-modernization-plugin",
+      "critical-thinking-with-agents",
+    ],
+    references: [
+      { title: "Strangler Fig Application", url: "https://martinfowler.com/bliki/StranglerFigApplication.html", source: "Martin Fowler" },
+      { title: "Messaging patterns", url: "https://www.enterpriseintegrationpatterns.com/patterns/messaging/", source: "Enterprise Integration Patterns" },
+      { title: "Migrating from Mule 3 to Mule 4", url: "https://docs.mulesoft.com/mule-runtime/latest/migration-intro", source: "MuleSoft docs" },
+    ],
+    content: [
+      {
+        heading: "Where migrations actually stall",
+        body: p(
+          "Most of my career has been spent moving integration estates: message queues, managed file transfer, MuleSoft and API platforms, towards cloud messaging and cloud-native services. That has included a data-centre exit to Azure and the reusable patterns behind Mule 3 to Mule 4 and Mule to Micronaut migrations.",
+          "The new technology is rarely the hard part. The hard part is the old landscape. Configuration is spread across repositories, servers and spreadsheets. Flows outlive the people who built them. A queue that looks unused turns out to feed a month-end job. Every one of those surprises costs a delay, and most of them could have been found earlier by reading what already exists.",
+          "That reading is exactly the kind of work agents are good at.",
+        ),
+      },
+      {
+        heading: "Discover: let agents gather the evidence",
+        body: p(
+          "Point discovery agents at the sources of truth you already have: queue manager object definitions, Mule flow XML, file-transfer definitions, API specifications, pipeline files and runbooks. Ask each agent for a structured inventory of every flow: source, target, transport, message format, schedule, error handling and, where it can be found, the owner.",
+          "Two rules make the output trustworthy:",
+          "- **Every fact cites its evidence**: a file and a line, or a command and its output. A fact without evidence goes into a separate list of questions.\n- **Unknowns are flagged, never guessed.** \"Owner unknown\" is useful. A plausible invented owner is dangerous.",
+          "This is the fan-out pattern from agent graphs: one worker per repository or server, each in its own context, with the results merged and de-duplicated in plain code rather than by another model.",
+        ),
+        diagram: {
+          steps: [
+            ["Discovery agent: repositories", "Discovery agent: queue managers", "Discovery agent: transfer definitions"],
+            "Merge and de-duplicate in code",
+            "Dependency map of producers and consumers",
+            { label: "Owners review the map", tone: "accent" },
+            "Migration waves",
+          ],
+          caption: "Agents gather evidence in parallel; code merges it; the people who own the systems check the map before anything moves.",
+        },
+      },
+      {
+        heading: "Map: make the dependencies visible",
+        body: p(
+          "An inventory becomes useful when it turns into a graph: which applications produce to which queues and topics, which consumers read them, which file transfers feed which jobs. From that graph the useful questions answer themselves. Which flows share infrastructure and must move together? Which endpoints have no consumer at all? Which chains cross three platforms before reaching a system of record?",
+          "Group flows into migration waves by dependency and risk, not by team or alphabet. Then put the map in front of the people who own the systems. They will correct it, and every correction is worth making before a cut-over rather than during one.",
+        ),
+      },
+      {
+        heading: "Modernise: one reliable seam at a time",
+        body: p(
+          "The strangler fig approach fits integration well: put a stable interface in front of a capability, then move what sits behind it one flow at a time. Agents speed up each step without taking the decisions:",
+          "1. **Spec**: an agent drafts a migration spec per flow from the inventory: current behaviour, target design, mappings and error handling.\n2. **Review**: reviewers with no chat history read only the spec. If they cannot follow it, it is not ready.\n3. **Build**: agents generate the scaffolding and contract tests, using captured real messages as fixtures.\n4. **Compare**: run old and new side by side and compare outputs on real traffic.\n5. **Cut over**: the owner approves the switch, based on the comparison.",
+        ),
+        diagram: {
+          steps: [
+            "Agent drafts the flow spec",
+            "Fresh-context spec review",
+            "Code and contract tests generated",
+            "Dual run: old and new compared",
+            { label: "Owner approves cut-over", tone: "accent" },
+          ],
+          caption: "Each flow moves through the same gates. Agents do the drafting and the comparison; a person owns the switch.",
+        },
+      },
+      {
+        heading: "Operate: a migration is not done at cut-over",
+        body: p(
+          "Give every migrated flow its observability from day one: throughput, errors, latency and, for messaging, queue depth and the age of the oldest message. Generate the runbook from the same spec the flow was built from, so they cannot drift apart.",
+          "Decommission with evidence, too. An old queue or transfer is retired when the data shows no traffic over an agreed period, not when someone remembers to switch it off. Agents can collect that evidence; the owner signs it off.",
+        ),
+      },
+      {
+        heading: "Where judgement stays with people",
+        body: p(
+          "The pattern only works if the boundary is clear. Agents gather evidence, draft and compare. People decide:",
+          "- the target architecture, for example Azure Service Bus or Kafka for a given class of messaging;\n- the order of waves and the business risk each one carries;\n- every cut-over and every decommission.",
+          "Agents never get write access to production configuration. They propose; the change goes through the same pipeline and approvals as any other. That is the discipline I try to keep: let the agents handle the evidence and the grunt work, and leave judgement with the people who own the system.",
+        ),
+      },
+    ],
+  },
+  {
+    slug: "llm-assisted-incident-triage",
+    title: "LLM-assisted incident triage: from alert to a ticket someone can act on",
+    topic: "Observability",
+    area: "AI",
+    date: "November 2026",
+    summary:
+      "A model can turn a noisy problem event into a clear, evidence-backed ticket, but only if observability already shows the health of each flow, and only if the model drafts while people decide.",
+    excerpt:
+      "Most incident time is not spent fixing. It is spent working out what broke, who owns it and whether it matters. That is the part a language model can genuinely help with.",
+    sources: ["critical-thinking-with-agents", "anthropic-beats-prompt-injection", "strands-decider-at-amazon"],
+    references: [
+      { title: "Monitoring Distributed Systems", url: "https://sre.google/sre-book/monitoring-distributed-systems/", source: "Google SRE book" },
+      { title: "Signals", url: "https://opentelemetry.io/docs/concepts/signals/", source: "OpenTelemetry docs" },
+    ],
+    content: [
+      {
+        heading: "Start with a view people trust",
+        body: p(
+          "In integration support the first question is always the same: which flow is broken? I redesigned the observability view of an integration estate so support teams could see the health of every platform and critical flow on one screen. That work came before any AI, and it should. A model summarising noise produces confident noise.",
+          "A view people trust shows a few signals per flow, not hundreds of metrics per host:",
+          "- **The four golden signals**: latency, traffic, errors and saturation.\n- **For messaging**: queue depth, the age of the oldest message and the dead-letter count.\n- **For file transfer**: time since the last successful transfer, compared with its schedule.",
+        ),
+      },
+      {
+        heading: "What the model is good at",
+        body: p(
+          "I have piloted LLM-assisted triage that takes problems from an observability platform into a ticketing system. The lessons that hold, whatever the vendors, are about the division of labour.",
+          "The model is good at drafting: a plain-language summary of the problem, the affected flows, recent deployments or configuration changes, similar past incidents and the relevant runbook, and a likely cause with the evidence for it.",
+          "It should not decide severity on its own, close incidents, or run remediation. Those carry consequences, so they stay with the on-call engineer.",
+        ),
+      },
+      {
+        heading: "Design the pipeline",
+        body: p(
+          "Enrichment matters more than the prompt. The model can only reason about context it is given, so assemble it deterministically first: the topology around the failing component, what changed recently, the runbook, and recent tickets for the same service.",
+          "Routing to the owning team is a closed choice from a known list, which makes it a candidate for a small decision model rather than a large generative one. The draft itself still needs a generative model.",
+        ),
+        diagram: {
+          steps: [
+            "Problem event",
+            "Enrich: topology, recent changes, runbook, past tickets",
+            "Model drafts summary, likely cause and evidence",
+            "Route to the owning team (closed choice)",
+            { label: "On-call engineer confirms", tone: "accent" },
+            "Ticket created",
+          ],
+          caption: "Deterministic enrichment, a drafted hypothesis, and a person who confirms before anything is filed.",
+        },
+      },
+      {
+        heading: "Treat log text as untrusted input",
+        body: p(
+          "Log lines, error messages and message payloads can contain arbitrary text, including text that reads like instructions. To a model, that is a prompt injection surface. Keep the triage pipeline read-only, so the worst a hostile log line can do is spoil a draft.",
+          "Redact secrets and personal data before anything is sent to a model, and check where the model runs and where its data is processed. Support data is often more sensitive than source code.",
+        ),
+      },
+      {
+        heading: "Keep the engineer in charge",
+        body: p(
+          "A triage draft is a hypothesis, not a diagnosis. Every claim in it should link to its evidence: the metric, the log query, the deployment record. The engineer's job changes from searching to checking, and checking is only real if the evidence is one click away.",
+          "Watch for the slow slide from using the draft to trusting it. A useful habit is to ask, for each draft, what would have to be true for it to be wrong.",
+        ),
+      },
+      {
+        heading: "Measure whether it helps",
+        body: p(
+          "Decide the measures before the pilot, and compare against tickets handled without assistance:",
+          "1. Time from alert to the correct owning team.\n2. How often tickets are reassigned.\n3. How often engineers edit or reject the draft, and why.\n4. Cases where the draft was confident and wrong.",
+          "The last one matters most. A tool that is usually right but occasionally confidently wrong needs stronger evidence links, not more trust.",
+        ),
+      },
+    ],
+  },
+  {
     slug: "loops-first-graphs-second",
     title: "Loops first, graphs second: a working model for agent systems",
     topic: "Agents",
@@ -313,6 +478,95 @@ const drafts = [
           steps: ["Commit", "Secrets scan", "Static analysis and dependency scan", "AI security review on the PR", "Runtime scan"],
           caption: "Automated checks at every stage, so human review can focus on design and intent.",
         },
+      },
+    ],
+  },
+  {
+    slug: "repository-health-scorecard-and-ai-audit",
+    title: "A control tower for repository health, with AI auditors on top",
+    topic: "Security",
+    area: "AI",
+    date: "November 2026",
+    summary:
+      "Security tools only help if they are switched on everywhere and someone can see the gaps. Score every repository on the same controls, put delivery metrics alongside, then point AI audit agents at the weakest repositories.",
+    excerpt:
+      "Across a large estate the risk is rarely one dramatic vulnerability. It is a long tail of repositories where scanning was never enabled, branch protection was relaxed, or a pipeline still pulls a mutable action tag.",
+    sources: [
+      "gh-secure-github-cli-extension",
+      "open-source-security-review-stack",
+      "five-public-ai-configs",
+      "claude-code-team-code-review",
+      "nvidia-skillevaluator",
+    ],
+    references: [
+      { title: "GitHub security features", url: "https://docs.github.com/en/code-security/getting-started/github-security-features", source: "GitHub docs" },
+      { title: "OpenSSF Scorecard", url: "https://securityscorecards.dev/", source: "Open Source Security Foundation" },
+      { title: "DORA's software delivery metrics", url: "https://dora.dev/guides/dora-metrics-four-keys/", source: "DORA" },
+    ],
+    content: [
+      {
+        heading: "Why a scorecard comes first",
+        body: p(
+          "I built a control-tower dashboard that scores the health of every repository across an integration estate, alongside reviewing how teams were onboarding GitHub Advanced Security, Snyk, Semgrep and Prisma Cloud, and introducing DORA metrics.",
+          "The lesson was simple: buying security tools is not the same as having them switched on. Adoption is uneven, and the gaps are invisible until someone lines every repository up against the same checklist. Once the gaps are visible, most teams close them quickly.",
+        ),
+      },
+      {
+        heading: "What to score",
+        body: p(
+          "Score every repository on the same controls, weight them by risk, and track the score over time rather than as a one-off audit. The OpenSSF Scorecard project is a good public reference for which checks matter.",
+        ),
+        diagram: {
+          layers: [
+            { label: "Repository settings", detail: "Branch protection, required reviews, CODEOWNERS." },
+            { label: "Secrets", detail: "Secret scanning with push protection." },
+            { label: "Dependencies", detail: "Alerts and automated updates, with Dependabot or Snyk." },
+            { label: "Code", detail: "Code scanning with CodeQL or Semgrep, findings triaged." },
+            { label: "Pipeline", detail: "Actions pinned to commit SHAs, least-privilege tokens, no long-lived secrets." },
+          ],
+          base: { label: "Delivery metrics", detail: "DORA's four keys alongside, so security and speed are seen together." },
+          caption: "The same five layers for every repository, weighted by risk and tracked over time.",
+        },
+      },
+      {
+        heading: "Put DORA next to security",
+        body: p(
+          "DORA's four keys measure delivery: deployment frequency, lead time for changes, change failure rate and time to restore service. Showing them next to the security score keeps the trade-off honest.",
+          "Controls that slow delivery without a visible benefit get bypassed. Controls that show up as fewer failed changes and faster recovery get defended by the teams themselves.",
+        ),
+      },
+      {
+        heading: "Then add AI auditors",
+        body: p(
+          "Part of my work on AI adoption has been custom agents for code review and security audit. A scorecard gives them a target list, which is far more useful than pointing an agent at everything.",
+          "The loop works like this. The scorecard flags the weakest repositories. Audit agents look at settings and pipelines on one side and code and dependencies on the other. A separate verifier tries to disprove each finding before it is reported, the approach Cloudflare's public security-audit skill uses. Real findings become pull requests, for example enabling secret scanning with gh-secure after a dry run, pinning actions, or adding CODEOWNERS, and the owning team reviews and merges.",
+        ),
+        diagram: {
+          steps: [
+            "Scorecard flags the weakest repositories",
+            ["Audit agent: settings and pipeline", "Audit agent: code and dependencies"],
+            "Verifier tries to disprove each finding",
+            "Fix proposed as a pull request",
+            { label: "Owning team reviews and merges", tone: "accent" },
+          ],
+          loopBack: 0,
+          loopLabel: "Every repository is re-scored on each run; one that drops is audited again.",
+          caption: "The scorecard chooses where to look; agents propose; owners decide.",
+        },
+      },
+      {
+        heading: "Rolling it out",
+        body: p(
+          "Start with the scorecard alone, in read-only mode, and publish it to the teams before asking anyone to change anything. Visibility on its own closes a surprising share of the gaps.",
+          "Then fix the cheapest controls everywhere at once: secret scanning, dependency alerts and branch protection can usually be switched on across an organisation in a day, with a dry run first. Leave code scanning, which needs per-language setup and triage, for a second wave.",
+          "Only then add the audit agents, starting with the lowest-scoring repositories and a single kind of finding. Expand once the owning teams trust the pull requests they receive. If they start closing them unread, slow down and improve the evidence.",
+        ),
+      },
+      {
+        heading: "Guardrails for the auditors",
+        body: p(
+          "- **Read-only by default.** Auditors propose changes through pull requests; they never change repository settings directly.\n- **Not the only gate.** AI review sits alongside code scanning, secret scanning and human review, never instead of them.\n- **Skills are supply chain.** The audit skills themselves are code that runs with real permissions. Scan them, test them with and without, and pin their versions.\n- **Trusted input only for review actions.** Some AI security review actions are not hardened against prompt injection, so run them on trusted pull requests.",
+        ),
       },
     ],
   },

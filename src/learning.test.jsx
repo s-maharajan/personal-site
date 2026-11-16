@@ -105,7 +105,24 @@ describe("name placement", () => {
     const footer = body.match(/<footer[\s\S]*?<\/footer>/)[0];
     expect(header).toContain(site.handle);
     expect(footer).toContain(site.handle);
-    expect(body).not.toMatch(/Somasundaram/i);
+    // The LinkedIn URL (published at the owner's request) contains part of the
+    // name; the full name itself must not appear.
+    expect(body).not.toMatch(/Somasundaram\s+Maharajan/i);
     expect(head).not.toMatch(/Somasundaram/i);
+    expect(body.replaceAll(site.links.linkedin, "")).not.toMatch(/Somasundaram/i);
+  });
+});
+
+describe("profile links", () => {
+  it.each(["/", "/about"])("links GitHub, LinkedIn and copilot-sessions from %s", (path) => {
+    const { body } = render(path);
+    expect(body).toContain(`href="${site.links.github}"`);
+    expect(body).toContain(`href="${site.links.linkedin}"`);
+    expect(body).toContain('href="https://github.com/smaharajan/copilot-sessions"');
+  });
+
+  it("keeps employer, client and contact details off the About page", () => {
+    const { body } = render("/about");
+    expect(body).not.toMatch(/\bTCS\b|Tata|Marks (&amp;|and) Spencer|\bM&amp;S\b|Standard Chartered|Stockley|Clayfin|\+44|linkedin\.com\/in\/[^"]*"[^>]*>[^<]*Somasundaram/i);
   });
 });
