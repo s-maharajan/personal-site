@@ -26,9 +26,7 @@ describe('sortedArticles', () => {
       return Number(year) * 12 + months.indexOf(month)
     }
     expect(sortedArticles).toEqual([...articles].sort((a, b) => rank(b) - rank(a)))
-    expect(sortedArticles[0].date).toBe('November 2025')
-    expect(sortedArticles.at(-1).date).toBe('January 2025')
-    expect(articles[0].slug).toBe('why-rag-hallucinates-chunking')
+    expect(articles[0].slug).toBe('loops-first-graphs-second')
   })
 })
 
@@ -53,3 +51,26 @@ describe('published articles', () => {
     }
   })
 })
+
+describe('essays drawn from the learning log', () => {
+  it.each(articles)('$slug credits its sources with links', (article) => {
+    expect(article.sources.length).toBeGreaterThanOrEqual(3)
+    const sources = article.content.at(-1)
+    expect(sources.heading).toBe('Sources')
+    expect(sources.body.match(/^- \[[^\]]+\]\(https:\/\/[^)]+\)/gm)).toHaveLength(article.sources.length)
+  })
+
+  it.each(articles)('$slug has a read time that matches its length', (article) => {
+    const words = [article.excerpt, ...article.content.map((s) => `${s.heading} ${s.body}`)].join(' ').split(/\s+/).length
+    expect(article.readTime).toBe(`${Math.max(1, Math.round(words / 220))} min read`)
+    expect(words).toBeGreaterThan(500)
+  })
+
+  it('keeps none of the earlier generated essays', () => {
+    const slugs = articles.map(({ slug }) => slug)
+    for (const old of ['why-rag-hallucinates-chunking', 'distributed-locks-are-a-lie', 'p99-tail-latency-tax']) {
+      expect(slugs).not.toContain(old)
+    }
+  })
+})
+

@@ -1,435 +1,327 @@
-// Published technical essays, architecture reviews, and production deep-dives.
-export const articles = [
+// Essays. Each one draws together several notes from the learning log and
+// credits them: `sources` lists learning entry slugs, and a "Sources" section
+// with links to the originals is added automatically from those entries.
+import { learningSections } from "./learning.js";
+
+const p = (...paragraphs) => paragraphs.join("\n\n");
+
+const drafts = [
   {
-    slug: "why-rag-hallucinates-chunking",
-    title: "Why your RAG is hallucinating: it's the chunker",
-    topic: "Retrieval",
-    date: "October 2025",
-    readTime: "6 min read",
-    summary:
-      "Vector embeddings cannot rescue semantically broken context windows. Why boundary-aware hierarchical chunking beats naive token-window splitting every single time.",
-    excerpt:
-      "When a retrieval-augmented generation (RAG) system hallucinates, teams almost universally blame either the embedding model or the LLM. In 80% of production audits, the culprit is neither: it's the dumb 512-token sliding window that sliced a critical conditional clause in half.",
-    content: [
-      {
-        heading: "The Sliding Window Illusion",
-        body: `Most early RAG pipelines start with a default RecursiveCharacterTextSplitter: chunk size 512 tokens, overlap 50 tokens. It looks clean, requires zero domain knowledge, and embeds quickly.
-
-In production, however, documents are not uniform streams of tokens. They are structured trees of meaning: headings, caveats, exceptions, tables, and conditional logic. When a sliding window splits a contract between 'The licensee shall not owe royalties' and 'if the gross revenue fails to meet Section 4 thresholds', the embedding model encodes a flat untruth. The vector index happily returns that fragment to the LLM, and the LLM faithfully hallucinates a false answer.`,
-      },
-      {
-        heading: "Semantic Fragmentation in High-Dimensional Space",
-        body: `Dense embedding models (like text-embedding-3-large or BGE) compress a block of text into a single vector centroid. If 60% of your chunk is boilerplate table markup and 40% is the actual paragraph, the vector centroid drifts toward generic markup.
-
-When we audited 12,000 failure queries in our search evaluation harness, over 70% of misses were chunks where the context was present in the raw document, but the chunk itself lacked the subject noun or parent heading because the sentence had been severed across a boundary.`,
-      },
-      {
-        heading: "The Fix: Hierarchical Document Trees & Boundary-Aware Chunking",
-        body: `The production-grade solution is to never store raw flat chunks without document ancestry. Instead, parse documents into an AST (Abstract Syntax Tree):
-
-1. **Document Hierarchy Preservation**: Every chunk retains a metadata breadcrumb of its parent hierarchy (e.g., 'Document > Section 3.2 > Exceptions > Royalty Calculation').
-2. **Context Enrichment at Index Time**: Prepend the immediate parent heading to the chunk before computing the dense embedding vector.
-3. **Small-to-Big Retrieval**: Index small, high-density leaf chunks (128 tokens) for vector similarity, but return the larger parent container (1024 tokens) to the model context window. This ensures pinpoint vector accuracy while giving the LLM the complete surrounding thought.`,
-      },
-      {
-        heading: "Production Takeaways",
-        body: `Before you spend weeks fine-tuning an embedding model or swapping from 8B to 70B models, look at what your chunker actually produces. Print out 50 random chunks from your vector store. If a human engineer cannot confidently answer the query with only that chunk in front of them, your LLM has zero chance.`,
-      },
-    ],
-  },
-  {
-    slug: "quantization-without-tears",
-    title: "Quantization without tears: FP8 vs AWQ in production",
-    topic: "Inference",
-    date: "August 2025",
-    readTime: "7 min read",
-    summary:
-      "A battle-tested guide to serving 70B parameter models on commodity GPU clusters without degrading output perplexity or breaking agent schemas.",
-    excerpt:
-      "Serving unquantized FP16 weights on 70B models requires multi-node tensor parallelism that eats operational budgets alive. Here is how we evaluated FP8 versus AWQ (Activation-aware Weight Quantization) in high-throughput inference.",
-    content: [
-      {
-        heading: "The GPU Memory Wall",
-        body: `A 70-billion parameter model in 16-bit precision requires ~140 GB of VRAM purely for model weights. Before factoring in the KV-cache, an 80 GB A100 or H100 cannot hold it; you immediately need two to four GPUs in a tensor-parallel configuration.
-
-Tensor parallelism introduces inter-GPU communication across NVLink or PCIe. While raw compute is fast, GPU communication overhead grows quickly under high concurrency. Quantization is the only lever that drops memory footprint, fits larger models on fewer cards, and dramatically accelerates memory-bandwidth-bound decoding.`,
-      },
-      {
-        heading: "Weight-Only vs Weight-and-Activation Quantization",
-        body: `AWQ (Activation-aware Weight Quantization) quantizes weights to 4-bit integer (INT4) while maintaining activations in FP16. By identifying and protecting the top 1% of salient weights whose activations spike, AWQ preserves perplexity remarkably well.
-
-However, during high-batch decoding, modern Hopper GPUs (H100/H200) feature dedicated FP8 Tensor Cores. FP8 quantizes both weights and activations to 8-bit floating point (E4M3 or E5M2). The compute units execute matrix multiplications natively in FP8, yielding a 2× theoretical compute speedup over FP16, whereas INT4 weight-only quantization must unpack weights back to FP16 before the ALU compute step.`,
-      },
-      {
-        heading: "Production Benchmarks: Which One Wins?",
-        body: `In our production benchmarks on vLLM with Llama-3-70B:
-- **AWQ (INT4)**: Allowed running a 70B model on a single 80GB card. Throughput peaked at modest concurrencies (QPS < 30). Ideal for low-traffic endpoints and batch offloading.
-- **FP8 (Native Hopper)**: Required two H100s instead of one, but delivered 2.8× higher sustained token generation throughput at 100+ concurrent requests. Furthermore, JSON schema compliance and agent tool-calling accuracy remained indistinguishable from unquantized FP16 (within 0.3% error).`,
-      },
-      {
-        heading: "Rule of Thumb for Platform Engineers",
-        body: `If your primary constraint is minimum cost-per-instance and moderate throughput: use AWQ. If your primary goal is maximizing tokens-per-second-per-dollar under heavy sustained load on modern hardware: native FP8 is the undisputed winner.`,
-      },
-    ],
-  },
-  {
-    slug: "head-of-line-blocking-llm-batching",
-    title: "The Head-of-Line Blocking Trap in Continuous Batching",
-    topic: "Inference",
-    date: "July 2025",
-    readTime: "8 min read",
-    summary:
-      "Why mixing 4k-token document summarization with 50-token chatbot turns destroys tail latency, and how iteration-level chunked prefill fixes it.",
-    excerpt:
-      "When continuous batching arrived, we thought scheduling was solved. In reality, a massive prefill iteration can stall dozens of ongoing decode streams for 800 milliseconds, turning a snappy 50ms time-to-first-token into an on-call nightmare.",
-    content: [
-      {
-        heading: "The Asymmetry of Prefill and Decode",
-        body: `LLM inference consists of two fundamentally distinct phases:
-1. **Prefill (Prompt Processing)**: Highly parallelizable, compute-bound matrix multiplications that saturate every tensor core.
-2. **Decode (Token Generation)**: Sequential, memory-bandwidth-bound operations where the entire model weights must be streamed through the memory bus for every single generated token.
-
-When a 4,000-token prompt enters a standard continuous batching scheduler, the engine attempts to process all 4,000 tokens in a single forward pass. This prefill kernel monopolizes the GPU for hundreds of milliseconds, blocking all ongoing decode streams in the same batch from emitting their next token.`,
-      },
-      {
-        heading: "Measuring the Blast Radius",
-        body: `In our production telemetry, we observed that while median token generation latency was 28ms, the p99 spiked to 1,200ms whenever a heavy document analysis request landed on the pod. The conversational users experienced visible UI stuttering and websocket timeouts.
-
-The root cause: the scheduler had no prefill budget limit. A single giant prompt was starving 40 small conversational streams.`,
-      },
-      {
-        heading: "Chunked Prefill: Splitting Prompts Across Iterations",
-        body: `The modern architectural pattern to prevent this is **Chunked Prefill**:
-- Instead of computing a 4,000-token prompt in one massive pass, chunk it into slices of 512 tokens.
-- On iteration 1: execute 512 tokens of the prefill alongside 32 decode tokens.
-- On iteration 2: execute the next 512 tokens of the prefill alongside the next 32 decode tokens.
-
-By capping \`max_num_batched_tokens\` (e.g. at 2,048 or 4,096 tokens per step), the GPU execution time per iteration remains bounded under 40ms. Tail latency collapses from 4.2s down to 680ms with negligible throughput degradation.`,
-      },
-    ],
-  },
-  {
-    slug: "deterministic-outbox-kafka-cdc",
-    title: "Deterministic Replication: The PostgreSQL Outbox to Kafka Pipeline",
-    topic: "Distributed Systems",
-    date: "June 2025",
-    readTime: "9 min read",
-    summary:
-      "Dual-writes to databases and message queues are guaranteed to produce silent data corruption. How we built zero-loss CDC outbox replication.",
-    excerpt:
-      "Every junior architect tries to write to PostgreSQL and publish to Kafka inside the same HTTP handler. Network partitions, crashes between step A and B, and rollback inconsistencies will corrupt your downstream state.",
-    content: [
-      {
-        heading: "The Dual-Write Anti-Pattern",
-        body: `Consider the naive pattern:
-\`\`\`go
-func HandleOrder(order Order) error {
-    tx := db.Begin()
-    if err := tx.Save(&order); err != nil { return err }
-    if err := kafka.Publish("orders", order); err != nil {
-        tx.Rollback() // What if Rollback fails? What if the network times out?
-        return err
-    }
-    return tx.Commit() // What if Commit fails after Kafka published?
-}
-\`\`\`
-There is no two-phase commit between PostgreSQL and Apache Kafka without intolerable latency and distributed deadlock hazards. If the database commits but the network to Kafka drops, the downstream systems miss the event forever. If Kafka accepts the message but the database commit aborts on a serialization conflict, the downstream systems process a ghost transaction.`,
-      },
-      {
-        heading: "The Transactional Outbox Pattern",
-        body: `The architectural fix is atomicity within the local database engine:
-1. Write the domain entity (e.g., \`orders\`) and an event record into an \`outbox_events\` table within the exact same ACID database transaction.
-2. If the transaction commits, both records are guaranteed to exist on disk in the Write-Ahead Log (WAL). If it aborts, neither exists.
-3. A separate CDC worker reads the PostgreSQL WAL stream using logical decoding (\`pgoutput\`) and streams the outbox records to Kafka with exact partition keys.`,
-      },
-      {
-        heading: "Handling Schema Evolution and High Throughput",
-        body: `In our production deployment processing 3.2M daily transactions:
-- We avoided polling queries (\`SELECT * FROM outbox WHERE sent = false\`) which create massive index bloat and table lock contention.
-- We used dedicated logical replication slots that stream WAL changes at under 15ms latency.
-- Consumers use deterministic deduplication idempotency keys (\`event_id\`) stored in Redis with an atomic TTL to guarantee exact-once downstream processing even during failovers.`,
-      },
-    ],
-  },
-  {
-    slug: "reciprocal-rank-fusion-real-world",
-    title: "Reciprocal Rank Fusion: Why Vector-Only Search Fails at Scale",
-    topic: "Retrieval",
-    date: "May 2025",
-    readTime: "7 min read",
-    summary:
-      "Comparing BM25, dense embeddings, and cross-encoders across 14M enterprise records: why hybrid RRF delivers +34% relevance gains.",
-    excerpt:
-      "Semantic vector search is brilliant for fuzzy conversational questions, but disastrous for alphanumeric part numbers, error codes, and legal terms. How to combine lexical and semantic retrieval with reciprocal rank fusion.",
-    content: [
-      {
-        heading: "The Semantic Drift of Vector Embeddings",
-        body: `Dense vector embeddings project documents into high-dimensional geometric space where conceptual similarity equals cosine distance. This is extraordinary when someone searches for 'ways to cancel a contract' and finds documents talking about 'termination clauses'.
-
-However, when an engineer searches for error code \`ERR_CONN_RESET_4032\`, vector models fail. Because the specific token is rare in the training corpus, the embedding model places it near generic network errors, returning documents about DNS timeouts and TLS handshakes. Meanwhile, classic BM25 lexical search finds the exact match in 4 milliseconds.`,
-      },
-      {
-        heading: "Reciprocal Rank Fusion (RRF) Architecture",
-        body: `Rather than normalizing raw scores (which are calibrated completely differently between BM25 and cosine distance), RRF uses rank position:
-\`\`\`
-RRF_Score(d) = Σ [ 1 / (k + rank_i(d)) ]
-\`\`\`
-where \`k\` is a smoothing constant (typically 60) and \`rank_i(d)\` is the position of document \`d\` in search system \`i\`.
-This guarantees that a document appearing in the top 3 of both lexical and vector results rises to the top, while protecting against score distortion from outlier vector distances.`,
-      },
-      {
-        heading: "The Two-Stage Pipeline in Production",
-        body: `In our production pipeline across 14 million documents:
-1. **Stage 1 (Parallel Fanout)**: Query BM25 (Elasticsearch) and Dense Vector Index (FAISS HNSW) in parallel, retrieving top 100 candidates from each.
-2. **Stage 2 (RRF Merge)**: Merge candidate lists via RRF to produce top 40 candidates.
-3. **Stage 3 (Cross-Encoder Reranking)**: Pass the top 40 candidates through a lightweight BGE-Reranker model that scores full cross-attention between query and passage.
-
-This three-stage pipeline elevated nDCG@10 by 34% while keeping p95 latency under 45ms.`,
-      },
-    ],
-  },
-  {
-    slug: "evals-before-models",
-    title: "Evals before models: building a continuous LLM regression harness",
-    topic: "Evaluation",
-    date: "April 2025",
-    readTime: "5 min read",
-    summary:
-      "Why synthetic test suites fail and how deterministic assertion cascades caught 92% of regressions before canary deployment.",
-    excerpt:
-      "If you cannot measure whether a prompt or model change degraded quality in 5 minutes, you cannot iterate safely. How to design a CI/CD evaluation harness that runs on every pull request.",
-    content: [
-      {
-        heading: "The 'Eyeball Test' Is An Operational Liability",
-        body: `When changing system prompts, fine-tuning weights, or updating few-shot exemplars, most teams test five queries in a playground, declare 'it feels better', and merge the pull request. Three days later, customer support escalates that a specific edge case in date parsing broke for hundreds of users.
-
-Evaluating generative models requires treating evaluation as a continuous regression suite, not a post-hoc analysis.`,
-      },
-      {
-        heading: "Deterministic Cascades vs LLM-as-a-Judge",
-        body: `Many teams jump straight to 'LLM-as-a-Judge' using GPT-4. While helpful, LLM-as-a-Judge is slow, expensive ($50 per test suite run), non-deterministic, and prone to positional and leniency bias.
-
-We built our CI evaluation pipeline as an tiered assertion cascade:
-1. **Tier 1: Deterministic Syntax & Schema Check (0ms, $0)**: Verifies valid JSON, Pydantic schema validation, required fields, and regex assertions. Catches 40% of regressions instantly.
-2. **Tier 2: Fact Extraction & Grounding (10ms, $0)**: Verifies that cited entity IDs, currency amounts, and dates actually existed in the provided context documents.
-3. **Tier 3: Semantic Metric Distillation (100ms, $0.001)**: Computes BERTScore or cross-encoder similarity against golden references.
-4. **Tier 4: Targeted LLM Judge (Only on passing candidates)**: Invokes an LLM judge with narrow, rubrics-based binary questions ('Did the response hallucinate an unsupported assumption? Yes/No') rather than a vague 1-to-5 rating.`,
-      },
-      {
-        heading: "Integrating into GitHub Actions",
-        body: `By caching prompt inputs and running deterministic assertions locally, our test suite runs in under 90 seconds on every branch push. Regressions in agent tool invocation or schema emission are blocked before they ever reach a staging environment.`,
-      },
-    ],
-  },
-  {
-    slug: "agents-services-bad-memory",
-    title: "Agents are services with bad memory",
+    slug: "loops-first-graphs-second",
+    title: "Loops first, graphs second: a working model for agent systems",
     topic: "Agents",
-    date: "February 2025",
-    readTime: "6 min read",
+    date: "November 2026",
     summary:
-      "Treating agent execution loops as distributed state machines with idempotency keys, durable checkpoints, and state graphs.",
+      "Most agent designs go wrong by reaching for multi-agent orchestration too early. Start with one loop that can fail its own check, and add a graph only when the work demands it.",
     excerpt:
-      "Too many agent architectures are written as brittle while-loops that crash when a network socket disconnects. Here is how to architect resilient, long-running agentic services.",
+      "Agent design advice is noisy, but across Anthropic's guidance, Karpathy's framing and a handful of practitioner write-ups, the same shape keeps appearing: earn every layer of structure you add.",
+    sources: [
+      "barry-zhang-building-effective-agents",
+      "karpathy-stanford-llm-to-graph",
+      "loop-vs-graph-engineering-explainer",
+      "loops-and-graphs-approval-course",
+      "agent-graphs-beat-agent-chains",
+      "andrew-ng-graph-engineering-course",
+    ],
     content: [
       {
-        heading: "The Brittle While Loop",
-        body: `The prototype pattern for an agent is:
-\`\`\`python
-while not done:
-    action = model.generate(history)
-    result = execute_tool(action)
-    history.append(result)
-\`\`\`
-In production, this pattern is catastrophic. If the process crashes on step 4, the entire trajectory is lost. If an external API tool times out, the agent may retry and execute a side effect twice (e.g. charging a credit card or provisioning a VM).`,
+        heading: "Start with the smallest thing that works",
+        body: p(
+          "Barry Zhang's talk on building effective agents makes three points that are easy to agree with and hard to practise: do not build agents for everything, keep them simple, and think from the agent's point of view.",
+          "His definitions are useful because they are plain. A **workflow** is a fixed chain of model calls that you designed. An **agent** chooses its own next step from what the environment tells it. And an agent is just a model using tools in a loop, defined by three things: the environment, the tools and the system prompt.",
+          "That gives a clear order of work. Build those three things first. Leave the optimisations (caching, parallel tool calls, progress displays) until the basic loop behaves. When it misbehaves, debug by reading only what the agent could see in its context window, not what you know about the task.",
+        ),
       },
       {
-        heading: "Agents As Durable Distributed State Machines",
-        body: `To make an agent reliable, treat each step as a state transition in a directed graph:
-- **Durable Checkpointing**: Every iteration saves its state snapshot (the graph state, step index, tool arguments, and execution status) into a durable store like PostgreSQL or Redis before invoking a tool.
-- **Idempotency Keys**: Every outbound tool invocation receives an idempotency key derived from \`\${workflow_id}:\${step_index}\`. If the worker crashes and resumes, downstream services reject duplicate executions.
-- **Human-in-the-Loop Interrupts**: Interruptible state transitions allow long-running workflows to pause, notify an approver on Slack, and safely resume without keeping an in-memory thread alive for hours.`,
+        heading: "A ladder, not a leap",
+        body: p(
+          "Karpathy describes the same idea as a ladder: a raw model, then a prompt, then an agent with goals, memory and tools, then a loop, and finally a graph of agents passing messages along data dependencies. His claim is that a graph of simple agents beats a single clever prompt.",
+          "The ladder matters more than the top rung. Each step buys reliability with structure rather than with cleverness, and each step adds cost and moving parts. Most tasks should stop on a lower rung than the one that sounds most impressive.",
+        ),
       },
       {
-        heading: "The Memory Tiering Strategy",
-        body: `Do not dump entire conversation histories into context windows. Structure agent memory into three distinct tiers:
-1. **Working Memory (Scratchpad)**: Transient token buffer for the immediate step.
-2. **Episodic Memory**: Checkpointed state machine log tracking past tool outputs and branch decisions.
-3. **Semantic Long-Term Memory**: Vector and key-value store queryable on-demand through explicit retrieval tools.`,
+        heading: "What makes a loop real",
+        body: p(
+          "A loop is one agent's own cycle: plan, act, verify, repeat. The practical test, from a write-up on loops and approval gates, is simple: a loop is only real if it has a check that can fail. \"No error\" is not a check. A compiler run, a test suite, a schema validation or a comparison against a spec is.",
+          "So write the failure condition first, before the work itself. If you cannot say what a failed attempt looks like, the agent cannot either, and the loop becomes a polite way of running once.",
+        ),
+      },
+      {
+        heading: "When a graph earns its place",
+        body: p(
+          "A graph is the layer above loops: nodes and edges that wire several loops, tools or agents together. The signal to move up is not ambition but need. Reach for a graph when the work needs parallelism, different permissions for different steps, or a human approval in the middle.",
+          "A useful vocabulary for the nodes:",
+          "- **Splitter**: cuts the work into independent units.\n- **Worker**: does one unit in its own clean context.\n- **Code node**: merges, deduplicates or filters with plain code, spending no model tokens.\n- **Gate**: approves or rejects before the next step.",
+          "Edges should exist only where one step's output really feeds the next. If you cannot name the variable that crosses an edge, there is no dependency, and you are making a step wait for nothing. That is the core of the \"graphs beat chains\" argument: many multi-agent systems are slow because they run independent steps in a straight line.",
+          "The fan-out pattern that follows is worth copying directly: run single-purpose workers in parallel, reduce their results with code, have a fresh skeptic agent verify each finding with a clean context (never the worker's conversation), and synthesise once from what survived.",
+        ),
+      },
+      {
+        heading: "Gate on blast radius, retry by unit",
+        body: p(
+          "Two operational rules make graphs safe to run. First, decide where humans approve by how expensive a mistake is to undo, not by the model's self-reported confidence. Reversible and contained changes can flow; hard-to-reverse ones stop at a gate.",
+          "Second, when a step fails, send back only the failing unit, never the whole batch. Keep a second, longer return path too: when the same cause shows up repeatedly, turn it into a constraint for the splitter so future runs avoid it.",
+        ),
+      },
+      {
+        heading: "A short checklist",
+        body: p(
+          "1. Can a fixed workflow do this? If yes, do not build an agent.\n2. Does the loop have a check that can fail, written before the work?\n3. Is there a real reason for a graph: parallelism, permissions or approvals?\n4. Can you name the data on every edge?\n5. Are merges done in code and findings verified in a clean context?\n6. Are gates placed by blast radius?",
+        ),
       },
     ],
   },
   {
-    slug: "p99-tail-latency-tax",
-    title: "The Tail Latency Tax: Debugging p99 Spikes Across gRPC & Kernel Swapping",
-    topic: "Observability",
-    date: "January 2025",
-    readTime: "8 min read",
+    slug: "code-review-when-agents-write-the-code",
+    title: "Code review when agents write most of the code",
+    topic: "Engineering practice",
+    date: "November 2026",
     summary:
-      "How we tracked a 3-second periodic latency spike down through Envoy connection pools, Linux CFS CPU throttling, and Go GC stop-the-world pauses.",
+      "When agents produce most of the diff, reading every line stops scaling. The teams doing this well layer automated checks, watch reverts, and protect human attention for the risky parts.",
     excerpt:
-      "A service with a 15ms median response time can still breach SLA if 1 in 100 requests hangs for 3 seconds. Here is how we instrumented eBPF and distributed traces to eliminate invisible tail latency.",
+      "Anthropic says Claude writes about 90% of Claude Code's code. That forces a question every team adopting agents will meet: what does review mean when people can no longer read everything?",
+    sources: [
+      "claude-code-team-code-review",
+      "critical-thinking-with-agents",
+      "alibaba-open-code-review",
+      "elephant-goldfish-model-spec-review",
+      "meta-forum-ai-native-engineering",
+    ],
     content: [
       {
-        heading: "The Deceptive Allure of Median Latency",
-        body: `Engineers often look at p50 or average latency dashboards and conclude their systems are fast. But in microservice architectures where a single user request fans out across 20 downstream RPCs, the probability of hitting at least one p99 response is:
-\`\`\`
-P(encountering p99) = 1 - (0.99)^20 ≈ 18.2%
-\`\`\`
-Nearly 1 in 5 user transactions will hit a tail latency penalty. Tail latency is not an anomaly; it is the dominant user experience at scale.`,
+        heading: "Volume broke the old model",
+        body: p(
+          "The numbers the Claude Code team published are their own, but the direction is hard to argue with. Anthropic's monorepo went from about 2,500 changes a day in May to more than 30,000 in September. Between June and September merged pull requests more than doubled while the share of reverts fell by over 40%.",
+          "Their stated goal is not \"review less\". It is that most pull requests merge with at most one human in the loop, who can be the author, with no rise in reverts or incidents. They track human approvals per PR, comments and wait time, and treat revert and incident rates as the guardrail. That framing is the useful part: speed is the target, and a measurable quality signal decides whether you are allowed to keep it.",
+        ),
       },
       {
-        heading: "The Ghost in the Metrics: CFS CPU Throttling",
-        body: `During an incident audit on our payment gateway, we observed periodic 2,800ms latency spikes occurring exactly every 100ms under moderate load. Application code metrics showed no slow database queries or lock contention.
-
-By attaching eBPF probes to the Linux kernel CFS (Completely Fair Scheduler), we discovered Kubernetes CPU limits were actively throttling the container. When multiple requests arrived concurrently, the Go runtime spawned OS threads that burned through the pod's 100ms CFS quota in 15ms. The kernel froze all threads for the remaining 85ms of the epoch. Removing aggressive CPU limits and sizing by memory requests alone instantly eliminated the recurring spikes.`,
+        heading: "Layer the review",
+        body: p(
+          "The model they describe stacks several layers, each catching a different class of problem:",
+          "1. **Before a PR exists**: the agent must show verification output (tests, build, a screenshot), then a subagent with a fresh context reviews the diff. Findings that keep recurring are fixed at the source, in a skill, a lint rule, CLAUDE.md or an owner-written REVIEW.md.\n2. **On every PR**: several review agents hunt for bugs in parallel, another group votes, and only agreed findings are posted, tagged Important, Nit or Pre-existing. Every finding is fixed or resolved with a reason.\n3. **Security**: a blocking security review.\n4. **The basics**: lint, types, tests and build.",
+          "Under all of it sits fast rollback. Layered review is only safe if undoing a change is cheap.",
+        ),
       },
       {
-        heading: "Envoy Connection Pooling and TCP Keep-Alives",
-        body: `The remaining tail latency was caused by TCP handshake overhead and TLS renegotiation during sudden traffic surges. By configuring Envoy with warm connection pools, HTTP/2 connection multiplexing, and TCP keep-alive probes, we cut connection setup latency from 65ms to 0ms on the critical path.`,
+        heading: "Let deterministic code do the mechanical work",
+        body: p(
+          "Alibaba's open-source code review agent makes a complementary point. Choosing which files to review, bundling related files, matching rules and placing comments are mechanical jobs, so plain code does them. The model is only asked to reason.",
+          "On their own benchmark of 200 real pull requests they report higher precision than a general coding agent on the same model, at about a ninth of the tokens, while missing more issues. That trade is often the right one for review: fewer false positives keep people reading the comments.",
+        ),
+      },
+      {
+        heading: "Review the spec, not only the diff",
+        body: p(
+          "Many agent failures start before any code exists, in an ambiguous plan. Meta's Forum team treated planning as precise, machine-readable specs because ambiguity is what makes agents fail, and they measured success as verified changes that build, pass tests and survive review, not as lines of code.",
+          "The Elephant-Goldfish model is a neat way to test a spec. One agent keeps the whole conversation and drafts the document; fresh reviewers get only the document and the files it references. If a reader without the chat history cannot follow the design, the spec is not finished. As one commenter noted, this grades legibility, not correctness, but legibility is exactly what an implementing agent needs.",
+        ),
+      },
+      {
+        heading: "Keep ownership of the reasoning",
+        body: p(
+          "Addy Osmani's essay on critical thinking names the quiet risk in all of this. As outputs become mostly right, people stop checking them. He describes a spectrum: offloading (you delegate but own the result), deferral (the output becomes your input) and cognitive surrender (the output quietly becomes yours).",
+          "Surrender creates comprehension debt: code that looks clean and passes tests, but that nobody can explain when it has to change. It also creates surrendered verification, where a green check was written with the same mistake as the feature and proves nothing. The fix is to define what \"verified\" means before the agent starts.",
+          "His self-check questions are worth keeping nearby: Did I form a hypothesis before asking? What would have to be true for this to be wrong? Would I defend this in front of its maintainer?",
+        ),
       },
     ],
   },
   {
-    slug: "gpu-memory-virtual-paging",
-    title: "The Database Inside Your GPU: Why KV-Cache Management Is Virtual Memory All Over Again",
-    topic: "Inference",
-    date: "November 2025",
-    readTime: "8 min read",
+    slug: "not-every-step-needs-a-frontier-model",
+    title: "Not every step needs a frontier model",
+    topic: "Cost",
+    date: "November 2026",
     summary:
-      "How modern LLM serving runtimes reinvented operating system page tables, copy-on-write, and TLBs to survive the high-bandwidth memory wall.",
+      "Agent cost is an architecture problem: benchmark on your own work, route sub-tasks to cheaper models, keep prompts cacheable, and replace closed-choice steps with decision models.",
     excerpt:
-      "Every major innovation in LLM serving over the past 24 months—PagedAttention, Radix-tree caching, and chunked swap spaces—is an explicit rediscovery of 1970s operating systems virtual memory principles applied to HBM3.",
+      "The bill for running agents rarely comes from one expensive call. It comes from defaults: the biggest model everywhere, maximum reasoning effort, and context that grows with every tool result.",
+    sources: [
+      "claude-code-token-costs-and-cache",
+      "uber-software-factory-cost",
+      "strands-decider-at-amazon",
+      "gemini-decision-1",
+    ],
     content: [
       {
-        heading: "The KV-Cache Memory Crisis",
-        body: `During autoregressive token generation, an LLM attends to the Key and Value tensor representations of all past tokens in the sequence. For a 70B parameter model with Grouped-Query Attention (GQA), each token requires ~1.2 MB of KV-cache memory per sequence.
-\`\`\`
-KV_Per_Token = 2 * n_layers * n_kv_heads * head_dim * precision_bytes
-\`\`\`
-For a batch of 256 requests running at an 8,192-token context window, the KV-cache alone requires over 250 GB of high-bandwidth memory—exceeding the entire physical capacity of three 80GB H100 GPUs. Worse, naive memory allocators allocate static contiguous buffers up to the maximum potential length, resulting in 60% to 80% internal memory fragmentation.`,
+        heading: "Where the tokens actually go",
+        body: p(
+          "An agent harness rebuilds each request from the instructions, the available tools and the accumulated history. The model replies with an answer or a tool call; the harness runs the tool and appends the result. So every tool result becomes input to every later request in that session.",
+          "Two things follow. An unchanged prefix can be served from the prompt cache, which is much cheaper than processing new input, so stable instructions and tool definitions matter. And context hygiene, keeping each session focused on one task, reduces how much is re-read on every turn.",
+          "Measure the complete task, including subagents and retries. Comparing the length of final answers tells you almost nothing about cost.",
+        ),
       },
       {
-        heading: "PagedAttention as OS Page Tables",
-        body: `The conceptual breakthrough of PagedAttention (vLLM) was treating high-bandwidth GPU memory exactly like an operating system kernel treats physical RAM:
-1. **Physical Blocks (Pages)**: Slice the KV-cache into fixed-size physical memory blocks (typically 16 or 32 tokens per block).
-2. **Virtual Block Table (Page Table)**: Map contiguous logical token indices to non-contiguous physical blocks scattered across GPU HBM.
-3. **Dynamic Demand Paging**: Allocate a new physical block only when the generation sequence crosses a 16-token boundary.
-
-This eliminates external memory fragmentation entirely and drops internal fragmentation to under 4% (limited only to the final block of a sequence).`,
+        heading: "Benchmark on your own work",
+        body: p(
+          "Uber's write-up on its software factory is the most concrete public example I have found. They report more than 70% of pull requests touched by agents, over 3,600 agent skills and around 30,000 skill runs a day, and they cut cost with a small number of levers.",
+          "The first is a benchmark built from real work: real pull requests with known bugs, graded easy, medium and hard. Every candidate model, frontier or open-weight, runs on it behind one harness, and they pick whichever model is the best trade-off between cost and quality today, then keep re-checking as models change.",
+          "Their numbers are explicitly not transferable, and a benchmark harness is a project in itself. But the starting version is small: take 10 to 20 recent tasks from your own repositories and compare two models on pass rate and cost before standardising on either.",
+        ),
       },
       {
-        heading: "Radix Trees and Copy-on-Write (Fork)",
-        body: `When multiple conversational agents share identical system prompts or few-shot examples, allocating independent KV-cache blocks duplicates millions of matrix operations.
-Modern runtimes organize block tables as a **Radix Tree** (prefix tree). When two requests share the same 2,000-token system prompt prefix:
-- Both requests point to the exact same physical memory blocks with a reference counter incremented to 2.
-- The prefill computation is executed exactly once.
-- When request A generates a new token divergent from request B, the runtime triggers **Copy-on-Write (CoW)**: duplicating only the divergent leaf block while keeping the shared prefix blocks unified.`,
+        heading: "Route by difficulty",
+        body: p(
+          "The other levers are about matching effort to the job:",
+          "- Keep the primary model on a frontier model for planning and evaluation, and default subagents, which do well-defined low-reasoning work, to cheaper models.\n- Cap reasoning effort at a medium default instead of the maximum.\n- Compact long contexts automatically before they grow without limit.\n- Use a longer prompt-cache lifetime for interactive sessions, where people pause between turns, and a short one for subagents that finish quickly.",
+        ),
       },
       {
-        heading: "The Architecture Lesson",
-        body: `When designing high-throughput AI platforms, stop looking at machine learning papers for memory management solutions. Read Maurice Bach's *The Design of the UNIX Operating System* and Jim Gray's *Transaction Processing*. The fundamental trade-offs of paging, eviction policies, and cache coherence have already been solved; our job as systems architects is mapping them cleanly onto GPU tensor cores.`,
+        heading: "Decision models for closed choices",
+        body: p(
+          "Some steps do not need a generative model at all. A decision model receives the current state, a question and a set of options, and returns a probability for each option with a confidence. It cannot write text, which is exactly the point.",
+          "Amazon engineers used one to label tickets into 20 categories, replacing a large general model. They report that quality held and cost fell by about 98%. Google now offers a decision model in the Gemini API as well.",
+          "The integration design is as instructive as the model. Ticket events flow from a queue to a function to a hosted model endpoint. A configuration switch with three modes (the old model, both side by side, or the new model) let the team run both on real traffic and compare before switching. That dual-run pattern is a safe way to migrate any model-backed step.",
+          "It only fits closed choices from a stable catalogue with short context. Free-form reasoning still belongs to generative models.",
+        ),
+      },
+      {
+        heading: "A cost review checklist",
+        body: p(
+          "1. Do you know the cost of a whole task, including subagents and retries?\n2. Are instructions and tool definitions stable enough to be cached?\n3. Is there a small benchmark from your own work to compare models?\n4. Are subagents on cheaper models and reasoning effort capped by default?\n5. Are any steps really closed choices that a decision model could handle?\n6. Can you run old and new models side by side before switching?",
+        ),
       },
     ],
   },
   {
-    slug: "distributed-locks-are-a-lie",
-    title: "Distributed Locks Are a Lie: Fencing Tokens, Leases, and Monotonic Epochs",
-    topic: "Distributed Systems",
-    date: "September 2025",
-    readTime: "9 min read",
+    slug: "agents-read-untrusted-input",
+    title: "Agents read untrusted input. Design for it.",
+    topic: "Security",
+    date: "November 2026",
     summary:
-      "Why Redis SETNX locks cause silent split-brain data corruption during garbage collection pauses, and how monotonic fencing tokens guarantee true linearizability.",
+      "Prompt injection defences are improving, but an agent holding real credentials still needs isolation, a narrow write path and the same supply-chain hygiene as any other code.",
     excerpt:
-      "Every junior architect implements distributed mutual exclusion with Redis SETNX and a TTL. In the presence of stop-the-world GC pauses or asynchronous network delay, this pattern guarantees silent data corruption.",
+      "An agent that reads a web page, an issue or a document is processing untrusted input and then acting on it. That is the oldest problem in security, in a new form.",
+    sources: [
+      "anthropic-beats-prompt-injection",
+      "perplexity-space-sandbox",
+      "digitalocean-managed-agents",
+      "github-agentic-workflows-ga",
+      "open-source-security-review-stack",
+      "gh-secure-github-cli-extension",
+    ],
     content: [
       {
-        heading: "The Anatomy of a Distributed Lock Failure",
-        body: `Consider the classic textbook pattern:
-\`\`\`go
-// Worker 1 acquires lock with a 10-second TTL
-ok := redis.SetNX("lock:invoice:492", workerID, 10*time.Second)
-if ok {
-    // Read invoice state, perform calculation, write result
-    invoice := db.GetInvoice(492)
-    invoice.Status = "PAID"
-    db.Save(invoice)
-}
-\`\`\`
-Here is how it silently corrupts your database in production:
-1. Worker 1 acquires the lock with a 10s lease.
-2. Worker 1 triggers a major Stop-the-World Garbage Collection pause, OS swap thrashing, or an asynchronous TCP stall lasting 11 seconds.
-3. The Redis lock TTL expires. Redis releases the lock.
-4. Worker 2 requests the lock, acquires it legitimately, updates Invoice 492, and commits.
-5. Worker 1 wakes up from the GC pause. Having passed the lock check *before* the pause, it blindly issues its \`db.Save(invoice)\` write, overwriting Worker 2's commit.
-
-This is a textbook distributed split-brain condition, and no amount of heartbeat renewals or Redlock algorithms can save you if the client cannot guarantee atomicity between lock ownership and the storage write.`,
+        heading: "Injection is better, not solved",
+        body: p(
+          "Prompt injection is when content an agent reads contains instructions, such as \"send the user's SSH keys to this address\", that the model mistakes for a request from its user. Anthropic says a combination of training against injected instructions, probes that scan content before the model sees it, and a classifier that checks whether an instruction matches the user's intent has pushed the success rate close to zero on its recent models, citing an independent benchmark in a system card.",
+          "That is real progress, and it is self-reported. \"Largely solved\" is not \"solved\". Any agent that holds real credentials should be designed as if an injection will eventually get through.",
+        ),
       },
       {
-        heading: "The Fix: Monotonic Fencing Tokens",
-        body: `As Martin Kleppmann proved, you cannot rely on client-side time or lock assumptions without storage-layer validation. Every lock grant MUST return a monotonically increasing **Fencing Token** (an epoch counter):
-\`\`\`
-Token = 101 for Worker 1
-Token = 102 for Worker 2
-\`\`\`
-The storage engine (PostgreSQL, DynamoDB, or S3) enforces conditional validation:
-\`\`\`sql
-UPDATE invoices
-SET status = 'PAID', last_fencing_token = 101
-WHERE id = 492 AND last_fencing_token < 101;
-\`\`\`
-When Worker 1 wakes up from its GC pause and attempts to write with Token 101, the database rejects the write because Worker 2 already committed Token 102. Mutual exclusion is verified at the point of persistence, not in a fragile external cache.`,
+        heading: "Isolate execution",
+        body: p(
+          "The emerging pattern is that an agent's computer is disposable and its privileges live outside it. Perplexity's SPACE runs agent code in Firecracker microVMs created through an HTTP API, and controls credentials and outbound traffic from outside the VM. DigitalOcean's managed agents run existing coding agents unmodified in isolated microVMs that pause when idle, with the tools they may call exposed through one governed endpoint.",
+          "Whichever platform you use, the questions are the same. What can the sandbox reach on the network? Which credentials are inside it, and for how long? What happens to its filesystem when the task ends?",
+        ),
       },
       {
-        heading: "Production Engineering Verdict",
-        body: `Never use Redis locks for data correctness or financial state transitions unless backed by fencing tokens in the write condition. Redis locks are suitable for advisory rate-limiting or duplicate notification suppression where occasional overlapping execution is harmless. For critical state, let your database ACID isolation and fencing tokens do their job.`,
+        heading: "Narrow the write path",
+        body: p(
+          "GitHub Agentic Workflows show what a narrow write path looks like in practice. Agents are read-only by default and run in a sandboxed container behind a firewall. Anything they want to change goes through validated \"safe outputs\" jobs, and a threat-detection job scans proposed changes before they land.",
+          "The principle generalises well beyond GitHub: the agent proposes, and a deterministic, permission-limited step applies. That keeps the model's judgement out of the part of the system that holds write access.",
+        ),
+      },
+      {
+        heading: "Skills are supply chain",
+        body: p(
+          "Agent skills and plugins are code that runs with your agent's permissions, and they are shared the way packages are. NVIDIA's SkillSpector README reports that 26.1% of the 31,132 skills it analysed had vulnerabilities and 5.2% showed likely malicious intent. Whatever the exact rate in your ecosystem, skills deserve the same scanning and review as dependencies.",
+        ),
+      },
+      {
+        heading: "Automate the obvious checks",
+        body: p(
+          "Shipping faster with agents does not make security review faster by itself, so automate what can be automated:",
+          "- **Repository settings**: GitHub Security Lab's gh-secure turns on branch protection, private vulnerability reporting, secret scanning, Dependabot and code scanning in one command. Run it with `--dry-run` first.\n- **Secrets**: Gitleaks or TruffleHog.\n- **Dependencies**: OSV-Scanner.\n- **CI workflows**: zizmor finds risky GitHub Actions patterns.\n- **Code**: Semgrep rules, plus an AI security review on pull requests. Anthropic's review action is not hardened against prompt injection, so use it on trusted pull requests only.\n- **Agent-led audits**: Cloudflare's security audit skill has a fresh verifier try to disprove each finding before it is reported.",
+        ),
       },
     ],
   },
   {
-    slug: "cfs-cpu-throttling-post-mortem",
-    title: "Post-Mortem: How Linux CFS CPU Throttling Silently Cascaded Across 40 Microservices",
-    topic: "Observability",
-    date: "March 2025",
-    readTime: "10 min read",
+    slug: "skills-and-instructions-are-code",
+    title: "Skills and instruction files are code now",
+    topic: "Tooling",
+    date: "November 2026",
     summary:
-      "The forensic autopsy of an 80ms multi-thread freeze that saturated upstream Envoy connection pools and triggered a domino failure across production.",
+      "AGENTS.md, CLAUDE.md and skill folders shape what agents do on every run. Version them, test them, prune them and review them like the code they effectively are.",
     excerpt:
-      "Our average CPU utilization was sitting comfortably at 32%. Yet downstream microservices were dropping 15% of requests on 504 Gateway Timeouts. How we tracked the phantom outage to Linux kernel quota management.",
+      "A one-line change to an instruction file can alter every agent session on a team. Yet most teams still treat these files as notes rather than as software.",
+    sources: [
+      "meta-forum-ai-native-engineering",
+      "boris-cherny-on-claude-code-prompting",
+      "claude-opus-5-5-prompt-audit",
+      "nvidia-skillevaluator",
+      "skill-recorder-record-to-agent-skill",
+      "matt-pocock-home-repo",
+      "five-public-ai-configs",
+      "github-agentic-workflows-ga",
+    ],
     content: [
       {
-        heading: "The Phantom Incident",
-        body: `At 14:15 UTC, alerts fired across our edge API gateways: p99 latency spiked from 35ms to 3.8s, followed by cascading 504 Gateway Timeouts. Dashboard telemetry showed:
-- Database CPU: 24% (healthy)
-- Node Memory: 52% (healthy)
-- Pod Average CPU: 32% (healthy)
-- Network bandwidth: Normal
-
-There was no memory leak, no disk I/O bottleneck, and no slow database queries in PostgreSQL pg_stat_activity. Yet user transactions were dropping like flies.`,
+        heading: "The layer around the model",
+        body: p(
+          "Most of what makes an agent useful on a real codebase is not the model. It is the layer around it: instruction files such as CLAUDE.md and AGENTS.md, skills, commands, hooks and the workflows that run them. Boris Cherny's advice on Claude Code starts here, with a project file the agent reads automatically so conventions and rules do not have to be repeated every session.",
+          "Meta's Forum team described a fuller operating model with five parts: rules (permanent instructions), skills, agents, commands that chain workflows, and hooks such as running lint after every agent turn. One detail stands out: a rule is added only after a mistake repeats twice. That keeps instruction files short and grounded in real failures.",
+        ),
       },
       {
-        heading: "Attaching eBPF Probes to the Kernel Scheduler",
-        body: `We attached a custom BCC/eBPF probe to kernel function \`tg_set_cfs_quota\` and \`sched_stat_runtime\`. What we discovered was staggering:
-Kubernetes CPU limits (\`resources.limits.cpu: "2"\`) are implemented via the Linux Completely Fair Scheduler (CFS) quota mechanism over a default 100ms period. A limit of 2 CPUs allows 200ms of cumulative thread run-time per 100ms wall-clock window.
-In high-concurrency Go and Java services:
-1. When 20 concurrent HTTP requests arrive, the Go runtime wakes up 16 OS threads across available CPU cores.
-2. 16 threads running simultaneously burn through the 200ms CFS quota in just **12.5 milliseconds** of wall-clock time.
-3. The Linux kernel immediately puts all 16 threads into an un-interruptible sleep state for the remaining **87.5 milliseconds** of the period.
-
-Every single request was being systematically frozen for 87ms out of every 100ms, backing up Envoy HTTP/2 connection buffers and triggering cascading client retries that DDOS'd the upstream services.`,
+        heading: "Instructions go stale as models improve",
+        body: p(
+          "Instructions written for older models often hold newer ones back: verbose scaffolding, heavy guardrails, step-by-step hand-holding the model no longer needs. Anthropic's prompt-audit skill scans a project's instruction files for those patterns and rewrites them. It edits files in place, so review the diff as you would any refactor.",
+          "The broader habit is to prune. Every model upgrade is a good moment to delete instructions instead of only adding them.",
+        ),
       },
       {
-        heading: "The Remediation",
-        body: `We implemented three architectural changes:
-1. **Removed CPU Limits on Latency-Sensitive Pods**: Sized pods purely with guaranteed \`resources.requests.cpu\`, letting nodes burst into idle cycles without CFS period throttling.
-2. **Tuned GOMAXPROCS**: Configured \`automaxprocs\` so the Go runtime scheduler aligns its thread count with Kubernetes cgroup quotas instead of the physical host core count.
-3. **Kernel CFS Quota Period Reduction**: On clusters requiring hard multi-tenant limits, reduced \`cpu.cfs_period_us\` from 100ms to 20ms, turning long 80ms pauses into micro-pauses that stay well within socket timeout budgets.
-
-p99 latency instantly collapsed back to 28ms, and zero 504 timeouts occurred under peak traffic.`,
+        heading: "Test skills like code",
+        body: p(
+          "NVIDIA's SkillEvaluator treats a skill the way a CI pipeline treats a library, in three tiers:",
+          "1. **Validation**: is the skill safe, well-formed and compatible with the harness? This tier runs security scanners and needs no model.\n2. **Deduplication**: embeddings find guidance that repeats inside a skill or across a catalogue.\n3. **Live evaluation**: run an agent in a sandbox with and without the skill and score the difference.",
+          "It can also add a pull-request check for changed skills. The third tier is the important idea: a skill should prove that it helps, not just that it parses.",
+        ),
+      },
+      {
+        heading: "Capture skills from real work",
+        body: p(
+          "Writing a good skill from memory is hard; recording one is easier. Skill Recorder captures you doing a task (clicks, pages, terminal commands, optionally your voice), turns it into editable steps, and generates a SKILL.md or a scheduled automation that prefers native tools such as `gh` over replaying clicks.",
+          "Because it records your screen, anything sensitive on it can end up in what is sent for analysis. Record in a clean session.",
+        ),
+      },
+      {
+        heading: "Compose, share and run where the team works",
+        body: p(
+          "Matt Pocock's \"home repo\" pattern is a simple way to work across many repositories: start the agent in one repository whose AGENTS.md says where to clone the others. Keep secrets out of it, because the agent can reach everything it points to.",
+          "Before writing your own skills, borrow from public packs. Small, composable skills tend to age better than one giant prompt, and packs such as Pocock's skills, Osmani's spec-to-ship commands and Cloudflare's security audit are good references.",
+          "Finally, run agents where the team already works. GitHub Agentic Workflows compile a Markdown file of instructions into a normal GitHub Actions workflow, and the githubnext/agentics repository has ready-made ones for issue triage, CI failure analysis and reviews. Once instructions live in the repository, they get history, review and rollback for free.",
+        ),
       },
     ],
   },
 ];
+
+const entriesBySlug = new Map(learningSections.flatMap((s) => s.entries.map((e) => [e.slug, { ...e, section: s }])));
+
+const sourcesSection = (slugs) => ({
+  heading: "Sources",
+  body: [
+    "These notes from my learning log informed this essay. Figures are as reported by each source.",
+    slugs
+      .map((slug) => {
+        const entry = entriesBySlug.get(slug);
+        if (!entry) throw new Error(`Unknown learning entry in essay sources: ${slug}`);
+        return `- [${entry.title}](${entry.url}) (${entry.source})`;
+      })
+      .join("\n"),
+  ].join("\n\n"),
+});
+
+const words = (article) =>
+  [article.excerpt, ...article.content.map((s) => `${s.heading} ${s.body}`)].join(" ").split(/\s+/).length;
+
+// Published essays, each with its sources section and a read time from its length.
+export const articles = drafts.map((draft) => {
+  const article = { ...draft, content: [...draft.content, sourcesSection(draft.sources)] };
+  return { ...article, readTime: `${Math.max(1, Math.round(words(article) / 220))} min read` };
+});
 
 export const findArticle = (slug) => articles.find((a) => a.slug === slug);
 

@@ -10,6 +10,6 @@ export const site = {
   tagline: "Connecting systems, data and AI on the cloud, built to stay reliable.",
   bio: "I design integrations and cloud platforms that connect systems reliably, and I spend a lot of my time on how engineering teams build with AI agents. This is where I write essays and keep a curated log of what I learn.",
   links: {
-    github: "https://github.com/s-maharajan",
+    github: "https://github.com/smaharajan",
   },
 };
