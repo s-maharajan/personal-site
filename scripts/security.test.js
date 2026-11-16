@@ -61,12 +61,36 @@ describe("static site security and caching", () => {
 describe("redirects for removed essays", () => {
   it("sends old essay URLs to the writing index without shadowing current essays", async () => {
     const { articles } = await import("../src/content/writing.js");
-    expect(config.redirects).toHaveLength(1);
-    const [{ source, destination, permanent }] = config.redirects;
+    const essays = config.redirects.filter(({ destination }) => destination === "/writing");
+    expect(essays).toHaveLength(1);
+    const [{ source, destination, permanent }] = essays;
     expect(destination).toBe("/writing");
     expect(permanent).toBe(true);
     const slugs = source.match(/^\/writing\/:slug\(([^)]+)\)$/)[1].split("|");
     expect(slugs).toContain("why-rag-hallucinates-chunking");
     for (const { slug } of articles) expect(slugs).not.toContain(slug);
+  });
+});
+
+describe("old addresses", () => {
+  it("sends the previous project address to the current site, keeping the path", async () => {
+    const { site } = await import("../src/content/site.js");
+    const old = config.redirects.find(({ has }) => has?.some(({ type }) => type === "host"));
+    expect(old.has).toEqual([{ type: "host", value: "personal-site-six-lovat-75.vercel.app" }]);
+    expect(old.source).toBe("/:path*");
+    expect(old.destination).toBe(`${site.url}/:path*`);
+    expect(old.permanent).toBe(true);
+  });
+});
+
+describe("browser theme colour", () => {
+  it("matches the page background of each theme in index.css and index.html", async () => {
+    const { THEME_COLORS } = await import("../src/components/Header.jsx");
+    const css = read("src/index.css");
+    const bg = (selector) => css.slice(css.indexOf(`${selector} {`)).match(/--bg:\s*(#[0-9A-F]{6})/i)[1];
+    expect(THEME_COLORS.light).toBe(bg(":root"));
+    expect(THEME_COLORS.dark).toBe(bg(".dark"));
+    expect(html).toContain(`<meta name="theme-color" content="${THEME_COLORS.light}" media="(prefers-color-scheme: light)" />`);
+    expect(html).toContain(`<meta name="theme-color" content="${THEME_COLORS.dark}" media="(prefers-color-scheme: dark)" />`);
   });
 });

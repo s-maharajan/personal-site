@@ -4,6 +4,17 @@ import { Sun, Moon } from "lucide-react";
 import { site } from "../content/site";
 import { navLinks } from "../content/nav";
 
+// Page background per theme (the --bg tokens in index.css), used for the
+// browser UI colour. index.html sets both by system preference; once someone
+// picks a theme, both follow the choice.
+// eslint-disable-next-line react-refresh/only-export-components
+export const THEME_COLORS = { light: "#FBFAF7", dark: "#0F1013" };
+
+const syncThemeColor = (theme) => {
+  for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
+    meta.setAttribute("content", THEME_COLORS[theme]);
+  }
+};
 
 const storedTheme = () => {
   try {
@@ -17,6 +28,8 @@ export default function Header() {
   // The pre-paint script in index.html sets the first theme. Until someone
   // picks one, keep following the system preference.
   useEffect(() => {
+    const chosen = storedTheme();
+    if (chosen === "light" || chosen === "dark") syncThemeColor(chosen);
     const preference = window.matchMedia("(prefers-color-scheme: dark)");
     const follow = () => {
       if (!storedTheme()) document.documentElement.classList.toggle("dark", preference.matches);
@@ -28,6 +41,7 @@ export default function Header() {
   const toggleTheme = () => {
     const dark = !document.documentElement.classList.contains("dark");
     document.documentElement.classList.toggle("dark", dark);
+    syncThemeColor(dark ? "dark" : "light");
     try {
       localStorage.setItem("theme", dark ? "dark" : "light");
     } catch {

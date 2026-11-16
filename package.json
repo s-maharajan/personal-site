@@ -42,6 +42,7 @@
   "overrides": {
     "eslint-plugin-jsx-a11y": {
       "eslint": "$eslint"
-    }
+    },
+    "fflate": "0.8.3"
   }
 }

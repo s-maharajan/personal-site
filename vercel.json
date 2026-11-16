@@ -9,6 +9,17 @@
       "source": "/writing/:slug(agents-services-bad-memory|cfs-cpu-throttling-post-mortem|deterministic-outbox-kafka-cdc|distributed-locks-are-a-lie|evals-before-models|gpu-memory-virtual-paging|head-of-line-blocking-llm-batching|p99-tail-latency-tax|quantization-without-tears|reciprocal-rank-fusion-real-world|why-rag-hallucinates-chunking)",
       "destination": "/writing",
       "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "personal-site-six-lovat-75.vercel.app"
+        }
+      ],
+      "destination": "https://s-maharajan.vercel.app/:path*",
+      "permanent": true
     }
   ],
   "headers": [

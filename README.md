@@ -30,7 +30,10 @@ Requires Node 22.12 or newer within Node 22.
   contrast in both themes.
 
 [CI](.github/workflows/ci.yml) runs lint, tests and the build on every push and pull
-request.
+request. [Dependabot](.github/dependabot.yml) opens weekly pull requests for npm
+packages (minor and patch updates grouped) and GitHub Actions. `fflate` is pinned to a
+patched version through `overrides`, because the Open Graph renderer depends on an
+affected release.
 
 ## Editing content
 
@@ -38,8 +41,9 @@ Content lives in `src/content/`:
 
 | File | What it holds |
 | --- | --- |
-| `site.js` | Handle, role, headline, tagline, location and social links. No email address or full name is published. |
-| `writing.js` | Published essays, listed at `/writing` and shown at `/writing/<slug>`. Each essay lists `sources` (learning entry slugs) and `references` (outside links); a Sources section is added from them. A section can carry a `diagram`. |
+| `site.js` | Handle, job title (`title`, shown above the home headline), full role (`role`, used in titles and the About page), headline, tagline, location, and GitHub and LinkedIn links. No email address or full name is published. |
+| `profile.js` | The About page profile from the CV: intro, focus areas (AI first), highlights, an anonymised timeline, certifications and open-source projects. Employer and client names, contact details and figures stay out. |
+| `writing.js` | Published essays, listed at `/writing` and shown at `/writing/<slug>`. Each essay has an `area` (`AI`, `Integration` or `Cloud`); lists always show AI essays first, then newest first. Each essay lists `sources` (learning entry slugs) and `references` (outside links); a Sources section is added from them. A section can carry a `diagram`. |
 | `learning.js` | The learning log: curated notes grouped into sections, shown at `/learning` and `/learning/<section>`. |
 | `nav.js` | Header and footer navigation. |
 
@@ -60,7 +64,7 @@ screens and top to bottom on phones.
 
 ```
 src/
-  content/     site, writing, learning, nav
+  content/     site, profile, writing, learning, nav
   components/  Layout, Header, Footer, Prose, Diagram, PostList, SectionCard, PageMeta, Icons
   lib/         og (Open Graph paths and sizes), learning (dates, sorting), essay
   pages/       Home, Writing, Essay, Learning, LearningSection, About, NotFound
@@ -92,7 +96,10 @@ updating page metadata. There are two themes, light and dark. The inline theme s
 applies the saved theme, or the system preference, before paint; the header button
 toggles between them and saves the choice. `vercel.json` uses `cleanUrls`, so `/about`
 serves `about/index.html`, and unknown paths get `404.html` with a real 404 status.
-URLs of essays that were removed redirect permanently to `/writing`.
+URLs of essays that were removed redirect permanently to `/writing`, and the
+previous project address (`personal-site-six-lovat-75.vercel.app`) redirects to the
+same path on `s-maharajan.vercel.app`. Once a visitor picks a theme, the browser UI
+colour (`theme-color`) follows it too.
 
 The site is the Vercel project `s-maharajan`, served at https://s-maharajan.vercel.app.
 
