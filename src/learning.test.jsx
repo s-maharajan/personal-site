@@ -90,3 +90,10 @@ describe("learning routes", () => {
     expect(body).toContain("Page not found");
   });
 });
+
+describe("privacy", () => {
+  it.each(routes)("publishes no email address on %s", (path) => {
+    const { head, body } = render(path);
+    expect(head + body).not.toMatch(/mailto:|@gmail\.com/i);
+  });
+});

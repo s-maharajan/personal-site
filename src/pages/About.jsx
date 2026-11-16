@@ -43,9 +43,8 @@ export default function About() {
       </section>
 
       <div className="flex flex-wrap items-center gap-3 text-sm">
-        <a href={`mailto:${site.email}`} className="btn-primary">Email me</a>
         {site.links.github && (
-          <a href={site.links.github} target="_blank" rel="noreferrer" className="btn-ghost">GitHub</a>
+          <a href={site.links.github} target="_blank" rel="noreferrer" className="btn-primary">GitHub</a>
         )}
       </div>
     </div>

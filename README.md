@@ -29,7 +29,7 @@ Content lives in `src/content/`:
 
 | File | What it holds |
 | --- | --- |
-| `site.js` | Name, role, tagline, location, email, and social links. |
+| `site.js` | Name, role, tagline, location and social links. No email address is published. |
 | `writing.js` | Published essays, listed at `/writing` and shown at `/writing/<slug>`. |
 | `learning.js` | The learning log: curated notes grouped into sections, shown at `/learning` and `/learning/<section>`. |
 | `nav.js` | Header and footer navigation. |
@@ -96,7 +96,7 @@ and form submissions. The policy permits the exact inline theme script by SHA-25
 hash; it does not permit arbitrary inline scripts or eval. When editing that
 script in `index.html`, update its hash in `vercel.json` (the security test detects
 a mismatch). The reading-progress bar updates through CSSOM, which the policy
-allows. External social and email links remain normal navigation links.
+allows. External social links remain normal navigation links.
 
 Responses also set `X-Content-Type-Options: nosniff`,
 `Referrer-Policy: strict-origin-when-cross-origin` and a Permissions Policy

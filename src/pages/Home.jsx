@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { site } from "../content/site";
 import { sortedArticles } from "../content/writing";
 import { learningSections } from "../content/learning";
@@ -41,9 +41,6 @@ export default function Home() {
         <p className="max-w-prose text-base leading-relaxed text-muted">{site.bio}</p>
         <div className="flex flex-wrap items-center gap-3 pt-1 text-sm">
           <Link to="/learning" className="btn-primary">Browse the learning log</Link>
-          <a href={`mailto:${site.email}`} className="btn-ghost">
-            <Mail className="h-3.5 w-3.5" aria-hidden="true" /> Email
-          </a>
           {site.links.github && (
             <a href={site.links.github} target="_blank" rel="noreferrer" className="btn-ghost">
               <GithubIcon className="h-3.5 w-3.5" /> GitHub

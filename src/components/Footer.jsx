@@ -12,9 +12,6 @@ export default function Footer() {
             {site.initials}<span className="text-accent">.</span>
           </span>
           <p className="max-w-xs leading-relaxed">{site.tagline}</p>
-          <a href={`mailto:${site.email}`} className="text-accent hover:underline underline-offset-2">
-            Say hello
-          </a>
         </div>
 
         <nav aria-label="Footer">
