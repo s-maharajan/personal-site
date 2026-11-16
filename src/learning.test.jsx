@@ -105,7 +105,7 @@ describe("name placement", () => {
     const footer = body.match(/<footer[\s\S]*?<\/footer>/)[0];
     expect(header).toContain(site.handle);
     expect(footer).toContain(site.handle);
-    expect(body).not.toContain(site.fullName);
-    expect(head).not.toContain(site.fullName);
+    expect(body).not.toMatch(/Somasundaram/i);
+    expect(head).not.toMatch(/Somasundaram/i);
   });
 });

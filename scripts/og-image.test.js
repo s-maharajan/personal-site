@@ -56,18 +56,18 @@ describe("Open Graph images", () => {
           topic: article.topic,
           date: article.date,
           readTime: article.readTime,
-          author: site.fullName,
+          author: site.handle,
         }),
       );
       expect(texts).toContain(article.title);
       expect(texts).toContain(article.topic);
-      expect(texts).toContain(site.fullName);
+      expect(texts).toContain(site.handle);
     }
   });
 
   it("shows the name, role and tagline on the site card", () => {
     const texts = textsOf(siteCard());
-    expect(texts).toContain(site.fullName);
+    expect(texts).toContain(site.handle);
     expect(texts).toContain(site.role);
     expect(texts).toContain(site.tagline);
   });

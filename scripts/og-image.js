@@ -126,7 +126,7 @@ export const siteCard = () =>
       box(
         { flexDirection: "column", gap: "22px" },
         rule("72px", palette.pineDeep, "3px"),
-        text({ fontSize: "25px", letterSpacing: "1px", color: palette.paper }, site.handle),
+        text({ fontSize: "25px", letterSpacing: "1px", color: palette.paper }, new URL(site.url).host),
       ),
     ),
     // Name, role and tagline
@@ -148,7 +148,7 @@ export const siteCard = () =>
             lineHeight: "64px",
             color: palette.text,
           },
-          site.fullName,
+          site.handle,
         ),
         text({ fontSize: "26px", lineHeight: "36px", color: palette.muted }, site.role),
       ),
@@ -161,7 +161,7 @@ export const siteCard = () =>
         { alignItems: "center", justifyContent: "space-between" },
         text(
           { fontSize: "25px", color: palette.faint },
-          "Essays on retrieval, inference and reliability",
+          "Essays and a curated learning log",
         ),
         chips(),
       ),

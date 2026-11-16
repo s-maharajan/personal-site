@@ -35,7 +35,7 @@ export const buildOgImages = async (outDir) => {
           topic: article.topic,
           date: article.date,
           readTime: article.readTime,
-          author: site.fullName || site.name,
+          author: site.handle,
         }),
       ),
     );
@@ -50,7 +50,7 @@ export const buildOgImages = async (outDir) => {
           topic: "Learning",
           date: formatDay(latestDate(section)),
           readTime: `${section.entries.length} notes`,
-          author: site.fullName || site.name,
+          author: site.handle,
         }),
       ),
     );
