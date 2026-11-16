@@ -3,9 +3,9 @@ import { site } from "../content/site";
 import { learningSections } from "../content/learning";
 
 const focus = [
-  ["Distributed systems", "Consistency, replication, tail latency and the failure modes that only show up at scale."],
-  ["AI infrastructure", "Serving, retrieval, evaluation and the platform work that makes models dependable in production."],
-  ["AI-native engineering", "How teams build with agents: verification, review, cost control and keeping humans in charge."],
+  ["Integration", "APIs, events and messaging that connect systems and keep data consistent across them."],
+  ["AI", "Agents, retrieval and evaluation, and how teams build with AI every day."],
+  ["Cloud", "Cloud-native platforms, delivery pipelines and the security around them."],
 ];
 
 export default function About() {
@@ -19,7 +19,7 @@ export default function About() {
 
       <div className="flex flex-col gap-4 text-base leading-relaxed text-muted">
         <p>
-          I&apos;m {site.fullName}. I work on distributed systems and AI infrastructure, and I write
+          I&apos;m {site.fullName}. I work on integration, AI and cloud, and I write
           here about the parts of that work that are worth thinking through in public.
         </p>
         <p>

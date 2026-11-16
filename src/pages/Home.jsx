@@ -115,7 +115,7 @@ export default function Home() {
       <section aria-labelledby="writing-heading">
         <SectionHeading
           title={<span id="writing-heading">Latest writing</span>}
-          intro="Longer essays on distributed systems and AI infrastructure."
+          intro="Longer essays on integration, AI and cloud."
           to="/writing"
           linkLabel="All posts"
         />

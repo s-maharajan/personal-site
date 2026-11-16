@@ -34,7 +34,7 @@ export function pageMeta(pathname) {
   const fixed = {
     "/": { title: `${author} · ${site.role}` },
     "/about": { title: `About · ${author}`, description: `About ${author}. ${site.role}. ${site.tagline}` },
-    "/writing": { title: `Writing · ${author}`, description: `Essays by ${author} on distributed systems and AI infrastructure.` },
+    "/writing": { title: `Writing · ${author}`, description: `Essays by ${author} on integration, AI and cloud.` },
     "/learning": {
       title: `Learning log · ${author}`,
       description: `A curated, section-by-section log of what ${author} learned about agents, AI engineering and developer tooling.`,

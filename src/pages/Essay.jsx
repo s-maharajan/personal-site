@@ -136,7 +136,7 @@ export default function Essay() {
             Written by {site.fullName || site.name}
           </p>
           <p className="mt-0.5 text-xs text-muted">
-            {site.role} · Focus on distributed systems and AI platforms.
+            {site.role} · Focus on integration, AI and cloud.
           </p>
         </div>
         <Link to="/about" className="text-xs text-accent hover:underline shrink-0 font-medium">
