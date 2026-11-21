@@ -1,5 +1,11 @@
 # Security policy
 
+## Supported versions
+
+Only the `main` branch (the deployed site) is supported.
+
+## Reporting a vulnerability
+
 This is a static personal site with no backend, accounts or user data.
 
 To report a vulnerability, use GitHub's private reporting:
