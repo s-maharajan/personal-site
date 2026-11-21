@@ -1,0 +1,10 @@
+# Semgrep scans source, scripts and workflows. Tests build regexes and strings from
+# fixed, local values (not untrusted input), so the audit rules only add noise there.
+node_modules/
+dist/
+coverage/
+package-lock.json
+fonts/
+src/assets/
+**/*.test.js
+**/*.test.jsx

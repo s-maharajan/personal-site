@@ -1,0 +1,101 @@
+name: Security scan
+
+# Static analysis (Semgrep), dependency audit (npm) and Snyk. Semgrep and npm audit
+# need no account. Snyk runs only when the SNYK_TOKEN repository secret is set
+# (free plan: https://app.snyk.io/account -> Auth Token).
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 5 * * 1" # Mondays at 05:23 UTC: catch new advisories with no new commits
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  semgrep:
+    name: Static analysis (Semgrep)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write # upload SARIF to the Security tab
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Semgrep (pinned)
+        run: python3 -m pip install --quiet --user semgrep==1.185.0
+      - name: Scan
+        # --error fails the job on any finding; rule packs are fetched from the public registry.
+        run: >-
+          semgrep scan --metrics=off --error --sarif-output=semgrep.sarif
+          --config p/default --config p/javascript --config p/react --config p/github-actions
+      - name: Upload results to code scanning
+        if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
+
+  npm-audit:
+    name: Dependency audit (npm)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies (no install scripts)
+        run: npm ci --ignore-scripts
+      - name: Known vulnerabilities
+        run: npm audit --audit-level=moderate
+      - name: Registry signatures and provenance
+        run: npm audit signatures
+
+  snyk:
+    name: Snyk (dependencies and code)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    steps:
+      - name: Skip when no token is configured
+        if: env.SNYK_TOKEN == ''
+        run: echo "::notice::SNYK_TOKEN is not set; skipping Snyk. Add it as a repository secret to enable."
+      - name: Checkout
+        if: env.SNYK_TOKEN != ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        if: env.SNYK_TOKEN != ''
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies (no install scripts)
+        if: env.SNYK_TOKEN != ''
+        run: npm ci --ignore-scripts
+      - name: Install Snyk CLI (pinned)
+        if: env.SNYK_TOKEN != ''
+        run: npm install --global --ignore-scripts snyk@1.1309.0
+      - name: Open-source dependencies
+        if: env.SNYK_TOKEN != ''
+        run: snyk test --severity-threshold=medium
+      - name: Source code (Snyk Code)
+        if: env.SNYK_TOKEN != ''
+        run: snyk code test --severity-threshold=medium

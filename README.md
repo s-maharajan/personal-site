@@ -31,7 +31,8 @@ Requires Node 22.12 or newer within Node 22.
 
 [CI](.github/workflows/ci.yml) runs lint, tests and the build on every push and pull
 request. [Dependabot](.github/dependabot.yml) opens weekly pull requests for npm
-packages (minor and patch updates grouped) and GitHub Actions. `fflate` is pinned to a
+packages (minor and patch updates grouped) and GitHub Actions, waiting 7 days after a
+release (14 for majors) before proposing it; security updates are not delayed. `fflate` is pinned to a
 patched version through `overrides`, because the Open Graph renderer depends on an
 affected release.
 
@@ -140,7 +141,9 @@ allows. External social links remain normal navigation links.
 
 Responses also set `X-Content-Type-Options: nosniff`,
 `Referrer-Policy: strict-origin-when-cross-origin` and a Permissions Policy
-disabling camera, microphone, geolocation and payment access. These headers are
+disabling camera, microphone, geolocation and payment access, plus
+`Cross-Origin-Opener-Policy: same-origin` and `X-Frame-Options: DENY` (for browsers
+that predate `frame-ancestors`). Vercel adds HSTS itself. These headers are
 applied by Vercel; the Vite development and preview servers do not apply them.
 
 ## Secret scanning
@@ -158,6 +161,36 @@ gitleaks git . --log-opts="--all" --config .gitleaks.toml --redact --no-banner
 Keep credentials and local environment files out of Git. `.env.example` may contain
 placeholders only. If a real secret is detected, remove it and rotate it; do not
 add a blanket scanner exclusion to make the check pass.
+
+## Security scanning
+
+All of these are free for a public repository and run on pushes to `main`, pull
+requests, manual runs and a weekly schedule:
+
+| Tool | Workflow | What it checks | Account needed |
+| --- | --- | --- | --- |
+| Semgrep 1.185.0 | [security.yml](.github/workflows/security.yml) | JavaScript, React and GitHub Actions rules (`p/default`, `p/javascript`, `p/react`, `p/github-actions`); fails on any finding | No |
+| npm audit | [security.yml](.github/workflows/security.yml) | Known advisories (moderate and above) and registry signatures | No |
+| Snyk CLI 1.1309.0 | [security.yml](.github/workflows/security.yml) | Dependencies (`snyk test`) and source (`snyk code test`), medium and above | Free Snyk account; skipped until the `SNYK_TOKEN` secret exists |
+| CodeQL | [codeql.yml](.github/workflows/codeql.yml) | `security-extended` queries for JavaScript and workflows | No |
+| Gitleaks | [secret-scan.yml](.github/workflows/secret-scan.yml) | Secrets in the full history | No |
+
+Semgrep and CodeQL results appear under **Security → Code scanning**. Test files are
+excluded from Semgrep in [.semgrepignore](.semgrepignore). Workflows install packages
+with `npm ci --ignore-scripts` (no dependency needs an install script), and the import
+workflow hands its write token only to the final push step.
+
+To enable Snyk: sign up at snyk.io with GitHub, copy the token from **Account settings
+→ Auth Token**, then `gh secret set SNYK_TOKEN -R s-maharajan/personal-site`.
+
+To run Semgrep locally:
+
+```sh
+pipx run semgrep==1.185.0 scan --metrics=off --error \
+  --config p/default --config p/javascript --config p/react --config p/github-actions
+```
+
+Report vulnerabilities as described in [SECURITY.md](SECURITY.md).
 
 ## Reading essays
 

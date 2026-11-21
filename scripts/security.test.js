@@ -32,6 +32,8 @@ describe("static site security and caching", () => {
     expect(headers["X-Content-Type-Options"]).toBe("nosniff");
     expect(headers["Referrer-Policy"]).toBe("strict-origin-when-cross-origin");
     expect(headers["Permissions-Policy"]).toBe("camera=(), microphone=(), geolocation=(), payment=()");
+    expect(headers["Cross-Origin-Opener-Policy"]).toBe("same-origin");
+    expect(headers["X-Frame-Options"]).toBe("DENY");
   });
 
   it("caches fingerprinted assets immutably without giving HTML the same lifetime", () => {
