@@ -6,7 +6,7 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const { instance: { exports: hb } } = await WebAssembly.instantiate(
-  readFileSync(require.resolve("harfbuzzjs/hb-subset.wasm")),
+  readFileSync(require.resolve("harfbuzzjs/dist/harfbuzz-subset.wasm")),
 );
 const output = new URL("../src/assets/", import.meta.url);
 mkdirSync(output, { recursive: true });

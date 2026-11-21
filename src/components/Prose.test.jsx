@@ -80,7 +80,7 @@ describe('bare links', () => {
     const html = renderToStaticMarkup(<p>{inline('See https://do.co/4ysh3it. Run `curl http://localhost:8080` or https://example.com/a?b=1, then stop.')}</p>)
     expect(html).toContain('<a href="https://do.co/4ysh3it" target="_blank" rel="noreferrer"')
     expect(html).toContain('</a>. Run')
-    expect(html).toContain('<code class="rounded bg-raised px-1 py-0.5 font-mono text-[0.85em] text-text">curl http://localhost:8080</code>')
+    expect(html).toContain('<code class="rounded-sm bg-raised px-1 py-0.5 font-mono text-[0.85em] text-text">curl http://localhost:8080</code>')
     expect(html).toContain('href="https://example.com/a?b=1"')
     expect(html).toContain('</a>, then stop.')
   })

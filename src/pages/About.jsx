@@ -15,7 +15,7 @@ function Section({ id, title, children }) {
 
 export default function About() {
   return (
-    <div className="flex max-w-prose flex-col gap-12 pt-6">
+    <div className="flex max-w-reading flex-col gap-12 pt-6">
       <header className="flex flex-col gap-3">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">About</p>
         <h1 className="font-serif text-4xl sm:text-5xl tracking-tight text-text">Hi, I&apos;m {site.name}.</h1>
@@ -43,7 +43,7 @@ export default function About() {
       </Section>
 
       <Section id="highlights-heading" title="Highlights">
-        <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-muted marker:text-accent">
+        <ul className="list-disc stack-y-2 pl-5 text-sm leading-relaxed text-muted marker:text-accent">
           {profile.highlights.map((text) => <li key={text} className="pl-1">{text}</li>)}
         </ul>
       </Section>

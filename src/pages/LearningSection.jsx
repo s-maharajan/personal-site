@@ -21,7 +21,7 @@ function Entry({ entry, number }) {
         )}
       </p>
 
-      <h2 className="font-serif text-2xl sm:text-3xl leading-tight tracking-tight text-text">
+      <h2 className="font-serif text-2xl sm:text-3xl/9 leading-tight tracking-tight text-text">
         <a href={`#${entry.slug}`} className="hover:text-accent transition-colors">{entry.title}</a>
       </h2>
 
@@ -35,7 +35,7 @@ function Entry({ entry, number }) {
         <div className="flex flex-col gap-3">
           <h3 className="font-mono text-xs uppercase tracking-wider text-faint">How it works</h3>
           {entry.flow && <Diagram {...entry.flow} label={`How ${entry.title} works, step by step`} />}
-          {entry.points.length > 0 && <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-muted marker:text-accent">
+          {entry.points.length > 0 && <ul className="list-disc stack-y-2 pl-5 text-sm leading-relaxed text-muted marker:text-accent">
             {entry.points.map((p, i) => <li key={i} className="pl-1">{inline(p)}</li>)}
           </ul>}
         </div>
@@ -44,7 +44,7 @@ function Entry({ entry, number }) {
       {entry.tryIt && (
         <div className="rounded-xl border border-line bg-raised px-4 py-3">
           <h3 className="mb-1 font-mono text-xs uppercase tracking-wider text-accent">Try it</h3>
-          <p className="text-sm leading-relaxed text-text break-words">{inline(entry.tryIt)}</p>
+          <p className="text-sm leading-relaxed text-text wrap-break-word">{inline(entry.tryIt)}</p>
         </div>
       )}
 
@@ -77,7 +77,7 @@ export default function LearningSection() {
   const next = learningSections[index + 1];
 
   return (
-    <div className="mx-auto flex max-w-prose flex-col gap-10 pt-6">
+    <div className="mx-auto flex max-w-reading flex-col gap-10 pt-6">
       <Link to="/learning" className="inline-flex w-fit items-center gap-1.5 text-sm text-muted hover:text-accent">
         <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" /> All sections
       </Link>

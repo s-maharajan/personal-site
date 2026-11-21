@@ -25,7 +25,7 @@ export default function Layout() {
       {/* Skip to Content for Accessibility */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-surface focus:px-3 focus:py-1.5 focus:text-xs focus:font-semibold focus:text-text"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-sm focus:bg-surface focus:px-3 focus:py-1.5 focus:text-xs focus:font-semibold focus:text-text"
       >
         Skip to main content
       </a>

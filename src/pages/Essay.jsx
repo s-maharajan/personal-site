@@ -59,7 +59,7 @@ export default function Essay() {
   };
 
   return (
-    <article className="max-w-prose mx-auto flex flex-col gap-8">
+    <article className="max-w-reading mx-auto flex flex-col gap-8">
 
       <div className="reading-progress print-hidden" aria-hidden="true">
         <div ref={progressRef} className="reading-progress-fill" />
@@ -93,11 +93,11 @@ export default function Essay() {
           <span>{article.readTime}</span>
         </div>
 
-        <h1 className="font-serif text-3xl sm:text-4xl md:text-[2.6rem] font-normal leading-[1.2] tracking-tight text-text">
+        <h1 className="font-serif text-3xl sm:text-4xl/10 md:text-[2.6rem] font-normal leading-[1.2] tracking-tight text-text">
           {article.title}
         </h1>
 
-        <p className="mt-2 border-l-2 border-accent/70 pl-4 font-serif italic text-base sm:text-lg leading-relaxed text-muted">
+        <p className="mt-2 border-l-2 border-accent/70 pl-4 font-serif italic text-base sm:text-lg/7 leading-relaxed text-muted">
           {article.excerpt}
         </p>
       </header>
@@ -105,7 +105,7 @@ export default function Essay() {
       {article.content.length >= 3 && (
         <nav aria-label="Contents" className="rounded-lg border border-line/70 px-4 py-3 font-sans text-sm">
           <p className="mb-2 font-mono text-xs text-faint">Contents</p>
-          <ol className="space-y-1">
+          <ol className="stack-y-1">
             {article.content.map((sec, idx) => (
               <li key={ids[idx]}>
                 <a href={`#${ids[idx]}`} className="text-muted hover:text-accent hover:underline">{sec.heading}</a>
@@ -123,7 +123,7 @@ export default function Essay() {
               {sec.heading}{" "}
               <a href={`#${ids[idx]}`} className="heading-anchor text-accent" aria-label={`Link to ${sec.heading}`}>#</a>
             </h2>
-            <div className="text-sm sm:text-base leading-relaxed text-muted space-y-4">
+            <div className="text-sm sm:text-base/6 leading-relaxed text-muted stack-y-4">
               <Prose body={sec.body} />
             </div>
             {sec.diagram && <Diagram {...sec.diagram} />}
@@ -149,7 +149,7 @@ export default function Essay() {
       {/* Next Article link */}
       <Link
         to={`/writing/${nextArticle.slug}`}
-        className="group flex items-center justify-between gap-4 rounded-xl border border-line bg-surface p-5 transition-all hover:border-accent hover:shadow-sm"
+        className="group flex items-center justify-between gap-4 rounded-xl border border-line bg-surface p-5 transition-all hover:border-accent hover:shadow-xs"
       >
         <div>
           <span className="font-mono text-[11px] uppercase tracking-wider text-faint">Next Essay</span>

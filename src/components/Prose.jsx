@@ -16,7 +16,7 @@ export function inline(text) {
     }
     if (part.startsWith("`") && part.endsWith("`") && part.length > 1) {
       return (
-        <code key={i} className="rounded bg-raised px-1 py-0.5 font-mono text-[0.85em] text-text">
+        <code key={i} className="rounded-sm bg-raised px-1 py-0.5 font-mono text-[0.85em] text-text">
           {part.slice(1, -1)}
         </code>
       );
@@ -101,7 +101,7 @@ export default function Prose({ body }) {
       return (
         <List
           key={i}
-          className={`my-2 space-y-1.5 pl-6 text-xs sm:text-sm marker:text-faint ${
+          className={`my-2 stack-y-1.5 pl-6 text-xs sm:text-sm marker:text-faint ${
             block.ordered ? "list-decimal" : "list-disc"
           }`}
         >

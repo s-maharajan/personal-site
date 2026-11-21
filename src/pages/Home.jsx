@@ -42,10 +42,10 @@ export default function Home() {
       {/* Hero */}
       <section className="flex flex-col gap-6 pt-6 sm:pt-10">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">{site.title}</p>
-        <h1 className="font-serif text-3xl sm:text-5xl leading-[1.1] tracking-tight text-text">
+        <h1 className="font-serif text-3xl sm:text-5xl/none leading-[1.1] tracking-tight text-text">
           {site.headline}
         </h1>
-        <p className="font-serif text-xl sm:text-2xl leading-snug text-muted italic">{site.tagline}</p>
+        <p className="font-serif text-xl sm:text-2xl/8 leading-snug text-muted italic">{site.tagline}</p>
         <div className="flex flex-wrap items-center gap-3 pt-1 text-sm">
           <Link to="/learning" className="btn-primary">Browse the learning log</Link>
           {site.links.github && (
@@ -82,7 +82,7 @@ export default function Home() {
           className="group flex flex-col gap-3 rounded-2xl border border-line bg-surface p-6 sm:p-8 transition-colors hover:border-accent"
         >
           <span className="font-mono text-xs uppercase tracking-wider text-accent">Long read · {featured.topic}</span>
-          <h3 className="font-serif text-2xl sm:text-3xl leading-tight text-text group-hover:text-accent transition-colors">
+          <h3 className="font-serif text-2xl sm:text-3xl/9 leading-tight text-text group-hover:text-accent transition-colors">
             {featured.title}
           </h3>
           <p className="text-sm leading-relaxed text-muted">{featured.summary}</p>

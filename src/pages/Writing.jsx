@@ -13,7 +13,7 @@ export default function Writing() {
       <header className="flex flex-col gap-3">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">Writing</p>
         <h1 className="font-serif text-4xl sm:text-5xl tracking-tight text-text">Essays</h1>
-        <p className="max-w-prose text-base leading-relaxed text-muted">
+        <p className="max-w-reading text-base leading-relaxed text-muted">
           Longer pieces on integration, cloud and AI, newest first.
         </p>
       </header>

@@ -14,10 +14,10 @@ export default function PostList({ posts, numbered = false }) {
               <p className="font-mono text-xs text-faint">
                 <time dateTime={isoMonth(a.date)}>{a.date}</time> · {a.readTime}
               </p>
-              <h3 className="mt-1 font-serif text-xl sm:text-2xl leading-snug text-text group-hover:text-accent transition-colors">
+              <h3 className="mt-1 font-serif text-xl sm:text-2xl/8 leading-snug text-text group-hover:text-accent transition-colors">
                 {a.title}
               </h3>
-              <p className="mt-1.5 max-w-prose text-sm leading-relaxed text-muted line-clamp-2">{a.summary}</p>
+              <p className="mt-1.5 max-w-reading text-sm leading-relaxed text-muted line-clamp-2">{a.summary}</p>
               <p className="mt-2 font-mono text-xs text-accent">#{a.topic.toLowerCase()}</p>
             </div>
           </Link>

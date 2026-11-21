@@ -88,6 +88,16 @@ scripts/       build-feeds, build-og, prerender
 fonts/         Fraunces TTF sources and licence (cards and web subsets)
 ```
 
+## Styles
+
+Tailwind CSS 4 is configured in `src/index.css` (`@theme`); there is no
+`tailwind.config.js`. Three local conventions keep the Tailwind 3 look:
+
+- `max-w-reading` (42rem) is the text column. Tailwind 4's own `max-w-prose` is 65ch.
+- `stack-y-*` spaces children with top margins, like Tailwind 3's `space-y-*`.
+- Text sizes keep fixed rem line heights. When an element has a `leading-*` class and
+  a responsive size, pin the size's line height too (`sm:text-3xl/9`).
+
 ## Deploying
 
 `npm run build` runs Vite, generates the feeds, sitemap and robots.txt, then
