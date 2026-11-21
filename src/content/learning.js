@@ -210,8 +210,31 @@ export const learningSections = [
     "title": "AI-native engineering",
     "kicker": "How teams actually ship with agents",
     "description": "Practices from teams running agents across the whole delivery lifecycle: verification, layered review, cost control and keeping humans in charge of the reasoning.",
-    "readTime": "7 min read",
+    "readTime": "8 min read",
     "entries": [
+      {
+        "slug": "copilot-fusion-benchmarks",
+        "title": "Copilot Fusion Benchmarks",
+        "date": "2026-11-18",
+        "source": "Jorge Balderas",
+        "url": "https://www.linkedin.com/posts/balderas_microsoftignite-githubcopilot-copilotfusion-share-7528585745163472896-XsNi/",
+        "takeaway": "Fusion tops Terminal-Bench 4.1 plus a hands-on 5-model cost comparison.",
+        "summary": "Terminal-Bench compares whole agent harnesses (model plus orchestration, tools and runtime), and Copilot Fusion now leads version 4.1 per the keynote. The author then ran one personal prompt across five models and found large cost differences for similar run times.",
+        "points": [
+          "Terminal-Bench ([tbench.ai](https://www.tbench.ai/)) scores agents doing terminal tasks, so the harness matters, not only the model.",
+          "The author used the VS Code Agents feature Compare Model Results with the prompt \"Implement shopping cart using cart.png\".",
+          "Cost is shown in AI Credits (1 credit = $0.01 USD)."
+        ],
+        "caveat": "The personal test is one prompt, one run. The author works on GitHub Copilot per the hashtags and keynote framing; the benchmark claim is the vendor's. The author's own takeaway: test against your actual workloads.",
+        "flow": {
+          "steps": [
+            "One prompt",
+            "Compare Model Results",
+            "Five models run in parallel",
+            "Compare credits time and output"
+          ]
+        }
+      },
       {
         "slug": "claude-code-team-code-review",
         "title": "Claude Code Team Code Review",
@@ -579,8 +602,55 @@ export const learningSections = [
     "title": "Skills & harness",
     "kicker": "Instructions, plugins & workflows",
     "description": "The layer around the model: skills, instruction files, plugins and CI workflows that make agents consistent across people and repositories.",
-    "readTime": "5 min read",
+    "readTime": "6 min read",
     "entries": [
+      {
+        "slug": "github-event-streams-preview",
+        "title": "GitHub Event Streams Preview",
+        "date": "2026-11-21",
+        "source": "The GitHub Blog",
+        "url": "https://github.blog/changelog/2026-11-17-github-event-streams-is-now-in-preview/",
+        "takeaway": "Agents subscribe to PR events instead of polling.",
+        "summary": "An agent subscribes to a pull request and keeps a connection open; GitHub pushes an event when something changes. No polling loop, and no public webhook endpoint, so it works for an agent running on a laptop.",
+        "points": [
+          "Subscribe to a PR, connect and keep the connection open.",
+          "Events fire on: review submitted, new commits, merge conflict, merged or closed, check-suite changes and status changes (one event per check suite).",
+          "Replaces polling, which either burns rate limit or delays reaction to review feedback."
+        ],
+        "tryIt": "Sign up at https://gh.io/event-streams-signup",
+        "caveat": "Preview, waitlist only. Check the docs for auth and connection limits before building on it.",
+        "flow": {
+          "steps": [
+            "Agent subscribes to PR",
+            "Open connection to GitHub",
+            "Review, commit or check event",
+            "Agent wakes and acts"
+          ]
+        }
+      },
+      {
+        "slug": "lauren-tan-slop-into-gold",
+        "title": "Lauren Tan: Slop into Gold",
+        "date": "2026-11-17",
+        "source": "Alejo (@ecommartinez)",
+        "url": "https://x.com/ecommartinez/status/2122049134660034936",
+        "takeaway": "Talk: turn every agent correction into a lint rule and invest in verification.",
+        "summary": "Lauren Tan (calls herself \"Potato\") explains how her team made the codebase trustworthy enough that agents merge most of their own PRs. The core move: turn every correction into a deterministic check (lint rule, type, architecture) and spend most tokens on verification, not generation.",
+        "points": [
+          "An \"inverse pyramid\" of where to invest: code and API design, then lint rules, types and tests, then runtime and formal verification, then a little prose (rules, skills, AGENTS.md).",
+          "The codebase is the agent's biggest input, so anti-patterns get copied; keep it clean.",
+          "Agents produce verification artifacts (videos, screenshots, diagrams) that replace most code review."
+        ],
+        "caveat": "Numbers are the speaker's claims, not independently checked. ASR transcript: names like GrokBot, Dune, PStack and Bombadil may be misheard. Slides and code on screen were not seen. Auto-merge without human review depends on very strong checks.",
+        "flow": {
+          "steps": [
+            "Agent makes a mistake",
+            "Add lint rule or API constraint",
+            "Agent verifies with tests and recordings",
+            "Agent merges its own PR"
+          ]
+        }
+      },
       {
         "slug": "github-agentic-workflows-ga",
         "title": "GitHub Agentic Workflows GA",
@@ -815,8 +885,109 @@ export const learningSections = [
     "title": "Developer toolbox",
     "kicker": "Tools worth keeping close",
     "description": "Small, practical tools that remove friction: faster search, local cloud emulation, quick tunnels, reverse engineering and curated building blocks for agents.",
-    "readTime": "6 min read",
+    "readTime": "9 min read",
     "entries": [
+      {
+        "slug": "uber-mcp-gateway-design",
+        "title": "Uber MCP Gateway Design",
+        "date": "2026-11-21",
+        "source": "Shannon Williams",
+        "url": "https://www.linkedin.com/posts/smw355_uber-engineering-published-the-design-of-share-7524014804051611649-Yyrc/",
+        "takeaway": "Registry-first, disabled-by-default gateway for 800 MCP servers.",
+        "summary": "A summary of Uber's MCP gateway (MCP = Model Context Protocol, the standard way to give AI agents tools). Every discovered server and tool starts disabled; the owning team must turn it on, and later changes to a tool description go through config review.",
+        "points": [
+          "A crawler discovers MCP servers and tools; all start disabled.",
+          "Owners enable what they stand behind; tool description changes become a config diff to approve, deploy or roll back.",
+          "Access is checked per server and per tool with the same policy system used for humans and services.",
+          "PII redaction on responses by default, plus a discovery layer so the model only loads tools it needs."
+        ],
+        "caveat": "The poster sells Obot, a competing product. Read the original [Uber post](https://www.uber.com/blog/designing-mcp-gateway/) for details.",
+        "flow": {
+          "steps": [
+            "Crawler finds MCP tools",
+            "Registry - disabled by default",
+            "Owner reviews and enables",
+            "Policy check per tool",
+            "Agent sees allowed tools only"
+          ]
+        }
+      },
+      {
+        "slug": "github-copilot-evals",
+        "title": "GitHub Copilot Evals",
+        "date": "2026-11-18",
+        "source": "The GitHub Blog",
+        "url": "https://github.blog/changelog/2026-11-17-github-copilot-evals-is-now-in-public-preview/",
+        "takeaway": "Repeatable tests for your Copilot skills, agents and MCP tools.",
+        "summary": "An eval is a repeatable test for AI behaviour: a realistic task plus a description of a good result, checking both the result and how the agent got there. Copilot Evals lets you create, run and compare these for your own skills, custom agents and MCP tools, so a change does not silently make things worse.",
+        "points": [
+          "Ask in plain words or use `/eval` (`setup`, `create`, `review`, `improve`, `run`, `compare`).",
+          "You approve each run before it starts; results show passed and failed checks and why.",
+          "Compare runs before and after a customisation change.",
+          "The engine is Vally, an extensible local eval tool; the plugin bundles six skills, three automation blueprints, an Evals Canvas and a 15-tool MCP server."
+        ],
+        "tryIt": "In Copilot CLI, install the plugin per the [docs](https://aka.ms/evals), then run `/eval setup`.",
+        "caveat": "Public preview; runs consume model usage. The repo is new (★9).",
+        "flow": {
+          "steps": [
+            "Skill agent or MCP tool",
+            "Create eval",
+            "Run and approve",
+            "Pass fail report",
+            "Compare before and after"
+          ]
+        }
+      },
+      {
+        "slug": "plannotator-plan-review",
+        "title": "Plannotator: Plan Review",
+        "date": "2026-11-18",
+        "source": "Mayank A.",
+        "url": "https://www.linkedin.com/posts/curiouslearner_a-13k-star-github-repo-is-built-around-one-share-7528711377352519682-LahT/",
+        "takeaway": "Browser UI to annotate agent plans and diffs and send feedback back.",
+        "summary": "Plannotator opens an agent's plan in a local browser page where you highlight, delete, comment and suggest replacements, then sends that structured feedback back to the agent. It also reviews uncommitted diffs, HTML artifacts, documents and PRs.",
+        "points": [
+          "Hooks into the agent's plan approval step (for example Claude Code plan mode); the review UI opens in your browser.",
+          "Annotations become structured feedback the agent uses to revise the plan; Plannotator shows what changed between versions.",
+          "`/plannotator-review` opens uncommitted changes in a side-by-side diff review with line comments.",
+          "Plannotator Inbox collects questions, plans and reviews from several agent sessions in one local place."
+        ],
+        "tryIt": "See the install steps in the [README](https://github.com/backnotprop/plannotator) (no single command was captured).",
+        "caveat": "GitHub shows no licence file detected, so confirm the licence before company use. Hooks run local code alongside your agent; review what it installs.",
+        "flow": {
+          "steps": [
+            "Agent proposes plan",
+            "Plannotator opens in browser",
+            "You annotate and comment",
+            "Feedback sent to agent",
+            "Revised plan diffed"
+          ]
+        }
+      },
+      {
+        "slug": "github-marketplace-badges",
+        "title": "GitHub Marketplace Badges",
+        "date": "2026-11-17",
+        "source": "GitHub Docs",
+        "url": "https://docs.github.com/en/apps/github-marketplace/github-marketplace-overview/about-marketplace-badges",
+        "takeaway": "What the publisher-verified badge means and does not mean.",
+        "summary": "Explains the two Marketplace app badges. The \"Publisher domain and email verified\" badge checks the publisher organisation, not the app's code.",
+        "points": [
+          "Verified badge: org verified its domain, confirmed its email for GitHub Support, and requires 2FA.",
+          "GitHub does not analyse or inspect third-party code; publishers maintain their apps.",
+          "\"App meets the requirements for listing\" badge: app meets listing rules but publisher is not verified; such apps cannot change pricing plan until verified."
+        ],
+        "tryIt": "Check the badge tooltip on any Marketplace app listing before installing.",
+        "caveat": "Docs page; no dates or stats.",
+        "flow": {
+          "steps": [
+            "Publisher org",
+            "Verify domain email and 2FA",
+            "Verified badge",
+            "Code still not inspected by GitHub"
+          ]
+        }
+      },
       {
         "slug": "microsoft-tgrep",
         "title": "Microsoft tgrep",
