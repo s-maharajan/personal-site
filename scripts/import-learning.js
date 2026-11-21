@@ -4,7 +4,7 @@
 // URLs already imported or skipped, so entries removed by hand do not come back.
 // Without that file, the first run only records what exists and imports nothing.
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -128,8 +128,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   if (!dir) throw new Error("usage: node scripts/import-learning.js <daily-learning>/site/notes");
   const notes = readdirSync(dir).filter((f) => /^\d{4}-\d{2}-\d{2}\.md$/.test(f)).sort()
     .map((f) => ({ date: f.slice(0, 10), markdown: readFileSync(join(dir, f), "utf8") }));
-  const seeding = !existsSync(SEEN);
-  const seen = new Set(seeding ? [] : JSON.parse(readFileSync(SEEN, "utf8")));
+  // Read once instead of checking existence first, so the file cannot change in between.
+  let seenFile;
+  try {
+    seenFile = readFileSync(SEEN, "utf8");
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+  }
+  const seeding = seenFile === undefined;
+  const seen = new Set(seeding ? [] : JSON.parse(seenFile));
   const source = readFileSync(LEARNING, "utf8");
   const { learningSections } = await import(LEARNING.href);
   const added = importNotes(learningSections, notes, seen);
