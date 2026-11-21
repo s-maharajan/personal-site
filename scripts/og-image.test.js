@@ -46,7 +46,7 @@ describe("Open Graph images", () => {
       expect(png.subarray(0, 8)).toEqual(PNG_SIGNATURE);
       expect(dimensions(png)).toEqual({ width: OG_WIDTH, height: OG_HEIGHT });
     }
-  });
+  }, 60_000); // renders every card through satori and resvg; slow on shared runners
 
   it("shows the title, topic and author on an essay card", () => {
     for (const article of articles) {
