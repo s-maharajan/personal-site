@@ -64,6 +64,11 @@ takeaway, and picks a section by keywords (move an entry by hand if it lands in 
 wrong one). Picks with redaction markers lose those lines, or are skipped when a required
 field has one. `scripts/learning-seen.json` holds hashes of every source already
 considered, so a pick is imported once and entries removed by hand stay removed.
+`scripts/learning-refresh.json` records the last refresh: its date (`lastRefresh`) and
+the newest note it covered (`lastNote`). Each run lists every pick in the notes dated
+after `lastNote` with what happened to it: imported, already considered, or not
+imported and why (not rated ✅, no verdict yet, an `lnkd.in` source). Review that list
+for picks worth adding by hand.
 
 One-time setup: add the public half of a fresh SSH key as a read-only deploy key on
 `smaharajan/daily-learning`, and the private half as the `DAILY_LEARNING_DEPLOY_KEY`

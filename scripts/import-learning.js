@@ -10,6 +10,8 @@ import { fileURLToPath } from "node:url";
 
 const LEARNING = new URL("../src/content/learning.js", import.meta.url);
 const SEEN = new URL("./learning-seen.json", import.meta.url);
+// { lastRefresh, lastNote }: when the notes were last reviewed and the newest note then.
+const REFRESH = new URL("./learning-refresh.json", import.meta.url);
 
 // Mirrors the content test in src/learning.test.jsx.
 const BAD = /\[removed\]|undefined|TODO|lnkd\.in|\bour (agent stack|workstream|team|repos)\b/i;
@@ -85,6 +87,24 @@ export function parseNote(markdown, date) {
   });
 }
 
+// Every pick in a note and whether parseNote can import it, with the reason when not,
+// so picks the importer leaves out are listed for review instead of vanishing.
+export function reviewNote(markdown, date) {
+  const importable = new Set(parseNote(markdown, date).map((e) => e.url));
+  return markdown.split(/^(?=## [a-z]\. )/m).slice(1).map((block) => {
+    const [, letter, heading] = block.match(/^## ([a-z])\. (.+)/);
+    const verdict = clean(block.match(/^\*\*((?:✅|🤔|⏭️|❌|👀)[^*]*)\*\*/mu)?.[1]);
+    const url = block.match(/<sub>🔗 \[[^\]]+\]\((https:\/\/[^)\s]+)\)/)?.[1];
+    const ready = importable.has(url);
+    let reason;
+    if (!verdict) reason = "no verdict yet";
+    else if (!verdict.startsWith("✅")) reason = `rated ${verdict}`;
+    else if (!url) reason = "no source link";
+    else if (!ready) reason = /lnkd\.in/.test(url) ? "source is an lnkd.in shortlink" : "a field failed the content check";
+    return { letter, title: clean(heading), verdict, url, importable: ready, reason };
+  });
+}
+
 export function sectionFor(entry) {
   const count = (text, word) => text.toLowerCase().split(word).length - 1;
   const body = [entry.takeaway, entry.summary, ...entry.points].join(" ");
@@ -149,5 +169,30 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     for (const e of added) console.log(`Imported "${e.title}" into ${e.section}`);
   } else {
     console.log("No new picks.");
+  }
+
+  // Review list: every pick in the notes dated after the last refresh, with what
+  // happened to it. The refresh record moves on only when newer notes arrive.
+  let refresh = {};
+  try {
+    refresh = JSON.parse(readFileSync(REFRESH, "utf8"));
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+  }
+  const since = notes.filter((n) => !refresh.lastNote || n.date > refresh.lastNote);
+  const addedUrls = new Set(added.map((e) => e.url));
+  console.log(refresh.lastNote
+    ? `Last refresh ${refresh.lastRefresh} covered notes up to ${refresh.lastNote}; ${since.length} newer note(s).`
+    : `No refresh record yet; reviewing all ${since.length} note(s).`);
+  for (const { date, markdown } of since) {
+    console.log(`${date}:`);
+    for (const pick of reviewNote(markdown, date)) {
+      const status = addedUrls.has(pick.url) ? "imported" : pick.importable ? "already considered" : `not imported: ${pick.reason}`;
+      console.log(`  ${pick.letter}. ${pick.title}: ${status}`);
+    }
+  }
+  if (since.length) {
+    refresh = { lastRefresh: new Date().toISOString().slice(0, 10), lastNote: since.at(-1).date };
+    writeFileSync(REFRESH, `${JSON.stringify(refresh, null, 2)}\n`);
   }
 }

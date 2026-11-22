@@ -210,7 +210,7 @@ export const learningSections = [
     "title": "AI-native engineering",
     "kicker": "How teams actually ship with agents",
     "description": "Practices from teams running agents across the whole delivery lifecycle: verification, layered review, cost control and keeping humans in charge of the reasoning.",
-    "readTime": "9 min read",
+    "readTime": "10 min read",
     "entries": [
       {
         "slug": "lauren-tan-slop-into-gold",
@@ -263,6 +263,32 @@ export const learningSections = [
         "tryIt": "In VS Code Agents, run one of your own prompts through Compare Model Results and compare credits, time and output."
       },
       {
+        "slug": "agent-eval-as-a-quality-system",
+        "title": "Agent Eval as a Quality System",
+        "date": "2026-11-12",
+        "source": "Ben (Xiaojun) Li (LinkedIn)",
+        "url": "https://www.linkedin.com/posts/xiaojunli_agent-eval-is-a-product-quality-system-not-share-7525276550393626624-bqbV/",
+        "takeaway": "Who should own agent evals, and how to start them.",
+        "summary": "Evals (tests that score an agent on your own cases) should drive releases. The author says Anthropic's model is a central evals team owning the infrastructure while PMs and engineers write and run their own eval tasks.",
+        "points": [
+          "Start with 20-50 tasks taken from real failures; grade the end state the agent leaves.",
+          "Keep capability evals (low pass rate) apart from regression evals (near 100%).",
+          "Use pass^k, where all k trials must pass, for behaviour that has to be reliable.",
+          "Grade full traces of model calls, tool calls and handoffs, not only the final answer."
+        ],
+        "tryIt": "Turn the last 20 agent failures you saw into eval tasks, and grade each by the state the agent leaves behind.",
+        "caveat": "The Anthropic and OpenAI practices are the author's summary of their guides. The post also promotes a book and an event.",
+        "flow": {
+          "steps": [
+            "Real failures",
+            "Eval tasks",
+            "Grade end state and trace",
+            "Capability or regression set",
+            "Release decision"
+          ]
+        }
+      },
+      {
         "slug": "claude-code-team-code-review",
         "title": "Claude Code Team Code Review",
         "date": "2026-11-06",
@@ -312,6 +338,33 @@ export const learningSections = [
             "Agent verifies with tests",
             "Ask what the check did not prove",
             "Own the decision"
+          ]
+        }
+      },
+      {
+        "slug": "anthropic-scion-source-control",
+        "title": "Anthropic Scion Source Control",
+        "date": "2026-10-14",
+        "source": "Rahul Patil (LinkedIn)",
+        "url": "https://www.linkedin.com/posts/rahul-patil-a0944836_we-now-merge-more-than-30000-code-changes-share-7515890280932499456-C2mn/",
+        "takeaway": "Anthropic replaced git for its monorepo with an in-house system to handle 30,000+ merges a day.",
+        "summary": "Anthropic replaced git for its monorepo (one big repository holding all code) with Scion, an in-house version control system. Seven engineers built it and migrated in five months, with Claude writing much of the code.",
+        "points": [
+          "Scion replaces git for the monorepo; the author says it is not a git replacement for most teams.",
+          "Permissions can be set down to individual directories.",
+          "Review tooling tells a comment-only change from a sensitive logic change, so humans focus on the risky ones.",
+          "Quality comes from hermetic simulations (isolated, repeatable test environments) of every known interaction, plus fuzzing and rate limiting.",
+          "Merges went from about 2,500 a day in May to more than 30,000; engineers owned the design, and much of the work was telling Claude no when it broke a core constraint."
+        ],
+        "tryIt": "Read the engineering write-up, [Redesigning source control at Anthropic](https://www.anthropic.com/engineering/redesigning-source-control).",
+        "caveat": "Internal tool, not available to use. Commenters note lock-in to one internal owner and gaps in accountability for unowned directories.",
+        "flow": {
+          "steps": [
+            "Engineer or Claude change",
+            "Scion monorepo",
+            "Directory permissions check",
+            "Review tooling sorts risk",
+            "Merge"
           ]
         }
       },
@@ -491,7 +544,7 @@ export const learningSections = [
     "title": "Agent security",
     "kicker": "Sandboxes, injection & supply chain",
     "description": "What changes when software reads untrusted content and acts on it: prompt injection defences, isolation designs and a practical open-source security stack.",
-    "readTime": "4 min read",
+    "readTime": "5 min read",
     "entries": [
       {
         "slug": "github-marketplace-badges",
@@ -543,6 +596,22 @@ export const learningSections = [
           ]
         },
         "tryIt": "List the MCP servers your agents can reach, and start any new one disabled until its owner enables it."
+      },
+      {
+        "slug": "github-copilot-local-sandboxing",
+        "title": "GitHub Copilot Local Sandboxing",
+        "date": "2026-10-11",
+        "source": "The GitHub Blog",
+        "url": "https://github.blog/changelog/2026-10-07-local-sandboxing-for-github-copilot-now-generally-available/",
+        "takeaway": "Copilot can run agent commands in a locked-down local sandbox, and admins can require it.",
+        "summary": "Local sandboxing for GitHub Copilot is generally available in Copilot CLI, the Copilot app and VS Code. Agent commands (installs, scripts, tests) run in an isolated environment with controlled access to files, network, system capabilities and credentials, instead of your normal shell.",
+        "points": [
+          "One sandbox policy is translated into native operating-system controls on Windows, macOS and Linux.",
+          "Enterprises can require sandboxing and set policies that developers cannot weaken.",
+          "Included with Copilot at no extra cost."
+        ],
+        "tryIt": "Turn on sandboxing in Copilot CLI, VS Code or the Copilot app settings, then run an agent task that installs packages and see what it blocks.",
+        "caveat": "It starts switched off. Org-wide policies need an admin. Check what controlled network access means behind a proxy or firewall before relying on it for tasks that need outbound calls."
       },
       {
         "slug": "anthropic-beats-prompt-injection",
@@ -680,8 +749,34 @@ export const learningSections = [
     "title": "Skills & harness",
     "kicker": "Instructions, plugins & workflows",
     "description": "The layer around the model: skills, instruction files, plugins and CI workflows that make agents consistent across people and repositories.",
-    "readTime": "6 min read",
+    "readTime": "7 min read",
     "entries": [
+      {
+        "slug": "factory-mindset-agentic-workflows",
+        "title": "Factory Mindset: Agentic Workflows",
+        "date": "2026-11-21",
+        "source": "GitHub Next",
+        "url": "https://githubnext.com/talks/the-factory-mindset/",
+        "takeaway": "Agentic workflows in production: markdown intent compiled to sandboxed Actions, agent reviewers, and a human merge.",
+        "summary": "A GitHub Universe 2026 talk (32 min) on running agentic workflows in production. A workflow is a markdown file that states intent and limits; a compiler turns it into GitHub Actions that run in a sandbox, and agents review the work before a human decides.",
+        "points": [
+          "A workflow is a markdown file that declares intent plus restrictions and security rules; a compiler converts it to GitHub Actions that run in GitHub's cloud or on your own runners.",
+          "The sandbox gives zero secrets, outbound traffic filtering and controlled writes, so the agent cannot write data wherever it wants.",
+          "Pull request loop: an agent writes code, agent reviewers check tests, docs and other aspects, a \"sous chef\" agent applies their feedback, then a human continues, merges or closes.",
+          "\"Daily improvers\" wake up each day, look for one kind of slop (for example duplicate code), fix it, add a test and open a small pull request."
+        ],
+        "tryIt": "Watch the [recording](https://www.youtube.com/watch?v=TYhsC-S-Fx0), then run one ready-made workflow from [githubnext/agentics](https://github.com/githubnext/agentics) on a repo you own.",
+        "caveat": "Numbers are the speakers' own. Agentic workflows cost money per run; one company in the talk turned theirs off until it had telemetry. No install command was given in the talk.",
+        "flow": {
+          "steps": [
+            "Markdown workflow with intent and limits",
+            "Compiler",
+            "GitHub Actions in sandbox",
+            "Agent reviewers and sous chef",
+            "Human merge decision"
+          ]
+        }
+      },
       {
         "slug": "github-copilot-evals",
         "title": "GitHub Copilot Evals",
@@ -1249,8 +1344,25 @@ export const learningSections = [
     "title": "Models & frontier",
     "kicker": "Local models & where research is going",
     "description": "Models you can run yourself, and a longer view on how AI changes scientific work.",
-    "readTime": "2 min read",
+    "readTime": "3 min read",
     "entries": [
+      {
+        "slug": "gemini-4-carbon-in-copilot",
+        "title": "Gemini 4 Carbon in Copilot",
+        "date": "2026-11-12",
+        "source": "The GitHub Blog",
+        "url": "https://github.blog/changelog/2026-11-09-gemini-4-carbon-in-github-copilot/",
+        "takeaway": "Google's new reasoning model is generally available in GitHub Copilot.",
+        "summary": "A new Google model you can pick in the Copilot app, CLI and VS Code. It targets long, multi-step coding work and secure code.",
+        "points": [
+          "Select it in the Copilot model picker (app, CLI, VS Code).",
+          "Google describes it as built for long agentic workflows with deeper build-and-verify loops, a 1M context window and responses over 64K tokens.",
+          "Generally available in Copilot, not a preview.",
+          "Route by job: a fast model for small edits, a stronger one for planning and security work."
+        ],
+        "tryIt": "Pick Gemini 4 Carbon in the Copilot model picker and give it a security-heavy task on a repo you know well, so you can judge the result.",
+        "caveat": "No pricing or benchmark numbers in the announcement. A security focus only covers the threats someone has written down."
+      },
       {
         "slug": "recursive-flint-local-coding-moe",
         "title": "Recursive Flint: Local Coding MoE",

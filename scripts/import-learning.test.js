@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { importNotes, parseNote } from "./import-learning.js";
+import { importNotes, parseNote, reviewNote } from "./import-learning.js";
 
 const note = `### 📌 At a glance
 
@@ -69,5 +69,30 @@ describe("daily-learning import", () => {
     sections[0].entries = [];
     expect(importNotes(sections, notes, seen)).toEqual([]);
     expect(seen.size).toBe(1);
+  });
+
+  it("lists every pick with the reason it was not imported", () => {
+    const extra = `${note}
+## c. Shortlink Pick
+
+<sub>🔗 [Someone (LinkedIn)](https://lnkd.in/p/abc)</sub>
+
+**✅ Yes** · good
+
+Worth keeping.
+
+## d. Unrated Pick
+
+<sub>🔗 [Web](https://example.com/d)</sub>
+
+**How it works**
+- Does a thing.
+`;
+    expect(reviewNote(extra, "2026-11-16").map(({ letter, importable, reason }) => ({ letter, importable, reason }))).toEqual([
+      { letter: "a", importable: true, reason: undefined },
+      { letter: "b", importable: false, reason: "rated 🤔 Maybe" },
+      { letter: "c", importable: false, reason: "source is an lnkd.in shortlink" },
+      { letter: "d", importable: false, reason: "no verdict yet" },
+    ]);
   });
 });
