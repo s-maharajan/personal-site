@@ -46,8 +46,8 @@
   --text-3xl--line-height: 2.25rem;
   --text-4xl--line-height: 2.5rem;
 
-  --container-page: 50rem;
-  --container-reading: 42rem; /* not "prose": Tailwind 4 has a built-in max-w-prose (65ch) */
+  --container-page: 58rem;
+  --container-reading: 46rem; /* not "prose": Tailwind 4 has a built-in max-w-prose (65ch) */
 }
 
 /*
