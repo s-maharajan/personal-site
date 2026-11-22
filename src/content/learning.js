@@ -69,7 +69,11 @@ export const learningSections = [
         "url": "https://x.com/sumanth_077/status/2097689190712692965",
         "takeaway": "Start with one loop for one coherent task; move to a graph only for parallelism, different permissions or human gates.",
         "summary": "Clear definitions: a \"loop\" is one agent's own plan→act→verify→repeat cycle; a \"graph\" is the layer above that wires multiple loops/tools/agents together via explicit nodes and edges. You start with a loop for one coherent task, move to a graph once work needs parallelism, different permissions, or human approval steps.",
-        "points": [],
+        "points": [
+          "Loop: one agent plans, acts, verifies and repeats until the task is done or it stops.",
+          "Graph: the layer above, wiring several loops, tools or agents together with explicit nodes and edges.",
+          "Move from a loop to a graph when work needs parallelism, different permissions or a human approval step."
+        ],
         "tryIt": "Take one multi-step agent task and ask whether it needs parallel work, different permissions or a human approval step. If not, keep it as one loop.",
         "caveat": "High-level framing only, no code or repo attached.",
         "flow": {
@@ -541,7 +545,11 @@ export const learningSections = [
         "url": "https://github.com/mattpocock/dictionary-of-ai-coding",
         "takeaway": "A shared vocabulary for sessions, context, failure modes and handoffs makes team conversations about agents faster.",
         "summary": "Matt Pocock's glossary of AI coding terms in seven sections: the model, sessions and context, tools, failure modes, handoffs, memory and steering, and patterns of work.",
-        "points": [],
+        "points": [
+          "Starts with the model itself: tokens, inference, effort, the harness and prefix caching.",
+          "Names failure modes such as sycophancy, hallucination, knowledge cutoff and attention degradation.",
+          "Covers handoffs between sessions: clearing, compaction, specs, tickets and handoff artifacts."
+        ],
         "tryIt": "Read the failure-modes section and use its terms the next time you describe an agent going wrong.",
         "caveat": "Includes a newsletter plug."
       }
@@ -902,6 +910,7 @@ export const learningSections = [
           "Tier 3 Live Evaluation: runs a supported agent in a sandbox (Docker by default) with and without the skill and scores the difference.",
           "A `ci init` command opens a PR that checks changed skills on every pull request."
         ],
+        "tryIt": "`pip install skillevaluator`, then `skillevaluator validate ./my-skill --tiers 1` for the free static checks. See [NVIDIA/SkillEvaluator](https://github.com/NVIDIA/SkillEvaluator).",
         "caveat": "Tier 3 needs model access, an agent and Docker. The LLM rubric sends skill text to NVIDIA's hosted endpoint. A scanner that cannot run makes the result `INCOMPLETE`.",
         "flow": {
           "steps": [
@@ -927,7 +936,8 @@ export const learningSections = [
           "Analyze: the Copilot CLI rebuilds one intent plus ordered steps, which you edit.",
           "Create: generate a Skill or an Automation, preferring native tools like `gh` or `web_fetch` over replaying clicks."
         ],
-        "caveat": "Needs a GitHub account with Copilot access. Records your screen, so sensitive data may end up in the recording sent to Copilot. No license listed in the repo. The README says review gives visibility, not a security guarantee.",
+        "tryIt": "Open the [latest release](https://github.com/microsoft/skill-recorder/releases/latest) of microsoft/skill-recorder and copy the commit-pinned install command for your platform.",
+        "caveat": "Needs a GitHub account with Copilot access. Records your screen, so sensitive data may end up in the recording sent to Copilot. MIT licence; installs from source with a commit-pinned script. The README says review gives visibility, not a security guarantee.",
         "flow": {
           "steps": [
             "Record task once",
@@ -946,9 +956,14 @@ export const learningSections = [
         "url": "https://x.com/danikkk_wqs/status/2119535297541070962",
         "takeaway": "Small composable skills beat one giant prompt; borrow from public skill packs before writing your own.",
         "summary": "A roundup of skill packs (reusable agent instructions). The most useful for engineering: Pocock's small composable skills, Osmani's spec-to-ship slash commands, and Cloudflare's multi-agent security audit.",
-        "points": [],
+        "points": [
+          "Packs listed: [mattpocock/skills](https://github.com/mattpocock/skills), [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills), [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill), kepano/obsidian-skills and google/elephant-go.",
+          "Cloudflare security audit: recon maps architecture and trust boundaries into a coverage ledger, isolated \"hunter\" agents search, and a fresh verifier tries to disprove each candidate.",
+          "Findings are marked confirmed, needs_validation or rejected and validated against a JSON schema; the skill seeded the harness Cloudflare uses on its own repos.",
+          "Osmani's pack gives slash commands such as /spec, /plan, /build, /test, /review and /ship; Pocock's skills install in Claude Code, Codex, Copilot CLI and Gemini CLI."
+        ],
         "tryIt": "`copilot plugin marketplace add mattpocock/skills`",
-        "caveat": "Star counts in the post are out of date. No licences shown in metadata. Post's claim about Osmani's role was not verified.",
+        "caveat": "Star counts in the post are out of date. No licences shown in metadata. The post's description of Osmani's role is unconfirmed.",
         "flow": {
           "steps": [
             "Recon and coverage ledger",
@@ -1259,8 +1274,13 @@ export const learningSections = [
         "url": "https://x.com/beamnxw/status/2101278282700226824",
         "takeaway": "A shortlist of building blocks; pick only what fills a real gap.",
         "summary": "A curated shortlist of 15 open-source projects mapped onto one pipeline: find a signal, turn it into context, keep what matters, hand it to an agent, give it somewhere to run, adapt the model, ship to users.",
-        "points": [],
-        "tryIt": "pick one gap you actually have, e.g. `pip install openbb` for market data, or `curl -fsSL https://dokploy.com/install.sh | bash` to self-host apps - don't adopt all 15 at once.",
+        "points": [
+          "Agent harnesses: [DeerFlow](https://github.com/bytedance/deer-flow) orchestrates sub-agents, memory and sandboxes; [Goose](https://github.com/aaif-goose/goose) is a desktop and CLI agent, now a Linux Foundation project.",
+          "Context and memory: [RAGFlow](https://github.com/infiniflow/ragflow) is an open-source RAG engine; [MemPalace](https://github.com/MemPalace/mempalace) gives coding agents local long-term memory.",
+          "Adapt the model: [Unsloth](https://github.com/unslothai/unsloth) for fast, cheap fine-tuning, and LlamaFactory for no-code fine-tuning.",
+          "Build and ship: [Agno](https://github.com/agno-agi/agno) to build and run agent platforms, CopilotKit for agent UIs, and Dokploy to self-host apps."
+        ],
+        "tryIt": "Pick one gap you actually have, for example `pip install openbb` for market data or `curl -fsSL https://dokploy.com/install.sh | bash` to self-host apps. Do not adopt all 15 at once.",
         "caveat": "Single creator's curated list with a self-promo close (\"save this to build your own business with an AI employee\"); several repos show no classified LICENSE on GitHub - check the actual file before adopting any of them; star counts are a popularity signal, not a quality guarantee."
       },
       {

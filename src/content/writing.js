@@ -931,6 +931,92 @@ const drafts = [
       },
     ],
   },
+  {
+    slug: "moving-integrations-to-the-cloud-one-seam-at-a-time",
+    title: "Moving integrations to the cloud, one seam at a time",
+    topic: "Cloud",
+    area: "Cloud",
+    date: "November 2026",
+    summary:
+      "Integration estates move to the cloud safely when each flow moves on its own: messaging first, infrastructure owned by Terraform, deploys as image swaps, no long-lived secrets, and a parallel run before every cutover.",
+    excerpt:
+      "A big-bang cloud migration of an integration estate asks every flow to work on the same day. Moving one seam at a time asks only one flow to work, and leaves a way back.",
+    sources: [
+      "aws-emulator-local-aws-apis",
+      "github-actions-parallel-steps",
+      "gh-secure-github-cli-extension",
+      "open-source-security-review-stack",
+    ],
+    references: [
+      { title: "Strangler Fig Application", url: "https://martinfowler.com/bliki/StranglerFigApplication.html", source: "Martin Fowler" },
+      { title: "Strangler Fig pattern", url: "https://learn.microsoft.com/en-us/azure/architecture/patterns/strangler-fig", source: "Azure Architecture Center" },
+      { title: "Service Bus dead-letter queues", url: "https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-dead-letter-queues", source: "Microsoft Learn" },
+      { title: "Service Bus duplicate detection", url: "https://learn.microsoft.com/en-us/azure/service-bus-messaging/duplicate-detection", source: "Microsoft Learn" },
+      { title: "Service Bus message sessions", url: "https://learn.microsoft.com/en-us/azure/service-bus-messaging/message-sessions", source: "Microsoft Learn" },
+      { title: "Service Bus emulator", url: "https://learn.microsoft.com/en-us/azure/service-bus-messaging/overview-emulator", source: "Microsoft Learn" },
+      { title: "azurerm backend", url: "https://developer.hashicorp.com/terraform/language/backend/azurerm", source: "Terraform docs" },
+      { title: "OpenID Connect in GitHub Actions", url: "https://docs.github.com/en/actions/concepts/security/openid-connect", source: "GitHub Docs" },
+      { title: "Connect GitHub Actions to Azure with OpenID Connect", url: "https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-openid-connect", source: "Microsoft Learn" },
+      { title: "Workload identity on AKS", url: "https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview", source: "Microsoft Learn" },
+      { title: "Secrets Store CSI Driver on AKS", url: "https://learn.microsoft.com/en-us/azure/aks/csi-secrets-store-driver", source: "Microsoft Learn" },
+    ],
+    content: [
+      {
+        heading: "Move a seam, not the estate",
+        body: p(
+          "An integration estate is a web of flows: queues, file transfers, APIs and event streams, each with producers and consumers that were added over years. A big-bang move asks all of them to work on the same day in a new place. When something breaks, it is hard to tell which of a hundred changes caused it, and there is no partial way back.",
+          "The strangler fig pattern is the alternative. Put a routing point in front of a flow, build the new version beside the old one, shift traffic across, and retire the old path only when the new one has proved itself. For integration, the seam is usually a single flow: one queue and its consumers, one file drop, one API. Each seam moves on its own, so each one carries its own small risk and its own rollback.",
+        ),
+        diagram: {
+          steps: [
+            "Pick one flow and list its producers and consumers",
+            "Build the new path in the cloud beside the old one",
+            { label: "Parallel run: compare outputs", tone: "accent" },
+            "Shift traffic at the routing point",
+            { label: "Retire the old path", tone: "dashed" },
+          ],
+          caption: "One seam at a time: every step can stop or roll back without touching the other flows.",
+        },
+      },
+      {
+        heading: "Messaging moves first",
+        body: p(
+          "Most integration flows are held together by messaging, so the broker decides what the cloud version can promise. On Azure, Service Bus covers the guarantees that on-premises brokers usually provide, but each must be switched on and designed for:",
+          "- **Dead-letter queues**: every queue and subscription has one. Messages that exceed their delivery count or fail validation are parked there, not lost, and someone must own reading them.\n- **Duplicate detection**: Service Bus can drop repeats of the same message ID within a time window. Consumers should still be idempotent, because duplicates can arrive from outside that window.\n- **Sessions**: where order matters, such as all events for one account, sessions give first-in, first-out handling per key instead of across the whole queue.",
+          "Map each old queue to these features before writing any code. A flow that relied on strict ordering or exactly-once behaviour in the old broker needs that stated in the new design, or it will break quietly after cutover.",
+        ),
+      },
+      {
+        heading: "Terraform owns the resources; pipelines swap images",
+        body: p(
+          "Split the platform into two lifecycles. Terraform owns the long-lived resources: the AKS cluster, Service Bus namespaces and queues, Key Vault, networking and identities, with state in a remote backend such as an Azure storage account with locking. Application pipelines own only what changes often: they build a container image, scan it, and roll it out to the deployment that Terraform created.",
+          "This keeps the blast radius of a routine release small. A deploy cannot delete a queue or change a network rule, because the pipeline has no permission to. Infrastructure changes go through their own reviewed plan and apply, where the plan output shows exactly what will change before it does.",
+        ),
+      },
+      {
+        heading: "No long-lived secrets in the path",
+        body: p(
+          "Migrations are a good moment to remove stored credentials rather than copy them into a new place.",
+          "- **Pipeline to cloud**: GitHub Actions can request a short-lived OpenID Connect token for each run and exchange it for Azure access through a federated credential. No client secret or publish profile sits in the repository settings, and the trust can be limited to one repository, branch or environment.\n- **Workload to secrets**: on AKS, workload identity lets a pod authenticate to Azure as a managed identity, and the Secrets Store CSI Driver mounts Key Vault secrets at runtime. Connection strings stay in Key Vault, not in Kubernetes manifests or container images.",
+          "Pair this with scanning in the pipeline: secret scanning, dependency checks and workflow linting catch the credentials and risky steps that slip in anyway.",
+        ),
+      },
+      {
+        heading: "Prove each seam before cutover",
+        body: p(
+          "Test the new path where it is cheap first. Local emulators, such as the Service Bus emulator, let integration tests send and receive real messages in CI without a cloud subscription, and parallel CI steps keep those runs fast.",
+          "Then run old and new side by side on real traffic. Feed the same input to both paths and compare what comes out: message counts, payloads after transformation, and what lands in each dead-letter queue. Cut over only when the differences are understood, and keep the old path ready to take traffic back for an agreed period.",
+          "Finally, watch the flow, not just the service. A healthy pod that silently drops one message in a thousand is a failed migration. Each moved flow needs its own signals: throughput, age of the oldest message, dead-letter depth and end-to-end latency.",
+        ),
+      },
+      {
+        heading: "Practical guidance",
+        body: p(
+          "1. Choose the first seam for learning, not for impact: a flow with few consumers and a clear owner.\n2. Write down each flow's delivery guarantees (ordering, duplicates, retries, dead-letter handling) before choosing its cloud design.\n3. Keep Terraform and application pipelines separate, with separate permissions.\n4. Use OpenID Connect from pipelines and workload identity in the cluster; move every remaining secret to Key Vault.\n5. Parallel-run and compare outputs before every cutover, and keep a tested way back.\n6. Give every moved flow its own dashboard and alerts before you call it done.",
+        ),
+      },
+    ],
+  },
 ];
 
 const entriesBySlug = new Map(learningSections.flatMap((s) => s.entries.map((e) => [e.slug, { ...e, section: s }])));
