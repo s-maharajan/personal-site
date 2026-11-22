@@ -7,7 +7,7 @@ export const learningSections = [
     "title": "Agent architecture",
     "kicker": "Loops, graphs & decisions",
     "description": "How to shape agent systems: when one loop is enough, when to wire loops into a graph, and when a small decision model beats a big generative one.",
-    "readTime": "4 min read",
+    "readTime": "5 min read",
     "entries": [
       {
         "slug": "barry-zhang-building-effective-agents",
@@ -22,7 +22,8 @@ export const learningSections = [
           "Build those three first; optimize (caching, parallel tool calls, progress display) later.",
           "Debug by reading only what the agent sees in its context window."
         ],
-        "caveat": "Talk dates from 2025; predictions (multi-agent in production \"by end of this year\") refer to that year. Slide content not visible from audio.",
+        "tryIt": "Before optimising an agent, read one failing run from start to finish using only what was in its context window.",
+        "caveat": "Talk dates from 2025; predictions (multi-agent in production \"by end of this year\") refer to that year. The slides are not covered.",
         "flow": {
           "steps": [
             "System prompt with goals and limits",
@@ -69,6 +70,7 @@ export const learningSections = [
         "takeaway": "Start with one loop for one coherent task; move to a graph only for parallelism, different permissions or human gates.",
         "summary": "Clear definitions: a \"loop\" is one agent's own plan→act→verify→repeat cycle; a \"graph\" is the layer above that wires multiple loops/tools/agents together via explicit nodes and edges. You start with a loop for one coherent task, move to a graph once work needs parallelism, different permissions, or human approval steps.",
         "points": [],
+        "tryIt": "Take one multi-step agent task and ask whether it needs parallel work, different permissions or a human approval step. If not, keep it as one loop.",
         "caveat": "High-level framing only, no code or repo attached.",
         "flow": {
           "steps": [
@@ -94,6 +96,7 @@ export const learningSections = [
           "Two return paths: a short \"correction\" edge sends one failing unit back to be fixed; a long \"learning\" edge turns a confirmed cause into a constraint for the splitter, so future runs don't repeat it",
           "Gate decisions should sort by blast radius (reversible & contained vs reversible-but-wide vs hard-to-reverse/irreversible), not by model confidence score"
         ],
+        "tryIt": "Before the next agent task, write the check that would make it fail, and sort its approval gates by how hard a mistake would be to undo.",
         "caveat": "No code/repo, just a written framework; needs translating into your own orchestration tooling to be useful.",
         "flow": {
           "steps": [
@@ -119,6 +122,7 @@ export const learningSections = [
           "Verify: a fresh \"skeptic\" agent checks each finding - critically, with its own clean context, never the worker's conversation history",
           "Synthesize once from what survived verification"
         ],
+        "tryIt": "Find two steps in an agent pipeline that share no data, run them in parallel, and have a fresh-context reviewer check the findings.",
         "caveat": "The $165K/535K-line case is a single anecdote with no linked source or repro; this is an architectural pattern to borrow, not a tool to install.",
         "flow": {
           "steps": [
@@ -190,10 +194,11 @@ export const learningSections = [
         "takeaway": "A hosted decision model for cheap classification and routing steps inside a larger agent.",
         "summary": "A decision model picks from given options instead of writing text. Google now offers one in the Gemini API, free to try.",
         "points": [
-          "You send state plus a question with options; the model returns its choice (see section m for how decision models work).",
+          "You send state plus a question with options; the model returns its choice.",
           "Inputs can be image, audio, video or PDF; 256K context window."
         ],
-        "caveat": "\"1K questions\" is not explained in the post. No accuracy data captured.",
+        "tryIt": "Try it free in the Gemini API on one routing or classification step: send the state, a question and the options.",
+        "caveat": "\"1K questions\" is not explained in the post. The post gives no accuracy data.",
         "flow": {
           "steps": [
             "Input: text, image, PDF",
@@ -210,7 +215,7 @@ export const learningSections = [
     "title": "AI-native engineering",
     "kicker": "How teams actually ship with agents",
     "description": "Practices from teams running agents across the whole delivery lifecycle: verification, layered review, cost control and keeping humans in charge of the reasoning.",
-    "readTime": "10 min read",
+    "readTime": "11 min read",
     "entries": [
       {
         "slug": "lauren-tan-slop-into-gold",
@@ -330,7 +335,8 @@ export const learningSections = [
           "Self-check questions: Did I form a hypothesis before asking? Am I using it to help me think or to replace thinking? What would have to be true for this to be wrong? Have I heard the counter-argument (ask another model to argue the opposite)? Would I bet on this in front of its maintainer? What am I no longer practising?",
           "Verification is the new bottleneck: give the agent a way to verify (tests, property tests, app interaction), but beware \"surrendered verification\" - a green check written with the same mistake as the feature proves nothing. Define \"verified\" upfront."
         ],
-        "caveat": "Opinion essay, no data. The article text was truncated in research, so the ending is not covered.",
+        "tryIt": "On the next agent task, write down your hypothesis and what \"verified\" means before you start, then go through the self-check questions.",
+        "caveat": "Opinion essay, no data. This summary does not cover the end of the article.",
         "flow": {
           "steps": [
             "Write hypothesis first",
@@ -411,7 +417,8 @@ export const learningSections = [
           "Operating model: Rules (permanent instructions, added after a mistake repeats twice), Skills, Agents, Commands (chained workflows) and Hooks (e.g. lint after every agent turn)",
           "Gave agents tools to inspect the live view hierarchy instead of text descriptions; a separate sandbox build flavor keeps prototype code out of production"
         ],
-        "caveat": "Internal Meta tooling; no numbers on overall speed-up in the readable text.",
+        "tryIt": "Write the next agent task as a precise spec with its checks (build, tests), and add a rule to your instruction file only after a mistake repeats.",
+        "caveat": "Internal Meta tooling; the post gives no numbers on overall speed-up.",
         "flow": {
           "steps": [
             "Engineer sets goal and spec",
@@ -535,6 +542,7 @@ export const learningSections = [
         "takeaway": "A shared vocabulary for sessions, context, failure modes and handoffs makes team conversations about agents faster.",
         "summary": "Matt Pocock's glossary of AI coding terms in seven sections: the model, sessions and context, tools, failure modes, handoffs, memory and steering, and patterns of work.",
         "points": [],
+        "tryIt": "Read the failure-modes section and use its terms the next time you describe an agent going wrong.",
         "caveat": "Includes a newsletter plug."
       }
     ]
@@ -680,7 +688,8 @@ export const learningSections = [
           "You choose from 75+ open and proprietary models, billed through one DigitalOcean account",
           "Sessions can be closed and resumed later from another device, continuing the same agent state"
         ],
-        "tryIt": "See the getting-started prompts in DigitalOcean's blog post: https://do.co/4ysh3it",
+        "tryIt": "Follow the getting-started prompts in [DigitalOcean's announcement](https://www.digitalocean.com/blog/managed-agents-public-preview).",
+        "caveat": "Public preview. Check pricing and the supported agents and models before relying on it.",
         "flow": {
           "steps": [
             "Developer starts agent",
@@ -1007,7 +1016,7 @@ export const learningSections = [
         "source": "Aravind Srinivas (@AravSrinivas)",
         "url": "https://x.com/aravsrinivas/status/2114021917586014449",
         "takeaway": "Deterministic rules catch the visual tells of AI-generated UI before a human has to.",
-        "summary": "Impeccable is design guidance for AI coding agents: 1 skill, 24 commands and 62 deterministic detector rules that spot typical \"AI-generated\" UI tells. Perplexity added it to its Computer skills marketplace; tasks using it are free through October 31, up to 5,000 credits per user.",
+        "summary": "Impeccable is design guidance for AI coding agents: 1 skill, 24 commands and 62 deterministic detector rules that spot typical \"AI-generated\" UI tells. Perplexity added it to its Computer skills marketplace; tasks using it were free through October 31, up to 5,000 credits per user.",
         "points": [
           "`/impeccable init` inspects the project and writes `PRODUCT.md` (audience, purpose, constraints, voice) so later commands have context",
           "24 commands form a shared design vocabulary: `audit`, `critique`, `polish`, `layout`, `typeset`, `harden` and more",
@@ -1016,7 +1025,7 @@ export const learningSections = [
           "Started from Anthropic's frontend-design skill"
         ],
         "tryIt": "`npx impeccable install`",
-        "caveat": "No licence shown in research output - check before use. The free credits are Perplexity-specific and end Oct 31.",
+        "caveat": "No licence shown, so check before use. The free Perplexity credits ended on October 31.",
         "flow": {
           "steps": [
             "npx impeccable install",
@@ -1153,6 +1162,7 @@ export const learningSections = [
           "`cancel` stops a background step (e.g. a test service)",
           "`parallel` groups steps to run together, then waits"
         ],
+        "tryIt": "In one CI job, mark independent steps `background: true` and add a `wait-all` step before the steps that need their results.",
         "caveat": "Check the workflow syntax docs for current details.",
         "flow": {
           "steps": [
@@ -1342,8 +1352,8 @@ export const learningSections = [
   {
     "slug": "models-and-frontier",
     "title": "Models & frontier",
-    "kicker": "Local models & where research is going",
-    "description": "Models you can run yourself, and a longer view on how AI changes scientific work.",
+    "kicker": "Models to try & where research is heading",
+    "description": "Models you can run yourself, new models worth trying in your coding tools, and a longer view on how AI changes scientific work.",
     "readTime": "3 min read",
     "entries": [
       {
