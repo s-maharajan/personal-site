@@ -1085,8 +1085,34 @@ export const learningSections = [
     "title": "Developer toolbox",
     "kicker": "Tools worth keeping close",
     "description": "Small, practical tools that remove friction: faster search, local cloud emulation, quick tunnels, reverse engineering and curated building blocks for agents.",
-    "readTime": "7 min read",
+    "readTime": "8 min read",
     "entries": [
+      {
+        "slug": "github-pr-overview-preview",
+        "title": "GitHub PR Overview Preview",
+        "date": "2026-11-23",
+        "source": "The GitHub Blog",
+        "url": "https://github.blog/changelog/2026-11-05-new-pull-request-overview-page-in-public-preview/",
+        "takeaway": "An opt-in pull request page that shows merge readiness and next actions first.",
+        "summary": "GitHub has an opt-in Overview page for pull requests. It moves a redesigned merge box to the top in a compact summary of merge readiness. The summary shows checks, comments and approvals, followed by the next available action. As reviewers handle more AI-generated pull requests, less scrolling saves real time.",
+        "points": [
+          "Select **Try the Overview page** in the PR header. You can switch back to the classic view from the same menu.",
+          "The redesigned merge box uses less than half the space and links to failing checks, missing approvals and relevant comments.",
+          "You can filter conversations to unresolved threads or your own comments, and sort comments from newest to oldest.",
+          "An upper-right summary shows new review comments and requests. The header lets you mark a draft ready for review or close the PR."
+        ],
+        "tryIt": "Open any PR and select \"Try the Overview page\" in the header.",
+        "caveat": "It is a preview, so the design may change. The actions available depend on your permissions.",
+        "flow": {
+          "steps": [
+            "Open long PR",
+            "Readiness summary at top",
+            "Jump to blocker - check, approval, comment",
+            "Fix or update branch",
+            "Merge"
+          ]
+        }
+      },
       {
         "slug": "plannotator-plan-review",
         "title": "Plannotator: Plan Review",
