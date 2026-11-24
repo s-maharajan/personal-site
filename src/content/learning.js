@@ -7,8 +7,33 @@ export const learningSections = [
     "title": "Agent architecture",
     "kicker": "Loops, graphs & decisions",
     "description": "How to shape agent systems: when one loop is enough, when to wire loops into a graph, and when a small decision model beats a big generative one.",
-    "readTime": "5 min read",
+    "readTime": "6 min read",
     "entries": [
+      {
+        "slug": "strands-decider-v2",
+        "title": "Strands Decider v2",
+        "date": "2026-11-24",
+        "source": "Matt Wood",
+        "url": "https://www.linkedin.com/posts/themza_ai-field-note-strands-decider-v2-is-now-share-7530728038423109632-dtuA/",
+        "takeaway": "Open decision models that score options in one forward pass.",
+        "summary": "A family of five decision models built on Gemma 4 (E2B to 31B parameters, Apache 2.0). You give it a set of options and it returns a probability for each in a single forward pass, so agents can pick tools, route requests or judge results without generating text.",
+        "points": [
+          "Input: a context plus a list of options; output: one probability per option.",
+          "One forward pass (one run through the model), no token generation, so it is fast and cheap.",
+          "Calibrated confidence lets an agent decide to act, escalate to a bigger model, or ask a human.",
+          "v2 accepts text, images and video, and is trained for long inputs such as agent execution traces."
+        ],
+        "caveat": "Benchmarks and savings are the author's figures. No repo or model link in the post; commenters ask for Bedrock availability.",
+        "flow": {
+          "steps": [
+            "Agent context",
+            "Options list",
+            "Decider single pass",
+            "Probability per option",
+            "Act or escalate"
+          ]
+        }
+      },
       {
         "slug": "barry-zhang-building-effective-agents",
         "title": "Barry Zhang: Building Effective Agents",
