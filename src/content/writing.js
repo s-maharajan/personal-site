@@ -8,6 +8,133 @@ const code = (lang, ...lines) => ["```" + lang, ...lines, "```"].join("\n");
 
 const drafts = [
   {
+    slug: "testing-agent-skills-with-microsoft-waza",
+    title: "Testing agent skills with Microsoft Waza",
+    topic: "Evals",
+    area: "AI",
+    date: "November 2026",
+    summary:
+      "A skill is a prompt that runs on every request it matches, so a careless edit can quietly change how an agent behaves. Waza, Microsoft's open-source eval CLI, gives skills and custom agents what code already has: repeatable tasks, graders and a gate in CI.",
+    excerpt:
+      "We review every line of application code, then ship the instruction files that steer our agents on a hunch. Microsoft's Waza is one of the clearest attempts yet to close that gap.",
+    sources: [
+      "microsoft-waza",
+      "github-copilot-evals",
+      "nvidia-skillevaluator",
+      "agent-eval-as-a-quality-system",
+      "bitdefender-poisoned-agent-configs",
+    ],
+    references: [
+      { title: "Waza documentation", url: "https://microsoft.github.io/waza/", source: "Microsoft" },
+      { title: "Waza v0.42.0 release notes", url: "https://microsoft.github.io/waza/releases/v0-42-0/", source: "Microsoft" },
+      { title: "Native grader reference", url: "https://github.com/microsoft/waza/blob/main/docs/GRADERS.md", source: "Microsoft" },
+      { title: "Skill development best practices", url: "https://github.com/microsoft/waza/blob/main/docs/SKILL-BEST-PRACTICES.md", source: "Microsoft" },
+    ],
+    content: [
+      {
+        heading: "Skills change behaviour without changing code",
+        body: p(
+          "A skill is a folder with a SKILL.md: a description that tells the agent when to use it, and instructions for what to do once it does. Copilot, Claude Code and other harnesses load the description on every request and pull in the rest when it matches. That makes a skill behave like code that runs on a large share of requests, yet most teams change one the way they edit a wiki page.",
+          "The failures are quiet. Broaden a description and the skill starts answering questions it should leave alone. Tighten it and it stops firing where it should. Reword a step and the agent skips a tool call it used to make. None of this breaks a build, and a newer model can change the outcome with no edit at all.",
+          "The fix is the one we already use for code: write down what good looks like, run it repeatedly, and fail the pull request when it gets worse. Waza is Microsoft's open-source tool for exactly that.",
+        ),
+      },
+      {
+        heading: "What Waza is",
+        body: p(
+          "Waza is a command-line tool written in Go and released under the MIT licence. It evaluates skills, custom agents (`.agent.md` files) and wider agent workflows that have no SKILL.md at all. Version 0.42.0 shipped on 21 November 2026, and releases arrive roughly weekly, so it is still pre-1.0 and moving fast.",
+          "The core loop is small. `waza init` creates a project, `waza new skill` scaffolds a skill with an eval beside it, and `waza run` executes the eval and scores it. Around that sit tools for the rest of the job: `check` for skill readiness, `tokens` for context budgets, `compare` for model-against-model results, `preflight` for validating a suite without running it, and `adversarial` for prompt-injection and scope-bypass packs.",
+        ),
+      },
+      {
+        heading: "The anatomy of an eval",
+        body: p(
+          "An eval is a YAML file that names the skill, the executor and model, how many trials to run per task, and the graders that score each run. Tasks live in their own files, each with a prompt and the fixture files it needs:",
+          code(
+            "yaml",
+            "# evals/code-explainer/eval.yaml",
+            "name: code-explainer-eval",
+            "skill: code-explainer",
+            "config:",
+            "  executor: copilot-sdk   # or mock, for offline harness checks",
+            "  model: claude-sonnet-4.6",
+            "  trials_per_task: 3",
+            "graders:",
+            "  - type: code",
+            "    name: has_output",
+            "    config:",
+            "      assertions:",
+            "        - \"len(output) > 0\"",
+            "tasks:",
+            "  - \"tasks/*.yaml\"",
+          ),
+          "Each task runs in a fresh copy of its fixtures, so a run can edit files freely and the originals stay untouched. Graders then look at three different things:",
+          "- **The answer**: `text` (substrings and regular expressions), `code` (inline assertions), `json_schema`, and `prompt`, an LLM judge that must call explicit pass or fail tools.\n- **The workspace**: `file` and `diff` check what the agent left on disk, and `program` runs any command and reads its exit code.\n- **The path**: `tool_calls`, `tool_constraint` and `action_sequence` check which tools were called, with what arguments and in what order; `skill_invocation` and `trigger` check whether the skill fired at all.",
+          "That last group matters most. An agent can produce a plausible answer by the wrong route, such as guessing instead of reading the file, or calling a write tool when the task was read-only. Grading the path catches what grading the answer misses.",
+        ),
+        diagram: {
+          steps: [
+            "SKILL.md and its eval",
+            "Tasks with fixtures",
+            ["Trial 1", "Trial 2", "Trial 3"],
+            { label: "Grade answer, workspace and tool calls", tone: "accent" },
+            "Compare with the baseline",
+          ],
+          caption: "Each trial gets a fresh workspace; graders score what the agent said, what it changed and how it got there.",
+        },
+      },
+      {
+        heading: "Start offline, and know what a mock pass proves",
+        body: p(
+          "Waza has a `mock` executor that needs no model and no account. It is the right first step: it shows that the suite loads, the fixtures resolve and the graders behave. It does not show that the skill works. The mock simply echoes the prompt back, so a regular expression that looks for words from the prompt will pass whatever the skill says.",
+          "The mock still earns its place. Scaffold a skill with v0.42.0, switch the eval to `executor: mock`, and run it: two of the three generated tasks fail. The default suite applies a check for words like \"explain\" to every task, including the one written to prove the skill stays quiet on an unrelated prompt about the weather. A negative test that demands a positive answer can never pass.",
+          "The fix is to scope a grader to the tasks it describes. Tasks can declare graders inline:",
+          code(
+            "yaml",
+            "# tasks/basic-usage.yaml",
+            "id: basic-usage-001",
+            "inputs:",
+            "  prompt: \"Read sample.py and explain the function it contains.\"",
+            "  files:",
+            "    - path: sample.py",
+            "graders:",
+            "  - type: text",
+            "    name: relevant_content",
+            "    config:",
+            "      regex_match:",
+            "        - \"(?i)(explain|describe|analyze|implement)\"",
+          ),
+          "With the check moved there, all three tasks pass and `waza run` exits 0. Then break a predicate on purpose (an impossible regular expression works) and confirm the run fails. A grader that has never failed has not been tested.",
+        ),
+      },
+      {
+        heading: "Then run it for real, more than once",
+        body: p(
+          "The built-in executor for real runs is the GitHub Copilot SDK, so they need Copilot access and they cost money; an LLM judge adds more. Two habits keep that spend useful.",
+          "First, run several trials. Models are not deterministic, so one pass tells you little. Waza reports pass rate, spread and confidence intervals per task, and its results include pass^k, where all k trials must pass, which is the right bar for behaviour that has to be reliable rather than occasionally right.",
+          "Second, record a reviewed baseline and compare against it. `waza compare` lines up result files side by side, which turns a model upgrade from a leap of faith into a measurement, and `waza tokens compare main` shows when a change bloats the context the skill costs on every request.",
+          "Where the tasks come from matters more than the tool. Start with twenty to fifty drawn from real failures, and keep capability evals, which you expect to fail today, apart from regression evals, which should stay near 100% and gate merges.",
+        ),
+      },
+      {
+        heading: "Gate it in CI, and treat the eval as code too",
+        body: p(
+          "`waza init` generates a GitHub Actions workflow that runs the evals on pull requests touching `skills/` or `evals/`. Cheap checks belong on every pull request: `waza check` scores the SKILL.md (a description of at least 150 characters, explicit USE FOR and DO NOT USE FOR triggers), and `waza spec verify --fail --format github-actions` fails the build when the eval no longer covers what the skill claims. Save paid model runs for a label, a nightly job or a release branch.",
+          "Review the generated workflow before you merge it. It references actions by tag and installs the Waza extension from a registry file on the repository's main branch. Pin both to commit hashes, give the job read-only permissions, and keep model credentials in secrets scoped to the jobs that need them.",
+          "That caution is not abstract. Bitdefender has just documented malware spread through repositories whose AGENTS.md, CLAUDE.md and session-start hooks tell coding agents to run a hidden setup script. Instruction files are now an execution path. A pipeline that reviews, versions and tests them is security work, not only quality work, and Waza's adversarial packs are a reasonable place to start probing a skill for prompt injection.",
+        ),
+      },
+      {
+        heading: "Where Waza fits",
+        body: p(
+          "Waza is not the only option. GitHub's Copilot Evals, now in public preview, wraps a similar loop in the Copilot experience with `/eval` commands and a canvas. NVIDIA's SkillEvaluator adds duplicate detection across a skill catalogue and runs agents with and without a skill to measure its effect. The ideas are converging: a skill should prove that it helps, not just that it parses.",
+          "Waza's strengths are that it is open source, runs from one binary, grades the path as well as the answer, and fits into the CI you already have. Its weaknesses are those of a young tool: weekly releases, real runs tied to the Copilot SDK, and fixture isolation that is not a sandbox for the host or the network.",
+          "The practical step is small. Take one skill your team depends on, write five tasks from the last five times it misbehaved, add one that should not trigger it, and run them on every change to the skill. That is the moment an instruction file stops being a note and starts being software.",
+        ),
+      },
+    ],
+  },
+  {
     slug: "agents-for-integration-migration",
     title: "Agents for integration migration: discover, map, modernise, operate",
     topic: "Migration",

@@ -615,8 +615,68 @@ export const learningSections = [
     "title": "Agent security",
     "kicker": "Sandboxes, injection & supply chain",
     "description": "What changes when software reads untrusted content and acts on it: prompt injection defences, isolation designs and a practical open-source security stack.",
-    "readTime": "5 min read",
+    "readTime": "7 min read",
     "entries": [
+      {
+        "slug": "jesta-ai-agent-probes-api",
+        "title": "An AI Agent Probes a Bank's API in 6 Minutes",
+        "date": "2026-11-24",
+        "source": "The Register",
+        "url": "https://www.theregister.com/security/2026/11/24/an-ai-coding-agent-a-browser-and-a-mac-tool-found-a-financial-firms-access-key-in-under-6-minutes/5311922",
+        "takeaway": "An attacker pointed an open-source coding agent at a financial firm's API; it found a key in minutes, and behaviour, not a blocklist, caught it.",
+        "summary": "Security start-up Jesta reported an attacker driving OpenCode, plus a browser and curl, against a financial-services customer on 16 November. The agent retried within seconds under a fake phone identity, read an API document and followed a link only that document contained. Jesta flagged it as an agent about a minute in and served it a decoy environment and fake key; it gave up after 5 minutes 44 seconds. Nothing was taken.",
+        "points": [
+          "Agents iterate faster than people: a refused request was retried six seconds later with a different user agent.",
+          "The address was on no threat feed, so blocklists would not have helped.",
+          "Signals that did work: following links that exist only in API docs, mixing desktop, fake-phone and curl traffic from one address, and trying several keys within seconds.",
+          "Decoy documents and keys turn an agent's speed against it."
+        ],
+        "tryIt": "Plant a canary link in your API docs that no real client follows, and alert when anything requests it.",
+        "caveat": "A vendor report shared with the press; the model, the attacker and the customer are not named.",
+        "flow": {
+          "steps": [
+            "Agent fetches API docs",
+            "Retries with spoofed identities",
+            "Follows a docs-only link",
+            {
+              "label": "Flagged by behaviour",
+              "tone": "accent"
+            },
+            "Decoy key and environment"
+          ]
+        }
+      },
+      {
+        "slug": "bitdefender-poisoned-agent-configs",
+        "title": "Bitdefender: Poisoned Agent Configs in GitHub Repos",
+        "date": "2026-11-17",
+        "source": "Bitdefender Labs",
+        "url": "https://www.bitdefender.com/en-us/blog/labs/how-ai-agents-become-new-targets-in-github-malware-campaign",
+        "takeaway": "Cloning a repository and opening it in a coding agent can now be enough to run malware: the payload hides behind AGENTS.md, CLAUDE.md and session-start hooks.",
+        "summary": "Bitdefender found 22 malicious GitHub repositories whose instruction files tell the agent to run scripts/setup.js at session start, calling it a sealed binary and asking it to hide the output. A second route uses a session-start hook in .claude/settings.json, which runs once the developer trusts the folder. The payload steals credentials and spreads by planting the same instruction files in other repositories.",
+        "points": [
+          "Steals CI/CD and cloud credentials, registry tokens, SSH keys, .env files, browser and password-manager data, and validates stolen tokens against provider APIs.",
+          "Searches the home directory for agent config (mcp.json, .cursorrules, copilot-instructions.md and others) for 14 named agents, then injects instructions, hooks or MCP servers.",
+          "Spreads with stolen GitHub and GitLab tokens: up to 25 repositories by default, committing AGENTS.md, CLAUDE.md or .vscode/tasks.json, and can republish packages to npm, PyPI and RubyGems.",
+          "Instruction files are now an execution path, not documentation."
+        ],
+        "tryIt": "Before trusting an unfamiliar repository, read its AGENTS.md, CLAUDE.md, .claude/, .cursor/, MCP definitions, hooks and .vscode/tasks.json, and any setup script they point at.",
+        "caveat": "Bitdefender says its analysis may be incomplete and may change; no attribution is given. Its AI Guardian detection figure (22 of 22) is from its own tests.",
+        "flow": {
+          "steps": [
+            "Developer clones a repo",
+            "Agent reads AGENTS.md or a hook runs",
+            "setup.js loader runs",
+            "Credentials stolen and validated",
+            {
+              "label": "Configs planted in more repos",
+              "tone": "accent"
+            }
+          ],
+          "loopBack": 0,
+          "loopLabel": "Each infected repository becomes the next lure."
+        }
+      },
       {
         "slug": "github-marketplace-badges",
         "title": "GitHub Marketplace Badges",
@@ -821,8 +881,35 @@ export const learningSections = [
     "title": "Skills & harness",
     "kicker": "Instructions, plugins & workflows",
     "description": "The layer around the model: skills, instruction files, plugins and CI workflows that make agents consistent across people and repositories.",
-    "readTime": "7 min read",
+    "readTime": "8 min read",
     "entries": [
+      {
+        "slug": "microsoft-waza",
+        "title": "Microsoft Waza: Evals for Skills and Agents",
+        "date": "2026-11-21",
+        "source": "Microsoft",
+        "url": "https://github.com/microsoft/waza",
+        "takeaway": "An open-source CLI that runs graded, repeatable tasks against skills, custom agents and workflows, locally or in CI.",
+        "summary": "Waza (MIT, written in Go) turns a SKILL.md or a custom agent into a test suite: YAML tasks with fixture files, graders that check the output, the files left behind and the tools the agent called, and repeated trials. A mock executor checks the harness offline; real runs go through the GitHub Copilot SDK. v0.42.0 shipped on 21 November 2026.",
+        "points": [
+          "`waza init` and `waza new skill <name>` scaffold the skill, an `eval.yaml`, tasks (including a should-not-trigger one), fixtures and a CI workflow.",
+          "13 native grader kinds: text and regex, code assertions, file and diff checks on the workspace, JSON schema, external programs, tool-call order and constraints, skill invocation, trigger checks, and an LLM judge (`prompt`).",
+          "`waza check` scores a SKILL.md's readiness (description length, USE FOR and DO NOT USE FOR triggers, routing hints); `waza tokens` counts and compares its token budget.",
+          "`waza compare` sets result files from different models side by side; `waza preflight` checks a suite without running anything.",
+          "Each task runs in a fresh copy of its fixtures, so originals are never changed."
+        ],
+        "tryIt": "`waza init demo --no-skill && cd demo && waza new skill my-skill`, set `executor: mock` in the eval, then `waza run evals/my-skill/eval.yaml`",
+        "caveat": "A mock pass only proves the harness works: the mock echoes the prompt. Real runs need Copilot SDK access and can cost money. Fixture copies are not a sandbox for the host or network. Pre-1.0, with frequent releases.",
+        "flow": {
+          "steps": [
+            "SKILL.md",
+            "Tasks and fixtures",
+            "Trials in fresh workspaces",
+            "Graders score output, files and tool calls",
+            "Compare against a baseline"
+          ]
+        }
+      },
       {
         "slug": "factory-mindset-agentic-workflows",
         "title": "Factory Mindset: Agentic Workflows",
@@ -1140,7 +1227,7 @@ export const learningSections = [
     "title": "Developer toolbox",
     "kicker": "Tools worth keeping close",
     "description": "Small, practical tools that remove friction: faster search, local cloud emulation, quick tunnels, reverse engineering and curated building blocks for agents.",
-    "readTime": "8 min read",
+    "readTime": "9 min read",
     "entries": [
       {
         "slug": "github-pr-overview-preview",
@@ -1191,6 +1278,31 @@ export const learningSections = [
             "You annotate and comment",
             "Feedback sent to agent",
             "Revised plan diffed"
+          ]
+        }
+      },
+      {
+        "slug": "copilot-browser-use-preview",
+        "title": "Copilot Browser Use (Preview)",
+        "date": "2026-11-17",
+        "source": "GitHub Changelog",
+        "url": "https://github.blog/changelog/2026-11-17-github-copilot-app-microsoft-ignite-releases",
+        "takeaway": "Copilot can now drive a Chromium browser tab to fill forms, read pages and test the web app you are building.",
+        "summary": "Browser use entered public preview at Ignite in the Copilot app, Copilot CLI, VS Code and JetBrains IDEs. It works through the GitHub Copilot extension for Chrome or Edge, in an isolated tab group, and alongside computer use. It is off by default.",
+        "points": [
+          "Use cases: test and debug the web app you are building, pull information from pages, fill out forms.",
+          "Enable it in the Copilot app under Settings > Computer Use (both Computer Use and Browser Use), or in JetBrains under GitHub Copilot > Chat > Enable Browser Use.",
+          "Permission levels are set in the browser extension.",
+          "Runs in an isolated tab group rather than your open tabs."
+        ],
+        "tryIt": "Install the GitHub Copilot extension for Chrome, turn on Browser Use, and ask Copilot to click through your local dev server and report broken flows.",
+        "caveat": "Public preview. A browser-driving agent reads untrusted pages, so treat page content as input that can carry prompt injection, and keep it away from signed-in sessions you care about.",
+        "flow": {
+          "steps": [
+            "Prompt in Copilot",
+            "Extension opens an isolated tab group",
+            "Agent navigates, reads and clicks",
+            "Reports findings back"
           ]
         }
       },
