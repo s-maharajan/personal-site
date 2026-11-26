@@ -244,8 +244,38 @@ export const learningSections = [
     "title": "AI-native engineering",
     "kicker": "How teams actually ship with agents",
     "description": "Practices from teams running agents across the whole delivery lifecycle: verification, layered review, cost control and keeping humans in charge of the reasoning.",
-    "readTime": "11 min read",
+    "readTime": "12 min read",
     "entries": [
+      {
+        "slug": "karpathy-llm-learning-path",
+        "title": "Karpathy LLM Learning Path",
+        "date": "2026-11-26",
+        "source": "Hao Hoang",
+        "url": "https://www.linkedin.com/posts/hoang-van-hao_i-screen-ai-engineer-candidates-the-gap-share-7531134560613449728-8PO7/",
+        "takeaway": "Seven Karpathy repos in order, from autograd to an agent that runs experiments.",
+        "summary": "A hiring screener's ordered reading list of seven free Karpathy repositories. Each step answers the question the previous one leaves open, taking you from how a network learns to a full chat model and an agent that runs training experiments.",
+        "points": [
+          "**micrograd** - backpropagation (how a network computes which way to adjust its weights) in an automatic-differentiation engine of about 100 lines, plus a 50-line neural-net library.",
+          "**nn-zero-to-hero** - 8 lectures from one neuron to GPT; lecture 1 builds micrograd.",
+          "**minbpe** - a BPE tokenizer (splits text into the sub-word pieces a model reads); its GPT-4 version matches tiktoken's token IDs.",
+          "**nanoGPT** - a ~300-line model and ~300-line training loop. Its README now marks it deprecated in favour of nanochat; read it for clarity, not to train.",
+          "**llm.c** - GPT-2 training in plain C and CUDA, showing what PyTorch does for you (CPU reference ~1,000 lines).",
+          "**nanochat** - a GPT-2-level chat model for about $48, roughly 2 hours on 8xH100; the README puts GPT-2's 2019 training at ~$43,000.",
+          "**autoresearch** - an agent edits train.py, trains 5 minutes, keeps the change only if validation loss improves, and repeats: about 100 experiments overnight on one GPU."
+        ],
+        "tryIt": "`git clone https://github.com/karpathy/micrograd`",
+        "caveat": "Lectures and repos take weeks, not hours. nanochat's quoted cost assumes rented 8xH100 GPUs. nanoGPT is deprecated for training.",
+        "flow": {
+          "steps": [
+            "micrograd - backprop",
+            "minbpe - tokenizer",
+            "nanoGPT - training loop",
+            "llm.c - C and CUDA",
+            "nanochat - full pipeline",
+            "autoresearch - agent experiments"
+          ]
+        }
+      },
       {
         "slug": "lauren-tan-slop-into-gold",
         "title": "Lauren Tan: Slop into Gold",
