@@ -58,7 +58,8 @@ jobs:
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
-          cache: npm
+          # No npm cache: signature checks must fetch current registry keys and
+          # Sigstore trust data, not stale copies restored from an earlier run.
       - name: Install dependencies (no install scripts)
         run: npm ci --ignore-scripts
       - name: Known vulnerabilities
