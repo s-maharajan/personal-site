@@ -618,6 +618,32 @@ export const learningSections = [
     "readTime": "7 min read",
     "entries": [
       {
+        "slug": "security-fundamentals-40-topics",
+        "title": "Security Fundamentals: 40 Topics",
+        "date": "2026-11-27",
+        "source": "saed (LinkedIn)",
+        "url": "https://www.linkedin.com/posts/saedf_i-am-a-security-engineer-at-google-with-6-share-7531693669523832832-Jfo4/",
+        "takeaway": "Checklist of 40 core security concepts for junior engineers.",
+        "summary": "A study map of 40 security topics in five groups. It argues that strong basics matter more when AI writes more of the code (\"vibecoding\" means describing code to an AI and accepting its output with little review).",
+        "points": [
+          "**Core fundamentals:** networking (TCP, UDP, HTTP, TLS, DNS), OS permissions, processes and privilege boundaries, crypto basics, threat modeling, least privilege and defence in depth, and the CIA triad, STRIDE and kill-chain models",
+          "**Web/API:** OWASP risks (XSS, SQLi, CSRF, SSRF, IDOR), input validation and output encoding, secure cookies, OAuth2/JWT, object-level authorization, rate limiting, and upload or deserialization risks",
+          "**Identity and secrets:** MFA, password storage, SSO, RBAC/ABAC, workload identity, just-in-time access, vaults and key rotation, and session hijacking",
+          "**Cloud/infra:** VPC segmentation, firewalls and WAF, bucket security, Kubernetes RBAC, policy as code, patching, EDR and secure baselines",
+          "**Detection and delivery:** log sources, detection rules, the incident lifecycle, triage, forensics, secure code review, SAST/DAST/dependency scanning in CI, and automation"
+        ],
+        "caveat": "The post is a list of topics, not learning material. It also leaves out AI and agent security. It ends with a promotional link.",
+        "flow": {
+          "steps": [
+            "Core systems and crypto",
+            "Web and API security",
+            "Identity and secrets",
+            "Cloud and infra",
+            "Detection and secure delivery"
+          ]
+        }
+      },
+      {
         "slug": "jesta-ai-agent-probes-api",
         "title": "An AI Agent Probes a Bank's API in 6 Minutes",
         "date": "2026-11-24",
