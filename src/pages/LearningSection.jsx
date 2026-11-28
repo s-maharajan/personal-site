@@ -79,15 +79,15 @@ export default function LearningSection() {
   return (
     <div className="mx-auto flex max-w-reading flex-col gap-10 pt-6">
       <Link to="/learning" className="group inline-flex w-fit items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent">
-        <ArrowLeft className="h-3.5 w-3.5 transition-transform motion-safe:group-hover:-translate-x-0.5" aria-hidden="true" /> All sections
+        <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-200 motion-safe:group-hover:-translate-x-1" aria-hidden="true" /> All sections
       </Link>
 
       <header className="flex flex-col gap-3">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
+        <p className="fade-in font-mono text-xs uppercase tracking-[0.18em] text-accent">
           Learning · {String(index + 1).padStart(2, "0")} of {learningSections.length}
         </p>
-        <h1 className="font-serif text-4xl sm:text-5xl tracking-tight text-text">{section.title}</h1>
-        <p className="font-serif text-xl italic text-muted">{section.kicker}</p>
+        <h1 className="fade-in fade-in-1 font-serif text-4xl sm:text-5xl tracking-tight text-text">{section.title}</h1>
+        <p className="fade-in fade-in-2 font-serif text-xl italic text-muted">{section.kicker}</p>
         <p className="text-base leading-relaxed text-muted">{section.description}</p>
         <p className="font-mono text-xs text-faint">
           {section.entries.length} notes · {section.readTime} · updated {formatDay(latestDate(section))}
@@ -112,14 +112,14 @@ export default function LearningSection() {
 
       <nav aria-label="More sections" className="grid gap-3 border-t border-line pt-8 sm:grid-cols-2">
         {previous ? (
-          <Link to={`/learning/${previous.slug}`} className="group rounded-2xl border border-line bg-surface p-4 transition-colors hover:border-accent">
-            <span className="inline-flex items-center gap-1 font-mono text-xs text-faint"><ArrowLeft className="h-3 w-3 transition-transform motion-safe:group-hover:-translate-x-0.5" aria-hidden="true" /> Previous</span>
+          <Link to={`/learning/${previous.slug}`} className="group card-hover rounded-2xl border border-line bg-surface p-4">
+            <span className="inline-flex items-center gap-1 font-mono text-xs text-faint"><ArrowLeft className="h-3 w-3 transition-transform duration-200 motion-safe:group-hover:-translate-x-1" aria-hidden="true" /> Previous</span>
             <span className="mt-1 block font-serif text-lg text-text transition-colors group-hover:text-accent">{previous.title}</span>
           </Link>
         ) : <span className="hidden sm:block" aria-hidden="true" />}
         {next && (
-          <Link to={`/learning/${next.slug}`} className="group rounded-2xl border border-line bg-surface p-4 text-right transition-colors hover:border-accent">
-            <span className="inline-flex items-center gap-1 font-mono text-xs text-faint">Next <ArrowRight className="h-3 w-3 transition-transform motion-safe:group-hover:translate-x-0.5" aria-hidden="true" /></span>
+          <Link to={`/learning/${next.slug}`} className="group card-hover rounded-2xl border border-line bg-surface p-4 text-right">
+            <span className="inline-flex items-center gap-1 font-mono text-xs text-faint">Next <ArrowRight className="h-3 w-3 transition-transform duration-200 motion-safe:group-hover:translate-x-1" aria-hidden="true" /></span>
             <span className="mt-1 block font-serif text-lg text-text transition-colors group-hover:text-accent">{next.title}</span>
           </Link>
         )}

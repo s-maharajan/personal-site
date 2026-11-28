@@ -11,9 +11,9 @@ export default function Writing() {
   return (
     <div className="flex flex-col gap-8 pt-6">
       <header className="flex flex-col gap-3">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">Writing</p>
-        <h1 className="font-serif text-4xl sm:text-5xl tracking-tight text-text">Essays</h1>
-        <p className="max-w-reading text-base leading-relaxed text-muted">
+        <p className="fade-in font-mono text-xs uppercase tracking-[0.18em] text-accent">Writing</p>
+        <h1 className="fade-in fade-in-1 font-serif text-4xl sm:text-5xl tracking-tight text-text">Essays</h1>
+        <p className="fade-in fade-in-2 max-w-reading text-base leading-relaxed text-muted">
           Longer pieces on integration, cloud and AI, newest first.
         </p>
       </header>
@@ -25,7 +25,7 @@ export default function Writing() {
             type="button"
             onClick={() => setTopic(t)}
             aria-pressed={topic === t}
-            className={`rounded-full border px-3 py-1 transition-colors ${
+            className={`rounded-full border px-3 py-1 transition-all duration-150 motion-safe:active:scale-[0.97] ${
               topic === t ? "border-accent bg-accent text-bg" : "border-line text-muted hover:border-accent hover:text-text"
             }`}
           >

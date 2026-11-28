@@ -87,7 +87,11 @@
 }
 
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-sans font-medium transition-all cursor-pointer motion-safe:active:scale-[0.98];
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-sans font-medium transition-all duration-200 cursor-pointer motion-safe:hover:-translate-y-px motion-safe:active:scale-[0.98];
+}
+
+@utility card-hover {
+  @apply transition-[transform,border-color,box-shadow] duration-200 hover:border-accent hover:shadow-sm motion-safe:hover:-translate-y-0.5;
 }
 
 @utility btn-primary {
@@ -151,10 +155,14 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .fade-in {
-    animation: fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: fade-in 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
+  .fade-in-1 { animation-delay: 50ms; }
+  .fade-in-2 { animation-delay: 100ms; }
+  .fade-in-3 { animation-delay: 150ms; }
+  .fade-in-4 { animation-delay: 200ms; }
   @keyframes fade-in {
-    from { opacity: 0; transform: translateY(4px); }
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: none; }
   }
 }

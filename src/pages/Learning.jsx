@@ -7,9 +7,9 @@ export default function Learning() {
   return (
     <div className="flex flex-col gap-14 pt-6">
       <header className="flex flex-col gap-3">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">Learning log</p>
-        <h1 className="font-serif text-4xl sm:text-5xl tracking-tight text-text">What I learned, by section</h1>
-        <p className="max-w-reading text-base leading-relaxed text-muted">
+        <p className="fade-in font-mono text-xs uppercase tracking-[0.18em] text-accent">Learning log</p>
+        <h1 className="fade-in fade-in-1 font-serif text-4xl sm:text-5xl tracking-tight text-text">What I learned, by section</h1>
+        <p className="fade-in fade-in-2 max-w-reading text-base leading-relaxed text-muted">
           Every day I save posts, talks and repositories worth a closer look, research them, and
           write a note. Most do not survive a second read. These {entryCount} did: each one has the
           idea, how it works, a way to try it and the caveats, with a link to the original source.

@@ -17,9 +17,9 @@ export default function About() {
   return (
     <div className="flex max-w-reading flex-col gap-12 pt-6">
       <header className="flex flex-col gap-3">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">About</p>
-        <h1 className="font-serif text-4xl sm:text-5xl tracking-tight text-text">Hi, I&apos;m {site.name}.</h1>
-        <p className="font-serif text-xl italic leading-snug text-muted">{site.role}</p>
+        <p className="fade-in font-mono text-xs uppercase tracking-[0.18em] text-accent">About</p>
+        <h1 className="fade-in fade-in-1 font-serif text-4xl sm:text-5xl tracking-tight text-text">Hi, I&apos;m {site.name}.</h1>
+        <p className="fade-in fade-in-2 font-serif text-xl italic leading-snug text-muted">{site.role}</p>
       </header>
 
       <div className="flex flex-col gap-4 text-base leading-relaxed text-muted">
@@ -79,7 +79,7 @@ export default function About() {
                 href={project.url}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex flex-col gap-1 rounded-xl border border-line bg-surface px-4 py-3 transition-colors hover:border-accent"
+                className="group card-hover flex flex-col gap-1 rounded-xl border border-line bg-surface px-4 py-3"
               >
                 <span className="inline-flex items-center gap-1 font-mono text-sm text-text group-hover:text-accent">
                   {project.name} <ArrowUpRight className="h-3.5 w-3.5 transition motion-safe:group-hover:translate-x-0.5 motion-safe:group-hover:-translate-y-0.5" aria-hidden="true" />

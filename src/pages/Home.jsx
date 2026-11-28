@@ -26,7 +26,7 @@ function SectionHeading({ title, intro, to, linkLabel, external = false }) {
       {to && !external && (
         <Link to={to} className="group inline-flex items-center gap-1 text-sm text-accent hover:text-accent-hover">
           {linkLabel}
-          <ArrowRight className="h-3.5 w-3.5 transition-transform motion-safe:group-hover:translate-x-0.5" aria-hidden="true" />
+          <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 motion-safe:group-hover:translate-x-1" aria-hidden="true" />
         </Link>
       )}
     </div>
@@ -41,12 +41,12 @@ export default function Home() {
     <div className="flex flex-col gap-20 sm:gap-24">
       {/* Hero */}
       <section className="flex flex-col gap-6 pt-6 sm:pt-10">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">{site.title}</p>
-        <h1 className="font-serif text-3xl sm:text-5xl/none leading-[1.1] tracking-tight text-text">
+        <p className="fade-in font-mono text-xs uppercase tracking-[0.18em] text-accent">{site.title}</p>
+        <h1 className="fade-in fade-in-1 font-serif text-3xl sm:text-5xl/none leading-[1.1] tracking-tight text-text">
           {site.headline}
         </h1>
-        <p className="font-serif text-xl sm:text-2xl/8 leading-snug text-muted italic">{site.tagline}</p>
-        <div className="flex flex-wrap items-center gap-3 pt-1 text-sm">
+        <p className="fade-in fade-in-2 font-serif text-xl sm:text-2xl/8 leading-snug text-muted italic">{site.tagline}</p>
+        <div className="fade-in fade-in-3 flex flex-wrap items-center gap-3 pt-1 text-sm">
           <Link to="/learning" className="btn-primary">Browse the learning log</Link>
           {site.links.github && (
             <a href={site.links.github} target="_blank" rel="noreferrer" className="btn-ghost">
@@ -59,7 +59,7 @@ export default function Home() {
             </a>
           )}
         </div>
-        <dl className="mt-4 grid grid-cols-3 gap-4 border-y border-line py-5 font-sans">
+        <dl className="fade-in fade-in-4 mt-4 grid grid-cols-3 gap-4 border-y border-line py-5 font-sans">
           {[
             [profile.years, "years in integration"],
             [sortedArticles.length, "essays"],
@@ -78,7 +78,7 @@ export default function Home() {
         <h2 id="featured-heading" className="sr-only">Featured</h2>
         <Link
           to={`/writing/${featured.slug}`}
-          className="group flex flex-col gap-3 rounded-2xl border border-line bg-surface p-6 sm:p-8 transition-colors hover:border-accent"
+          className="group card-hover flex flex-col gap-3 rounded-2xl border border-line bg-surface p-6 sm:p-8"
         >
           <span className="font-mono text-xs uppercase tracking-wider text-accent">Long read · {featured.topic}</span>
           <h3 className="font-serif text-2xl sm:text-3xl/9 leading-tight text-text group-hover:text-accent transition-colors">
@@ -146,7 +146,7 @@ export default function Home() {
                 href={project.url}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex h-full flex-col gap-2 rounded-2xl border border-line bg-surface p-5 transition-colors hover:border-accent"
+                className="group card-hover flex h-full flex-col gap-2 rounded-2xl border border-line bg-surface p-5"
               >
                 <span className="flex items-center justify-between font-mono text-sm text-text group-hover:text-accent">
                   {project.name}

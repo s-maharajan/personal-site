@@ -79,7 +79,7 @@ export default function Header() {
           <button
             type="button"
             onClick={toggleTheme}
-            className="ml-0.5 sm:ml-1 rounded-md border border-line p-1 sm:p-1.5 text-muted transition-colors hover:border-accent hover:text-accent"
+            className="ml-0.5 sm:ml-1 rounded-md border border-line p-1 sm:p-1.5 text-muted transition-[color,border-color,transform] duration-200 hover:border-accent hover:text-accent motion-safe:active:scale-95 motion-safe:active:rotate-12"
             title="Switch between light and dark theme"
             aria-label="Switch between light and dark theme"
           >

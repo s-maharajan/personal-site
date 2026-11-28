@@ -74,14 +74,16 @@ export default function Essay() {
           to="/writing"
           className="group inline-flex items-center gap-1.5 font-sans text-xs text-muted transition-colors hover:text-accent"
         >
-          <ArrowLeft className="h-3.5 w-3.5 transition-transform motion-safe:group-hover:-translate-x-0.5" strokeWidth={1.75} aria-hidden="true" />
+          <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-200 motion-safe:group-hover:-translate-x-1" strokeWidth={1.75} aria-hidden="true" />
           <span>All writing</span>
         </Link>
 
         <button
           type="button"
           onClick={handleShare}
-          className="inline-flex items-center gap-1.5 rounded-md border border-line bg-surface px-2.5 py-1 font-mono text-xs text-muted transition hover:border-accent hover:text-accent"
+          className={`inline-flex items-center gap-1.5 rounded-md border bg-surface px-2.5 py-1 font-mono text-xs transition-all duration-200 motion-safe:active:scale-[0.97] ${
+            copied ? "border-accent text-accent" : "border-line text-muted hover:border-accent hover:text-accent"
+          }`}
         >
           {copied ? <Check className="h-3.5 w-3.5 text-accent" aria-hidden="true" /> : <Share2 className="h-3.5 w-3.5" aria-hidden="true" />}
           <span>{copied ? "Link Copied" : "Share"}</span>
@@ -154,7 +156,7 @@ export default function Essay() {
       {/* Next Article link */}
       <Link
         to={`/writing/${nextArticle.slug}`}
-        className="group flex items-center justify-between gap-4 rounded-xl border border-line bg-surface p-5 transition-all hover:border-accent hover:shadow-xs"
+        className="group card-hover flex items-center justify-between gap-4 rounded-xl border border-line bg-surface p-5"
       >
         <div>
           <span className="font-mono text-[11px] uppercase tracking-wider text-faint">Next Essay</span>
