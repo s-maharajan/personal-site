@@ -95,4 +95,13 @@ describe("browser theme colour", () => {
     expect(html).toContain(`<meta name="theme-color" content="${THEME_COLORS.light}" media="(prefers-color-scheme: light)" />`);
     expect(html).toContain(`<meta name="theme-color" content="${THEME_COLORS.dark}" media="(prefers-color-scheme: dark)" />`);
   });
+
+  it("uses the site ember and paper palette in favicon.svg", () => {
+    const css = read("src/index.css");
+    const root = css.slice(css.indexOf(":root {")).split("}")[0];
+    const token = (name) => root.match(new RegExp(`--${name}:\\s*(#[0-9A-F]{6})`, "i"))[1];
+    const favicon = read("public/favicon.svg");
+    expect(favicon).toContain(token("accent"));
+    expect(favicon).toContain(token("bg"));
+  });
 });

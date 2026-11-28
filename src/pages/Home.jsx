@@ -35,7 +35,7 @@ function SectionHeading({ title, intro, to, linkLabel, external = false }) {
 
 export default function Home() {
   const [featured, ...rest] = sortedArticles;
-  const recent = allEntries.slice(0, 5);
+  const recent = allEntries.slice(0, 3);
 
   return (
     <div className="flex flex-col gap-20 sm:gap-24">
@@ -65,10 +65,9 @@ export default function Home() {
             [sortedArticles.length, "essays"],
             [entryCount, "curated notes"],
           ].map(([value, label]) => (
-            <div key={label}>
-              <dt className="sr-only">{label}</dt>
+            <div key={label} className="flex flex-col">
               <dd className="font-serif text-3xl text-text">{value}</dd>
-              <dd className="font-mono text-xs text-faint">{label}</dd>
+              <dt className="font-mono text-xs text-faint">{label}</dt>
             </div>
           ))}
         </dl>
@@ -92,7 +91,7 @@ export default function Home() {
         <div className="flex flex-col gap-3 rounded-2xl border border-line bg-raised p-6">
           <span className="font-mono text-xs uppercase tracking-wider text-accent">Latest learning</span>
           <ul className="flex flex-col divide-y divide-line">
-            {recent.slice(0, 3).map((e) => (
+            {recent.map((e) => (
               <li key={`${e.section.slug}-${e.slug}`} className="py-2.5 first:pt-0">
                 <Link to={entryPath(e)} className="group block">
                   <span className="font-mono text-[11px] text-faint">{formatDay(e.date)} · {e.section.title}</span>

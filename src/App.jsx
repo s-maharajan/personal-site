@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
@@ -19,18 +19,16 @@ export default function App({
   LearningSection = LazyLearningSection,
 }) {
   return (
-    <Suspense fallback={<p role="status" className="p-8 text-muted">Loading page…</p>}>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/writing" element={<Writing />} />
-          <Route path="/writing/:slug" element={<Essay />} />
-          <Route path="/learning" element={<Learning />} />
-          <Route path="/learning/:section" element={<LearningSection />} />
-          <Route path="/about" element={<About />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
-    </Suspense>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/writing" element={<Writing />} />
+        <Route path="/writing/:slug" element={<Essay />} />
+        <Route path="/learning" element={<Learning />} />
+        <Route path="/learning/:section" element={<LearningSection />} />
+        <Route path="/about" element={<About />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
   );
 }

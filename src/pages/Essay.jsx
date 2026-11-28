@@ -15,6 +15,9 @@ export default function Essay() {
 
   const contentRef = useRef(null);
   const progressRef = useRef(null);
+  const copyTimerRef = useRef(null);
+
+  useEffect(() => () => clearTimeout(copyTimerRef.current), []);
 
   useEffect(() => {
     if (!article) return;
@@ -51,7 +54,8 @@ export default function Essay() {
       } else {
         await navigator.clipboard.writeText(window.location.href);
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        clearTimeout(copyTimerRef.current);
+        copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
       }
     } catch {
       // User cancelled
@@ -59,7 +63,7 @@ export default function Essay() {
   };
 
   return (
-    <article className="max-w-reading mx-auto flex flex-col gap-8">
+    <article className="mx-auto flex max-w-reading flex-col gap-8 pt-6">
 
       <div className="reading-progress print-hidden" aria-hidden="true">
         <div ref={progressRef} className="reading-progress-fill" />
@@ -79,14 +83,14 @@ export default function Essay() {
           onClick={handleShare}
           className="inline-flex items-center gap-1.5 rounded-md border border-line bg-surface px-2.5 py-1 font-mono text-xs text-muted transition hover:border-accent hover:text-accent"
         >
-          {copied ? <Check className="h-3.5 w-3.5 text-accent" /> : <Share2 className="h-3.5 w-3.5" />}
+          {copied ? <Check className="h-3.5 w-3.5 text-accent" aria-hidden="true" /> : <Share2 className="h-3.5 w-3.5" aria-hidden="true" />}
           <span>{copied ? "Link Copied" : "Share"}</span>
         </button>
       </div>
 
       <header className="flex flex-col gap-3">
         <div className="flex items-center gap-2 font-mono text-xs text-faint">
-          <span className="text-accent font-medium">#{article.topic.toLowerCase()}</span>
+          <span className="text-accent font-medium">#{article.topic.toLowerCase().replace(/\s+/g, "-")}</span>
           <span>·</span>
           <time dateTime={isoMonth(article.date)}>{article.date}</time>
           <span>·</span>
@@ -103,12 +107,13 @@ export default function Essay() {
       </header>
 
       {article.content.length >= 3 && (
-        <nav aria-label="Contents" className="rounded-lg border border-line/70 px-4 py-3 font-sans text-sm">
-          <p className="mb-2 font-mono text-xs text-faint">Contents</p>
-          <ol className="stack-y-1">
+        <nav aria-label="Contents" className="rounded-2xl border border-line bg-surface p-5 font-sans text-sm">
+          <p className="mb-3 font-mono text-xs uppercase tracking-wider text-faint">Contents</p>
+          <ol className="flex flex-col gap-2">
             {article.content.map((sec, idx) => (
-              <li key={ids[idx]}>
-                <a href={`#${ids[idx]}`} className="text-muted hover:text-accent hover:underline">{sec.heading}</a>
+              <li key={ids[idx]} className="grid grid-cols-[2rem_1fr]">
+                <span className="pt-0.5 font-mono text-xs text-faint">{String(idx + 1).padStart(2, "0")}</span>
+                <a href={`#${ids[idx]}`} className="text-muted transition-colors hover:text-accent">{sec.heading}</a>
               </li>
             ))}
           </ol>

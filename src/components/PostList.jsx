@@ -6,11 +6,14 @@ export default function PostList({ posts, numbered = false }) {
     <ol className="flex flex-col divide-y divide-line border-y border-line">
       {posts.map((a, i) => (
         <li key={a.slug}>
-          <Link to={`/writing/${a.slug}`} className="group grid gap-x-6 gap-y-1 py-6 sm:grid-cols-[3rem_1fr]">
+          <Link
+            to={`/writing/${a.slug}`}
+            className={`group grid gap-x-6 gap-y-1 py-6 ${numbered ? "sm:grid-cols-[3rem_1fr]" : ""}`}
+          >
             {numbered && (
               <span className="font-mono text-sm text-faint" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
             )}
-            <div className={numbered ? "" : "sm:col-span-2"}>
+            <div>
               <p className="font-mono text-xs text-faint">
                 <time dateTime={isoMonth(a.date)}>{a.date}</time> · {a.readTime}
               </p>
@@ -18,7 +21,7 @@ export default function PostList({ posts, numbered = false }) {
                 {a.title}
               </h3>
               <p className="mt-1.5 max-w-reading text-sm leading-relaxed text-muted line-clamp-2">{a.summary}</p>
-              <p className="mt-2 font-mono text-xs text-accent">#{a.topic.toLowerCase()}</p>
+              <p className="mt-2 font-mono text-xs text-accent">#{a.topic.toLowerCase().replace(/\s+/g, "-")}</p>
             </div>
           </Link>
         </li>

@@ -1,14 +1,14 @@
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useLocation, Outlet } from "react-router-dom";
 import PageMeta from "./PageMeta";
 import Header from "./Header";
 import Footer from "./Footer";
 
-export default function Layout() {
+// Lives inside Suspense so scroll runs after lazy route chunks mount their targets.
+function ScrollManager() {
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    // Run after route effects and layout have settled, including hydration.
     const frame = requestAnimationFrame(() => {
       let id;
       try { id = decodeURIComponent(hash.slice(1)); } catch { id = hash.slice(1); }
@@ -18,6 +18,12 @@ export default function Layout() {
     });
     return () => cancelAnimationFrame(frame);
   }, [pathname, hash]);
+
+  return null;
+}
+
+export default function Layout() {
+  const { pathname } = useLocation();
 
   return (
     <div className="relative min-h-screen print:min-h-0 print:overflow-visible print:bg-white">
@@ -33,7 +39,10 @@ export default function Layout() {
       <div className="mx-auto flex min-h-screen max-w-page flex-col px-4 sm:px-6 print:max-w-none print:p-0">
         <Header />
         <main id="main-content" tabIndex={-1} key={pathname} className="fade-in flex-1 pb-16 pt-8 sm:pt-12 print:p-0">
-          <Outlet />
+          <Suspense fallback={<p role="status" className="py-12 text-sm text-muted">Loading page…</p>}>
+            <ScrollManager />
+            <Outlet />
+          </Suspense>
         </main>
         <Footer />
       </div>

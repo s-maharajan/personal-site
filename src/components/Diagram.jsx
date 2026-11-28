@@ -23,7 +23,7 @@ const toneClass = {
 
 function Node({ item, number }) {
   return (
-    <div className={`flex-1 rounded-lg border px-2.5 py-2 ${toneClass[item.tone]}`}>
+    <div className={`min-w-0 flex-1 rounded-lg border px-2.5 py-2 ${toneClass[item.tone] ?? toneClass.undefined}`}>
       {number && <span className={`block font-mono text-[10px] ${item.tone === "accent" ? "text-accent" : "text-faint"}`}>{number}</span>}
       <span className="block text-xs leading-snug text-text">{item.label}</span>
     </div>
@@ -37,9 +37,9 @@ function Flow({ steps, loopBack, loopLabel }) {
         {steps.map((step, i) => {
           const branches = group(step);
           return (
-            <li key={i} className="flex flex-1 flex-col items-stretch gap-1 sm:flex-row sm:items-center">
+            <li key={i} className="flex min-w-0 flex-1 flex-col items-stretch gap-1 sm:flex-row sm:items-stretch">
               {branches ? (
-                <div className="flex flex-1 flex-col gap-1">
+                <div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
                   <ul className="flex flex-col gap-1" aria-label={`Step ${i + 1}, ${branches.note}`}>
                     {branches.nodes.map((n, j) => (
                       <li key={j} className="flex"><Node item={node(n)} number={j === 0 ? pad(i) : null} /></li>
@@ -51,7 +51,7 @@ function Flow({ steps, loopBack, loopLabel }) {
                 <Node item={node(step)} number={pad(i)} />
               )}
               {i < steps.length - 1 && (
-                <span aria-hidden="true" className="flex shrink-0 justify-center text-faint">
+                <span aria-hidden="true" className="flex shrink-0 items-center justify-center text-faint">
                   <ArrowDown className="h-3.5 w-3.5 sm:hidden" />
                   <ArrowRight className="hidden h-3.5 w-3.5 sm:block" />
                 </span>
@@ -74,7 +74,7 @@ function Layers({ layers, base }) {
   return (
     <ol className="flex flex-col gap-1.5">
       {layers.map((layer, i) => (
-        <li key={layer.label} className="grid grid-cols-[2rem_1fr] items-baseline gap-2 rounded-lg border border-line bg-bg px-3 py-2.5 sm:grid-cols-[2rem_12rem_1fr]">
+        <li key={`${layer.label}-${i}`} className="grid grid-cols-[2rem_1fr] items-baseline gap-2 rounded-lg border border-line bg-bg px-3 py-2.5 sm:grid-cols-[2rem_12rem_1fr]">
           <span className="font-mono text-[10px] text-accent">{pad(i)}</span>
           <span className="text-sm font-medium text-text">{layer.label}</span>
           <span className="col-start-2 text-xs leading-snug text-muted sm:col-start-3">{layer.detail}</span>

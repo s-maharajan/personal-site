@@ -112,15 +112,15 @@ export default function LearningSection() {
 
       <nav aria-label="More sections" className="grid gap-3 border-t border-line pt-8 sm:grid-cols-2">
         {previous ? (
-          <Link to={`/learning/${previous.slug}`} className="group rounded-2xl border border-line p-4 hover:border-accent">
+          <Link to={`/learning/${previous.slug}`} className="group rounded-2xl border border-line bg-surface p-4 transition-colors hover:border-accent">
             <span className="inline-flex items-center gap-1 font-mono text-xs text-faint"><ArrowLeft className="h-3 w-3" aria-hidden="true" /> Previous</span>
-            <span className="mt-1 block font-serif text-lg text-text group-hover:text-accent">{previous.title}</span>
+            <span className="mt-1 block font-serif text-lg text-text transition-colors group-hover:text-accent">{previous.title}</span>
           </Link>
-        ) : <span />}
+        ) : <span className="hidden sm:block" aria-hidden="true" />}
         {next && (
-          <Link to={`/learning/${next.slug}`} className="group rounded-2xl border border-line p-4 text-right hover:border-accent">
+          <Link to={`/learning/${next.slug}`} className="group rounded-2xl border border-line bg-surface p-4 text-right transition-colors hover:border-accent">
             <span className="inline-flex items-center gap-1 font-mono text-xs text-faint">Next <ArrowRight className="h-3 w-3" aria-hidden="true" /></span>
-            <span className="mt-1 block font-serif text-lg text-text group-hover:text-accent">{next.title}</span>
+            <span className="mt-1 block font-serif text-lg text-text transition-colors group-hover:text-accent">{next.title}</span>
           </Link>
         )}
       </nav>

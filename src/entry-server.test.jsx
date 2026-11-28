@@ -27,6 +27,7 @@ describe("prerendered routes", () => {
       expect(body).toContain(`href="#${id}"`);
     }
     expect(body).toContain('class="reading-progress print-hidden" aria-hidden="true"');
+    expect(body.replaceAll("<!-- -->", "")).toContain(`#${article.topic.toLowerCase().replace(/\s+/g, "-")}`);
     expect(body).not.toMatch(/<title>|<meta|rel="canonical"/);
     expect(body).toContain('href="/writing"');
     expect(body).toContain('aria-label="Switch between light and dark theme"');
