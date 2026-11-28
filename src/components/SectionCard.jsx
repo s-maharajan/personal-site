@@ -9,7 +9,7 @@ export default function SectionCard({ section, index }) {
     >
       <div className="flex items-center justify-between font-mono text-xs text-faint">
         <span>{String(index + 1).padStart(2, "0")} · {section.kicker}</span>
-        <ArrowUpRight className="h-4 w-4 transition-colors group-hover:text-accent" aria-hidden="true" />
+        <ArrowUpRight className="h-4 w-4 transition group-hover:text-accent motion-safe:group-hover:translate-x-0.5 motion-safe:group-hover:-translate-y-0.5" aria-hidden="true" />
       </div>
       <h3 className="font-serif text-xl text-text group-hover:text-accent transition-colors">{section.title}</h3>
       <p className="text-sm leading-relaxed text-muted">{section.description}</p>

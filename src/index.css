@@ -87,7 +87,7 @@
 }
 
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-sans font-medium transition-all cursor-pointer;
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-sans font-medium transition-all cursor-pointer motion-safe:active:scale-[0.98];
 }
 
 @utility btn-primary {
@@ -183,6 +183,11 @@
 .heading-anchor {
   opacity: 0;
   text-decoration: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .heading-anchor {
+    transition: opacity 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
 }
 .essay-heading:hover .heading-anchor,
 .heading-anchor:focus-visible {

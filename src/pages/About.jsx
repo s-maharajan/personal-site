@@ -82,7 +82,7 @@ export default function About() {
                 className="group flex flex-col gap-1 rounded-xl border border-line bg-surface px-4 py-3 transition-colors hover:border-accent"
               >
                 <span className="inline-flex items-center gap-1 font-mono text-sm text-text group-hover:text-accent">
-                  {project.name} <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                  {project.name} <ArrowUpRight className="h-3.5 w-3.5 transition motion-safe:group-hover:translate-x-0.5 motion-safe:group-hover:-translate-y-0.5" aria-hidden="true" />
                 </span>
                 <span className="text-sm leading-relaxed text-muted">{project.description}</span>
                 <span className="font-mono text-xs text-faint">{project.stack}</span>

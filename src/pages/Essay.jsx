@@ -72,9 +72,9 @@ export default function Essay() {
       <div className="flex items-center justify-between pb-4 border-b border-line/70">
         <Link
           to="/writing"
-          className="inline-flex items-center gap-1.5 font-sans text-xs text-muted transition-colors hover:text-accent"
+          className="group inline-flex items-center gap-1.5 font-sans text-xs text-muted transition-colors hover:text-accent"
         >
-          <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
+          <ArrowLeft className="h-3.5 w-3.5 transition-transform motion-safe:group-hover:-translate-x-0.5" strokeWidth={1.75} aria-hidden="true" />
           <span>All writing</span>
         </Link>
 
@@ -163,7 +163,7 @@ export default function Essay() {
           </p>
         </div>
         <ArrowRight
-          className="h-4 w-4 shrink-0 text-faint transition group-hover:translate-x-1 group-hover:text-accent"
+          className="h-4 w-4 shrink-0 text-faint transition motion-safe:group-hover:translate-x-1 group-hover:text-accent"
           strokeWidth={1.75}
           aria-hidden="true"
         />

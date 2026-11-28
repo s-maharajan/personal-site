@@ -20,13 +20,13 @@ function SectionHeading({ title, intro, to, linkLabel, external = false }) {
       {to && external && (
         <a href={to} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-1 text-sm text-accent hover:text-accent-hover">
           {linkLabel}
-          <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+          <ArrowUpRight className="h-3.5 w-3.5 transition motion-safe:group-hover:translate-x-0.5 motion-safe:group-hover:-translate-y-0.5" aria-hidden="true" />
         </a>
       )}
       {to && !external && (
         <Link to={to} className="group inline-flex items-center gap-1 text-sm text-accent hover:text-accent-hover">
           {linkLabel}
-          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+          <ArrowRight className="h-3.5 w-3.5 transition-transform motion-safe:group-hover:translate-x-0.5" aria-hidden="true" />
         </Link>
       )}
     </div>
@@ -150,7 +150,7 @@ export default function Home() {
               >
                 <span className="flex items-center justify-between font-mono text-sm text-text group-hover:text-accent">
                   {project.name}
-                  <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                  <ArrowUpRight className="h-4 w-4 transition motion-safe:group-hover:translate-x-0.5 motion-safe:group-hover:-translate-y-0.5" aria-hidden="true" />
                 </span>
                 <span className="text-sm leading-relaxed text-muted">{project.description}</span>
                 <span className="mt-auto pt-1 font-mono text-xs text-faint">{project.stack}</span>

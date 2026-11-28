@@ -78,8 +78,8 @@ export default function LearningSection() {
 
   return (
     <div className="mx-auto flex max-w-reading flex-col gap-10 pt-6">
-      <Link to="/learning" className="inline-flex w-fit items-center gap-1.5 text-sm text-muted hover:text-accent">
-        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" /> All sections
+      <Link to="/learning" className="group inline-flex w-fit items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent">
+        <ArrowLeft className="h-3.5 w-3.5 transition-transform motion-safe:group-hover:-translate-x-0.5" aria-hidden="true" /> All sections
       </Link>
 
       <header className="flex flex-col gap-3">
@@ -113,13 +113,13 @@ export default function LearningSection() {
       <nav aria-label="More sections" className="grid gap-3 border-t border-line pt-8 sm:grid-cols-2">
         {previous ? (
           <Link to={`/learning/${previous.slug}`} className="group rounded-2xl border border-line bg-surface p-4 transition-colors hover:border-accent">
-            <span className="inline-flex items-center gap-1 font-mono text-xs text-faint"><ArrowLeft className="h-3 w-3" aria-hidden="true" /> Previous</span>
+            <span className="inline-flex items-center gap-1 font-mono text-xs text-faint"><ArrowLeft className="h-3 w-3 transition-transform motion-safe:group-hover:-translate-x-0.5" aria-hidden="true" /> Previous</span>
             <span className="mt-1 block font-serif text-lg text-text transition-colors group-hover:text-accent">{previous.title}</span>
           </Link>
         ) : <span className="hidden sm:block" aria-hidden="true" />}
         {next && (
           <Link to={`/learning/${next.slug}`} className="group rounded-2xl border border-line bg-surface p-4 text-right transition-colors hover:border-accent">
-            <span className="inline-flex items-center gap-1 font-mono text-xs text-faint">Next <ArrowRight className="h-3 w-3" aria-hidden="true" /></span>
+            <span className="inline-flex items-center gap-1 font-mono text-xs text-faint">Next <ArrowRight className="h-3 w-3 transition-transform motion-safe:group-hover:translate-x-0.5" aria-hidden="true" /></span>
             <span className="mt-1 block font-serif text-lg text-text transition-colors group-hover:text-accent">{next.title}</span>
           </Link>
         )}
